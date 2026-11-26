@@ -1,0 +1,430 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-26 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language: tr-TR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "%d belirteç iptal edildi."
+msgstr[1] "%d belirteç iptal edildi."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(silinmiş kullanıcı)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "Yetenekler"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "Yetenek"
+
+#: setup.php
+msgid "Actions"
+msgstr "Eylemler"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "Etkin"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "Etkinlik"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "Tümü"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "Ek Açıklamalar"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "Herhangi Biri"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "Denetim"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "Denetim Kayıtları"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "Kullanılabilir Araçlar"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "İptal"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "Kategori"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "İptal edilecek bir belirteç seçin."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "Bir kullanıcı ve 1 ila 365 gün arasında bir geçerlilik süresi seçin."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "Bir eylem seçin."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "1 ila 365 gün arasında bir geçerlilik süresi seçin."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "Temizle"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "Bu yetenekleri yapay zeka istemcilerine açmak için Devam'a tıklayın. Kullanıcıların yine de her yeteneğin gerektirdiği yetki alanına sahip olması gerekir."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "Bu yetenekleri yapay zeka istemcilerinden gizlemek için Devam'a tıklayın."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "Bu belirteçleri iptal etmek için Devam'a tıklayın. İptal edilen belirteçler tekrar kullanılamaz."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "Devam Et"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "Bu belirteci şimdi kopyalayın. Bir daha gösterilmeyecektir."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "Oluştur"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "Belirteç Oluştur"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "Oluşturuldu"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "Oluşturan"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "Açıklama"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "Yıkıcı"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "Kayıtlar"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "Süresi dolmuş"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "Son Kullanma"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "Geçerlilik süresi (gün)"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "Erişime Aç"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "Yetenekleri Erişime Aç"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "Erişime Açık"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "Erişim ayarları okunamadığından tüm yetenekler yapay zeka istemcilerinden gizlendi."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "Tamamlandı"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "Git"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "Gizle"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "Yetenekleri Gizle"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "Kimlik"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "Eşgüçlü (Idempotent)"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "Son Kullanım"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "MCP Yönetimi"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "MCP yönetimi yalnızca ana yoklayıcıda kullanılabilir."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP ve Yetenekler API'si"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "MCP kurulumu tamamlanmamış"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "MCP belirteçleri yalnızca ana yoklayıcıda kullanılabilir."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "MCP belirteçleri için oturum açmış bir Cacti kullanıcısı gerekir."
+
+#: setup.php
+msgid "Management"
+msgstr "Yönetim"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "Etkinliklerim"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "MCP Belirteçlerim"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "Belirteçlerim"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "Ad"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "Yeni Belirteç"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "Hayır"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "Kullanabileceğiniz hiçbir yetenek yok"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "Kayıtlı yetenek yok"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "Etkinlik bulunamadı"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "Denetim kaydı bulunamadı"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "Belirteç bulunamadı"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "Seçilen yeteneklerin hiçbiri kayıtlı değil."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "Seçilen belirteçlerin hiçbiri etkin değil."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "Sonuç"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "Eklenti"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "Genel Cacti URL'si"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "Salt okunur"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "Gerekli Yetki Alanı"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "İptal Et"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "Belirteçleri İptal Et"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "İptal Edildi"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "En az bir öğe seçin."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "Eklenti tarafından ayarlanır"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "Yapay zeka istemcilerini bağlamadan önce Ayarlar > MCP bölümünden Genel Cacti URL'sini ayarlayın."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "Başlatıldı"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "Durum"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "Bu belirteç etkin belirteçlerinizden biri değil."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "MCP istemcilerinin bu Cacti sunucusuna ulaşmak için kullandığı adres, örneğin https://cacti.example.com/cacti. MCP uç noktasının yanıt vermesi için gereklidir."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "Denetim günlüğü okunamadı."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "Kullanılabilir araçlar listelenemedi."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "Erişim ayarı değişikliği kaydedilemedi. Hiçbir şey değiştirilmedi."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "Erişim ayarları kaydedildi."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "Seçim geçersiz bir yetenek içeriyor. Hiçbir şey değiştirilmedi."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "Belirteç oluşturulamadı."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "Belirteç iptal edilemedi."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "Belirteç listesi okunamadı."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "Belirteç iptal edildi."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "Belirteçler iptal edilemedi."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "Belirteçler iptal edildi ancak denetim kaydı yazılamadı."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "Bunlar, bir belirtecinizin şu anda kullanabileceği salt okunur yeteneklerdir. Listeyi Cacti izinleriniz ve yöneticinin erişim ayarları belirler."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "Bu form zaten gönderildi."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "Belirteç"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "Belirteçler"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "Konuk hesabı veya devre dışı bırakılmış kullanıcılar için belirteç oluşturulamaz."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "Kullanıcı"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "Evet"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "Hiç belirteciniz yok"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "Kullanıcılar/Gruplar izni olmadan yalnızca kendiniz için belirteç oluşturabilirsiniz."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "Etkinliğiniz okunamadı."

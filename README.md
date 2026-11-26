@@ -580,6 +580,14 @@ plugin into a real Cacti in containers and runs live checks against it. It needs
 with Compose v2.23.1 or later, git and openssl. `KEEP=1` leaves the stack running for debugging. CI runs it
 nightly and on demand, not on pull requests.
 
+## Localization
+
+Cacti MCP ships compiled GNU gettext catalogs under `locales/po/` and `locales/LC_MESSAGES/`
+for English plus 19 Tier 1 locales (`ar-SA`, `de-DE`, `es-ES`, `fr-FR`, `hi-IN`, `id-ID`,
+`it-IT`, `ja-JP`, `ko-KR`, `nl-NL`, `pl-PL`, `pt-BR`, `ru-RU`, `sv-SE`, `tr-TR`, `uk-UA`,
+`vi-VN`, `zh-CN`, `zh-TW`), using the `mcp` text domain (`locales/po/mcp.pot`). Cacti loads
+the matching catalog automatically when language support is enabled.
+
 ## Contributing
 
 Pull requests go to `develop`. Keep production code compatible with PHP 8.2 and
