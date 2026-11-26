@@ -1,0 +1,429 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-26 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language: vi-VN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "Đã thu hồi %d mã thông báo."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(người dùng đã xóa)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "Khả năng"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "Khả năng"
+
+#: setup.php
+msgid "Actions"
+msgstr "Thao tác"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "Đang hoạt động"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "Hoạt động"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "Tất cả"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "Chú thích"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "Bất kỳ"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "Kiểm toán"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "Mục kiểm toán"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "Công cụ khả dụng"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "Hủy"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "Danh mục"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "Chọn một mã thông báo để thu hồi."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "Chọn một người dùng và thời hạn từ 1 đến 365 ngày."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "Chọn một hành động."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "Chọn thời hạn từ 1 đến 365 ngày."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "Xóa"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "Nhấp Tiếp tục để công khai các khả năng này cho máy khách AI. Người dùng vẫn cần quyền hạn (realm) mà mỗi khả năng yêu cầu."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "Nhấp Tiếp tục để ẩn các khả năng này khỏi máy khách AI."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "Nhấp Tiếp tục để thu hồi các mã thông báo này. Mã thông báo đã thu hồi không thể sử dụng lại."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "Tiếp tục"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "Hãy sao chép mã thông báo này ngay bây giờ. Nó sẽ không được hiển thị lại."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "Tạo"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "Tạo mã thông báo"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "Đã tạo"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "Người tạo"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "Mô tả"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "Có tính phá hủy"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "Số mục"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "Đã hết hạn"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "Hết hạn"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "Hết hạn sau (ngày)"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "Công khai"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "Công khai khả năng"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "Đã công khai"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "Không thể đọc thiết lập công khai, vì vậy mọi khả năng đều bị ẩn khỏi máy khách AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "Đã kết thúc"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "Thực hiện"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "Ẩn"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "Ẩn khả năng"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "Lũy đẳng"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "Sử dụng lần cuối"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "Quản trị MCP"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "Quản trị MCP chỉ khả dụng trên trình thăm dò chính."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP và API Khả năng"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "Cài đặt MCP chưa hoàn tất"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "Mã thông báo MCP chỉ khả dụng trên trình thăm dò chính."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "Mã thông báo MCP yêu cầu người dùng Cacti đã đăng nhập."
+
+#: setup.php
+msgid "Management"
+msgstr "Quản lý"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "Hoạt động của tôi"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "Mã thông báo MCP của tôi"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "Mã thông báo của tôi"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "Tên"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "Mã thông báo mới"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "Không"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "Không có khả năng nào khả dụng cho bạn"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "Chưa có khả năng nào được đăng ký"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "Không tìm thấy hoạt động nào"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "Không tìm thấy mục kiểm toán nào"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "Không tìm thấy mã thông báo nào"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "Không có khả năng nào trong số đã chọn được đăng ký."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "Không có mã thông báo nào trong số đã chọn đang hoạt động."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "Kết quả"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "Plugin"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "URL Cacti công khai"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "Chỉ đọc"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "Quyền hạn yêu cầu"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "Thu hồi"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "Thu hồi mã thông báo"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "Đã thu hồi"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "Hãy chọn ít nhất một mục."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "Do plugin thiết lập"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "Hãy đặt URL Cacti công khai trong Settings > MCP trước khi kết nối máy khách AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "Đã bắt đầu"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "Trạng thái"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "Mã thông báo đó không phải là một trong các mã thông báo đang hoạt động của bạn."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "Địa chỉ mà các máy khách MCP dùng để truy cập máy chủ Cacti này, ví dụ https://cacti.example.com/cacti. Bắt buộc phải có trước khi điểm cuối MCP phản hồi."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "Không thể đọc nhật ký kiểm toán."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "Không thể liệt kê các công cụ khả dụng."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "Không thể lưu thay đổi công khai. Chưa có gì bị thay đổi."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "Đã lưu thiết lập công khai."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "Lựa chọn có chứa khả năng không hợp lệ. Chưa có gì bị thay đổi."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "Không thể tạo mã thông báo."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "Không thể thu hồi mã thông báo."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "Không thể đọc danh sách mã thông báo."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "Mã thông báo đã được thu hồi."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "Không thể thu hồi các mã thông báo."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "Các mã thông báo đã bị thu hồi, nhưng không thể ghi mục kiểm toán."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "Đây là các khả năng chỉ đọc mà mã thông báo của bạn có thể sử dụng hiện tại. Quyền Cacti của bạn và thiết lập công khai của quản trị viên sẽ quyết định danh sách này."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "Biểu mẫu này đã được gửi trước đó."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "Mã thông báo"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "Mã thông báo"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "Không thể tạo mã thông báo cho tài khoản khách hoặc người dùng bị vô hiệu hóa."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "Người dùng"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "Có"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "Bạn không có mã thông báo nào"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "Bạn chỉ có thể tạo mã thông báo cho chính mình khi không có quyền Users/Groups."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "Không thể đọc hoạt động của bạn."

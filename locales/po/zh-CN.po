@@ -1,0 +1,429 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-26 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language: zh-CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "%d 个令牌已吊销。"
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(已删除用户)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "能力"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "能力"
+
+#: setup.php
+msgid "Actions"
+msgstr "操作"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "活跃"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "活动"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "所有"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "注解"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "任何"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "审计"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "审计条目"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "可用工具"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "取消"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "类别"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "请选择要吊销的令牌。"
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "请选择一个用户以及 1 至 365 天的有效期。"
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "请选择一项操作。"
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "请选择 1 至 365 天的有效期。"
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "清除"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "点击“继续”以向 AI 客户端公开这些能力。用户仍需拥有每项能力所需的权限域。"
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "点击“继续”以对 AI 客户端隐藏这些能力。"
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "点击“继续”以吊销这些令牌。已吊销的令牌无法再次使用。"
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "继续"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "请立即复制此令牌，此后将不再显示。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "创建"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "创建令牌"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "创建时间"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "创建者"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "描述"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "破坏性"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "条目"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "已过期"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "过期时间"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "有效期（天数）"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "公开"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "公开能力"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "已公开"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "无法读取公开设置，因此所有能力均已对 AI 客户端隐藏。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "完成时间"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "运行"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "隐藏"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "隐藏能力"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "幂等"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "最后使用"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "MCP 管理"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "MCP 管理仅在主轮询器上可用。"
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP 与能力 API"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "MCP 安装不完整"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "MCP 令牌仅在主轮询器上可用。"
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "MCP 令牌需要已登录的 Cacti 用户。"
+
+#: setup.php
+msgid "Management"
+msgstr "管理"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "我的活动"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "我的 MCP 令牌"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "我的令牌"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "名称"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "新建令牌"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "否"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "您没有可用的能力"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "未注册任何能力"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "未找到活动记录"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "未找到审计条目"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "未找到令牌"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "所选能力均未注册。"
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "所选令牌均未处于活动状态。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "结果"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "插件"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "公开 Cacti URL"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "只读"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "所需权限域"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "吊销"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "吊销令牌"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "已吊销"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "请至少选择一项。"
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "由插件设置"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "在连接 AI 客户端之前，请在“设置 > MCP”中设置公开 Cacti URL。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "开始时间"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "状态"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "该令牌不是您的有效令牌之一。"
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "MCP 客户端用于访问此 Cacti 服务器的地址，例如 https://cacti.example.com/cacti。MCP 端点响应前必须设置此项。"
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "无法读取审计日志。"
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "无法列出可用工具。"
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "无法保存公开设置更改，未做任何修改。"
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "公开设置已保存。"
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "所选内容包含无效的能力，未做任何修改。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "无法创建令牌。"
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "无法吊销该令牌。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "无法读取令牌列表。"
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "该令牌已吊销。"
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "无法吊销这些令牌。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "令牌已吊销，但无法写入审计条目。"
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "以下是您的令牌当前可使用的只读能力。具体列表由您的 Cacti 权限以及管理员的公开设置决定。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "此表单已提交。"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "令牌"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "令牌"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "无法为访客账户或已禁用的用户创建令牌。"
+
+#: mcp_admin.php
+msgid "User"
+msgstr "用户"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "是"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "您没有令牌"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "如果没有“用户/组”权限，您只能为自己创建令牌。"
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "无法读取您的活动记录。"
