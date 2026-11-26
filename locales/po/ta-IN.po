@@ -1,0 +1,430 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-26 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language: ta-IN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "%d டோக்கன் ரத்து செய்யப்பட்டது."
+msgstr[1] "%d டோக்கன்கள் ரத்து செய்யப்பட்டன."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(நீக்கப்பட்ட பயனர்)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "திறன்கள்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "திறன்"
+
+#: setup.php
+msgid "Actions"
+msgstr "செயல்கள்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "செயலில் உள்ளது"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "செயல்பாடு"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "அனைத்தும்"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "குறிப்புரைகள்"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "ஏதேனும்"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "தணிக்கை"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "தணிக்கை பதிவுகள்"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "கிடைக்கும் கருவிகள்"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "ரத்து செய்"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "வகை"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "ரத்து செய்ய ஒரு டோக்கனைத் தேர்ந்தெடுக்கவும்."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "ஒரு பயனரையும் 1 முதல் 365 நாட்கள் வரையிலான காலாவதியையும் தேர்ந்தெடுக்கவும்."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "ஒரு செயலைத் தேர்ந்தெடுக்கவும்."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "1 முதல் 365 நாட்கள் வரையிலான காலாவதியைத் தேர்ந்தெடுக்கவும்."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "அழி"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "AI கிளையன்ட்களுக்கு இந்தத் திறன்களை வெளிப்படுத்த தொடரவும் என்பதைக் கிளிக் செய்யவும். ஒவ்வொரு திறனுக்கும் தேவையான மண்டலம் பயனர்களுக்கு இன்னும் தேவை."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "AI கிளையன்ட்களிலிருந்து இந்தத் திறன்களை மறைக்க தொடரவும் என்பதைக் கிளிக் செய்யவும்."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "இந்த டோக்கன்களை ரத்து செய்ய தொடரவும் என்பதைக் கிளிக் செய்யவும். ரத்து செய்யப்பட்ட டோக்கன்களை மீண்டும் பயன்படுத்த முடியாது."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "தொடரவும்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "இந்த டோக்கனை இப்போது நகலெடுக்கவும். இது மீண்டும் காட்டப்படாது."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "உருவாக்கு"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "டோக்கனை உருவாக்கு"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "உருவாக்கப்பட்டது"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "உருவாக்கியவர்"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "விளக்கம்"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "அழிவுகரமானது"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "பதிவுகள்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "காலாவதியானது"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "காலாவதியாகிறது"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "காலாவதியாகும் நாட்கள்"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "வெளிப்படுத்து"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "திறன்களை வெளிப்படுத்து"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "வெளிப்படுத்தப்பட்டது"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "வெளிப்படுத்தல் அமைப்புகளைப் படிக்க முடியவில்லை, எனவே ஒவ்வொரு திறனும் AI கிளையன்ட்களிலிருந்து மறைக்கப்பட்டுள்ளது."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "முடிந்தது"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "செல்"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "மறை"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "திறன்களை மறை"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "தனிமாறாத்தன்மை கொண்டது"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "கடைசியாகப் பயன்படுத்தியது"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "MCP நிர்வாகம்"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "MCP நிர்வாகம் முதன்மைப் போல்லரில் மட்டுமே கிடைக்கும்."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP மற்றும் திறன்கள் API"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "MCP நிறுவல் முழுமையடையவில்லை"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "MCP டோக்கன்கள் முதன்மைப் போல்லரில் மட்டுமே கிடைக்கும்."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "MCP டோக்கன்களுக்கு உள்நுழைந்த Cacti பயனர் தேவை."
+
+#: setup.php
+msgid "Management"
+msgstr "மேலாண்மை"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "எனது செயல்பாடு"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "எனது MCP டோக்கன்கள்"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "எனது டோக்கன்கள்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "பெயர்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "புதிய டோக்கன்"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "இல்லை"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "உங்களுக்கு எந்தத் திறன்களும் கிடைக்கவில்லை"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "எந்தத் திறன்களும் பதிவு செய்யப்படவில்லை"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "செயல்பாடு எதுவும் காணப்படவில்லை"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "தணிக்கை பதிவுகள் எதுவும் காணப்படவில்லை"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "டோக்கன்கள் எதுவும் காணப்படவில்லை"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "தேர்ந்தெடுக்கப்பட்ட திறன்களில் எதுவும் பதிவு செய்யப்படவில்லை."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "தேர்ந்தெடுக்கப்பட்ட டோக்கன்களில் எதுவும் செயலில் இல்லை."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "விளைவு"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "செருகுநிரல்"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "பொது Cacti URL"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "படிக்க மட்டும்"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "தேவையான மண்டலம்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "ரத்து செய்"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "டோக்கன்களை ரத்து செய்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "ரத்து செய்யப்பட்டது"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "குறைந்தது ஒரு உருப்படியையாவது தேர்ந்தெடுக்கவும்."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "செருகுநிரலால் அமைக்கப்பட்டது"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "AI கிளையன்ட்களை இணைப்பதற்கு முன் அமைப்புகள் > MCP இல் பொது Cacti URL ஐ அமைக்கவும்."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "தொடங்கப்பட்டது"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "நிலை"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "அந்த டோக்கன் உங்கள் செயலில் உள்ள டோக்கன்களில் ஒன்றல்ல."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "இந்த Cacti சேவையகத்தை அடைய MCP கிளையன்ட்கள் பயன்படுத்தும் முகவரி, எடுத்துக்காட்டாக https://cacti.example.com/cacti. MCP முனையம் பதிலளிப்பதற்கு முன் இது தேவை."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "தணிக்கை பதிவைப் படிக்க முடியவில்லை."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "கிடைக்கும் கருவிகளைப் பட்டியலிட முடியவில்லை."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "வெளிப்படுத்தல் மாற்றத்தைச் சேமிக்க முடியவில்லை. எதுவும் மாற்றப்படவில்லை."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "வெளிப்படுத்தல் அமைப்புகள் சேமிக்கப்பட்டன."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "தேர்வில் தவறான திறன் உள்ளது. எதுவும் மாற்றப்படவில்லை."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "டோக்கனை உருவாக்க முடியவில்லை."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "டோக்கனை ரத்து செய்ய முடியவில்லை."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "டோக்கன் பட்டியலைப் படிக்க முடியவில்லை."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "டோக்கன் ரத்து செய்யப்பட்டது."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "டோக்கன்களை ரத்து செய்ய முடியவில்லை."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "டோக்கன்கள் ரத்து செய்யப்பட்டன, ஆனால் தணிக்கை பதிவை எழுத முடியவில்லை."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "இவை உங்கள் டோக்கன் இன்று பயன்படுத்தக்கூடிய படிக்க-மட்டும் திறன்கள் ஆகும். உங்கள் Cacti அனுமதிகளும் நிர்வாகியின் வெளிப்படுத்தல் அமைப்புகளும் பட்டியலைத் தீர்மானிக்கின்றன."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "இந்தப் படிவம் ஏற்கனவே சமர்ப்பிக்கப்பட்டது."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "டோக்கன்"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "டோக்கன்கள்"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "விருந்தினர் கணக்கு அல்லது முடக்கப்பட்ட பயனர்களுக்கு டோக்கன்களை உருவாக்க முடியாது."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "பயனர்"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "ஆம்"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "உங்களிடம் டோக்கன்கள் இல்லை"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "பயனர்கள்/குழுக்கள் அனுமதி இல்லாமல் உங்களுக்காக மட்டுமே டோக்கன்களை உருவாக்க முடியும்."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "உங்கள் செயல்பாட்டைப் படிக்க முடியவில்லை."

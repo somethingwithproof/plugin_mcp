@@ -3,6 +3,10 @@ SPDX-FileCopyrightText: 2026 Thomas Vincent
 SPDX-License-Identifier: GPL-2.0-or-later
 -->
 
+<!-- translations:start -->
+[English](README.md) | [Afrikaans](docs/i18n/af-ZA/README.md) | [አማርኛ](docs/i18n/am-ET/README.md) | [العربية (مصر)](docs/i18n/ar-EG/README.md) | [العربية (المغرب)](docs/i18n/ar-MA/README.md) | [العربية (السعودية)](docs/i18n/ar-SA/README.md) | [বাংলা](docs/i18n/bn-BD/README.md) | [Deutsch](docs/i18n/de-DE/README.md) | [Español (España)](docs/i18n/es-ES/README.md) | [فارسی](docs/i18n/fa-IR/README.md) | [Filipino](docs/i18n/fil-PH/README.md) | [Français](docs/i18n/fr-FR/README.md) | [Français (Maroc)](docs/i18n/fr-MA/README.md) | [Français (Sénégal)](docs/i18n/fr-SN/README.md) | [Hausa](docs/i18n/ha-NG/README.md) | [עברית](docs/i18n/he-IL/README.md) | [हिन्दी](docs/i18n/hi-IN/README.md) | [Bahasa Indonesia](docs/i18n/id-ID/README.md) | [Igbo](docs/i18n/ig-NG/README.md) | [Italiano](docs/i18n/it-IT/README.md) | [日本語](docs/i18n/ja-JP/README.md) | [한국어](docs/i18n/ko-KR/README.md) | [Malagasy](docs/i18n/mg-MG/README.md) | [मराठी](docs/i18n/mr-IN/README.md) | [Bahasa Melayu](docs/i18n/ms-MY/README.md) | [Nederlands](docs/i18n/nl-NL/README.md) | [Polski](docs/i18n/pl-PL/README.md) | [Português (Brasil)](docs/i18n/pt-BR/README.md) | [Русский](docs/i18n/ru-RU/README.md) | [Kinyarwanda](docs/i18n/rw-RW/README.md) | [Soomaali](docs/i18n/so-SO/README.md) | [Svenska](docs/i18n/sv-SE/README.md) | [Kiswahili](docs/i18n/sw-KE/README.md) | [தமிழ்](docs/i18n/ta-IN/README.md) | [తెలుగు](docs/i18n/te-IN/README.md) | [ไทย](docs/i18n/th-TH/README.md) | [Türkçe](docs/i18n/tr-TR/README.md) | [Українська](docs/i18n/uk-UA/README.md) | [اردو](docs/i18n/ur-PK/README.md) | [Tiếng Việt](docs/i18n/vi-VN/README.md) | [isiXhosa](docs/i18n/xh-ZA/README.md) | [Yorùbá](docs/i18n/yo-NG/README.md) | [简体中文](docs/i18n/zh-CN/README.md) | [繁體中文](docs/i18n/zh-TW/README.md) | [isiZulu](docs/i18n/zu-ZA/README.md)
+<!-- translations:end -->
+
 <h1 align="center">
 	<picture>
 		<source media="(prefers-color-scheme: dark)" srcset="images/mcp_logo_dark.png">
@@ -583,10 +587,9 @@ nightly and on demand, not on pull requests.
 ## Localization
 
 Cacti MCP ships compiled GNU gettext catalogs under `locales/po/` and `locales/LC_MESSAGES/`
-for English plus 19 Tier 1 locales (`ar-SA`, `de-DE`, `es-ES`, `fr-FR`, `hi-IN`, `id-ID`,
-`it-IT`, `ja-JP`, `ko-KR`, `nl-NL`, `pl-PL`, `pt-BR`, `ru-RU`, `sv-SE`, `tr-TR`, `uk-UA`,
-`vi-VN`, `zh-CN`, `zh-TW`), using the `mcp` text domain (`locales/po/mcp.pot`). Cacti loads
-the matching catalog automatically when language support is enabled.
+and localized READMEs under `docs/i18n/` for English plus 44 locales (19 Broad Tier 1,
+15 African, and 10 Asian locales), using the `mcp` text domain (`locales/po/mcp.pot`).
+Cacti loads the matching catalog automatically when language support is enabled.
 
 ## Contributing
 
