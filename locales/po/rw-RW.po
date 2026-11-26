@@ -1,0 +1,430 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-26 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language: rw-RW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "Token %d yakuweho."
+msgstr[1] "Token %d zakuweho."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(umukoresha wasibwe)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "Ubushobozi"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "Ubushobozi"
+
+#: setup.php
+msgid "Actions"
+msgstr "Ibikorwa"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "Irakora"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "Ibikorwa"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "Byose"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "Ibisobanuro"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "Icyo ari cyo cyose"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "Igenzura"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "Ibyanditswe by'igenzura"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "Ibikoresho biboneka"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "Hagarika"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "Icyiciro"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "Hitamo token yo kuvanaho."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "Hitamo umukoresha n'igihe cyo kurangiriraho kuva ku munsi 1 kugeza ku minsi 365."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "Hitamo igikorwa."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "Hitamo igihe cyo kurangiriraho kuva ku munsi 1 kugeza ku minsi 365."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "Hanagura"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "Kanda Komeza kugira ngo ugaragarize ubu bushobozi abakiriya ba AI. Abakoresha baracyakeneye uburenganzira buri bushobozi busaba."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "Kanda Komeza kugira ngo uhishe ubu bushobozi abakiriya ba AI."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "Kanda Komeza kugira ngo uvaneho izi token. Token zakuweho ntizishobora kongera gukoreshwa."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "Komeza"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "Kopora iyi token nonaha. Ntiyongera kwerekanwa."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "Rema"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "Kora Token"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "Yakozwe"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "Yakozwe na"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "Ibisobanuro"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "Yangiza"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "Ibyanditswe"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "Byarangiye"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "Irangira"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "Irangira mu minsi"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "Garagaza"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "Garagaza ubushobozi"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "Byagaragajwe"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "Igenamiterere ryo kugaragaza ntirishoboye gusomwa, bityo buri bushobozi bwose buhiswe abakiriya ba AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "Byarangiye"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "Kora"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "Hisha"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "Hisha ubushobozi"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "Idempotent"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "Yakoreshejwe bwa nyuma"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "Imiyoborere ya MCP"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "Imiyoborere ya MCP iboneka kuri poller nkuru gusa."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP na API y'ubushobozi"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "Iyinjizwa rya MCP ntiriruzura"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "Token za MCP ziboneka kuri poller nkuru gusa."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "Token za MCP zikenera umukoresha wa Cacti winjiye."
+
+#: setup.php
+msgid "Management"
+msgstr "Imicungire"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "Ibikorwa byanjye"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "Token zanjye za MCP"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "Token zanjye"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "Izina"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "Token nshya"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "Oya"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "Nta bushobozi bukubonekera"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "Nta bushobozi bwanditswe"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "Nta bikorwa byabonetse"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "Nta byanditswe by'igenzura byabonetse"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "Nta token zabonetse"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "Nta na bumwe mu bushobozi bwahiswemo bwanditswe."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "Nta n'imwe muri token zahiswemo ikora."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "Ibyavuyemo"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "Umugereka"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "URL rusange ya Cacti"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "Isoma gusa"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "Uburenganzira busabwa"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "Kuraho"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "Kuraho Token"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "Yakuweho"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "Hitamo nibura ikintu kimwe."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "Byashyizweho n'umugereka"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "Shyiraho URL rusange ya Cacti muri Igenamiterere > MCP mbere yo guhuza abakiriya ba AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "Byatangiye"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "Imiterere"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "Iyo token si imwe muri token zawe zikora."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "Aderesi abakiriya ba MCP bakoresha bagera kuri iyi seriveri ya Cacti, urugero https://cacti.example.com/cacti. Irasabwa mbere y'uko ahantu ho guhurira ha MCP hasubiza."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "Inyandiko-mvugo y'igenzura ntishoboye gusomwa."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "Ibikoresho biboneka ntibishoboye gushyirwa ku rutonde."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "Impinduka yo kugaragaza ntishoboye kubikwa. Nta kintu cyahindutse."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "Igenamiterere ryo kugaragaza ryabitswe."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "Ibyahiswemo birimo ubushobozi butemewe. Nta kintu cyahindutse."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "Token ntishoboye gukorwa."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "Token ntishoboye kuvanwaho."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "Urutonde rwa token ntirushoboye gusomwa."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "Token yakuweho."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "Token ntizishoboye kuvanwaho."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "Token zakuweho, ariko icyanditswe cy'igenzura nticyashoboye kwandikwa."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "Ubu ni ubushobozi bwo gusoma gusa token yawe ishobora gukoresha uyu munsi. Uburenganzira bwawe bwa Cacti n'igenamiterere ryo kugaragaza ry'umuyobozi nibyo bigena uru rutonde."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "Iyi fishi yari yamaze koherezwa."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "Token"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "Token"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "Token ntizishobora gukorerwa konti y'umushyitsi cyangwa abakoresha bahagaritswe."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "Umukoresha"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "Yego"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "Nta token ufite"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "Ushobora gukorera wenyine token udafite uburenganzira bw'Abakoresha/Amatsinda."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "Ibikorwa byawe ntibishoboye gusomwa."

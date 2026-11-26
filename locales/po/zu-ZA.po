@@ -1,0 +1,430 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-26 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language: zu-ZA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "Ithokheni engu-%d ihoxisiwe."
+msgstr[1] "Amathokheni angu-%d ahoxisiwe."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(umsebenzisi osusiwe)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "Amakhono"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "Ikhono"
+
+#: setup.php
+msgid "Actions"
+msgstr "Izenzo"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "Iyasebenza"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "Umsebenzi"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "Konke"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "Izichasiso"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "Noma yikuphi"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "Ukuhlola"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "Okufakiwe Kokuhlola"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "Amathuluzi Atholakalayo"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "Khansela"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "Isigaba"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "Khetha ithokheni ozoyihoxisa."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "Khetha umsebenzisi nesikhathi sokuphelelwa sezinsuku eziyi-1 kuya kwezingama-365."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "Khetha isenzo."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "Khetha isikhathi sokuphelelwa sezinsuku eziyi-1 kuya kwezingama-365."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "Sula"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "Chofoza u-Qhubeka ukuze uveze la makhono kumaklayenti e-AI. Abasebenzisi basadinga i-realm edingwa yikhono ngalinye."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "Chofoza u-Qhubeka ukuze ufihle la makhono kumaklayenti e-AI."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "Chofoza u-Qhubeka ukuze uhoxise la mathokheni. Amathokheni ahoxisiwe awakwazi ukuphinde asetshenziswe."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "Qhubeka"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "Kopisha le thokheni manje. Ngeke iphinde iboniswe."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "Dala"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "Dala Ithokheni"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "Idaliwe"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "Idalwe Ngu"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "Incazelo"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "Okubhubhisayo"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "Okufakiwe"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "Kuphelelwe yisikhathi"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "Iphelelwa yisikhathi"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "Iphelelwa yisikhathi ezinsukwini"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "Veza"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "Veza Amakhono"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "Veziwe"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "Izilungiselelo zokuveza azikwazanga ukufundwa, ngakho lonke ikhono lifihliwe kumaklayenti e-AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "Kuqediwe"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "Hamba"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "Fihla"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "Fihla Amakhono"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "I-ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "Idempotent"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "Isetshenziswe Kokugcina"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "Ukuphathwa kwe-MCP"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "Ukuphathwa kwe-MCP kutholakala ku-poller eyinhloko kuphela."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "I-API ye-MCP Namakhono"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "Ukufakwa kwe-MCP akuphelele"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "Amathokheni e-MCP atholakala ku-poller eyinhloko kuphela."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "Amathokheni e-MCP adinga umsebenzisi we-Cacti ongenile."
+
+#: setup.php
+msgid "Management"
+msgstr "Ukuphathwa"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "Umsebenzi Wami"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "Amathokheni Ami e-MCP"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "Amathokheni Ami"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "Igama"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "Ithokheni Entsha"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "Cha"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "Akukho makhono atholakala kuwe"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "Akukho makhono abhalisiwe"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "Awukho umsebenzi otholakele"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "Akukho okufakiwe kokuhlola okutholakele"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "Akukho mathokheni atholakele"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "Alikho ikhono elikhethiwe elibhalisiwe."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "Alikho ithokheni elikhethiwe elisebenzayo."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "Umphumela"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "I-plugin"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "I-URL Ye-Cacti Yomphakathi"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "Okufundwa kuphela"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "I-Realm Edingekayo"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "Hoxisa"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "Hoxisa Amathokheni"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "Ihoxisiwe"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "Khetha okungenani into eyodwa."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "Kusethwe yi-plugin"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "Setha i-Public Cacti URL ku-Izilungiselelo > MCP ngaphambi kokuxhuma amaklayenti e-AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "Kuqaliwe"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "Isimo"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "Leyo thokheni akuyona enye yamathokheni akho asebenzayo."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "Ikheli elisetshenziswa ngamaklayenti e-MCP ukufinyelela kule seva ye-Cacti, isibonelo https://cacti.example.com/cacti. Liyadingeka ngaphambi kokuba i-endpoint ye-MCP iphendule."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "Ilogi yokuhlola ayikwazanga ukufundwa."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "Amathuluzi atholakalayo awakwazanga ukubhalwa ohlwini."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "Ushintsho lokuveza alukwazanga ukugcinwa. Akukho okushintshiwe."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "Izilungiselelo zokuveza zigciniwe."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "Okukhethiwe kuqukethe ikhono elingavumelekile. Akukho okushintshiwe."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "Ithokheni ayikwazanga ukudalwa."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "Ithokheni ayikwazanga ukuhoxiswa."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "Uhlu lwamathokheni alukwazanga ukufundwa."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "Ithokheni ihoxisiwe."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "Amathokheni awakwazanga ukuhoxiswa."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "Amathokheni ahoxisiwe, kodwa okufakiwe kokuhlola akukwazanga ukubhalwa."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "Lawa ngamakhono okufundwa kuphela ithokheni yakho engawasebenzisa namuhla. Izimvume zakho ze-Cacti nezilungiselelo zokuveza zomlawuli yizona ezinquma uhlu."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "Leli fomu selithunyelwe kakade."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "Ithokheni"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "Amathokheni"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "Amathokheni awakwazi ukudalelwa i-akhawunti yesivakashi noma abasebenzisi abakhubaziwe."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "Umsebenzisi"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "Yebo"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "Awunamathokheni"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "Ungazidalela wena kuphela amathokheni ngaphandle kwemvume ye-Users/Groups."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "Umsebenzi wakho awukwazanga ukufundwa."
