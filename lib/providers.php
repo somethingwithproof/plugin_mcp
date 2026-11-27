@@ -11,13 +11,19 @@ require_once __DIR__ . '/../setup.php';
 const MCP_DEVICE_STATES = [0 => 'UNKNOWN', 1 => 'DOWN', 2 => 'RECOVERING', 3 => 'UP', 4 => 'ERROR'];
 
 /* Cacti poller status codes (POLLER_STATUS_* constants). */
-const MCP_POLLER_STATES = [0 => 'NEW', 1 => 'RUNNING', 2 => 'IDLE', 3 => 'UNKNOWN', 4 => 'DISABLED', 5 => 'RECOVERING', 6 => 'ERROR'];
+const MCP_POLLER_STATES = [
+	0 => 'NEW', 1 => 'RUNNING', 2 => 'IDLE', 3 => 'UNKNOWN',
+	4 => 'DISABLED', 5 => 'RECOVERING', 6 => 'ERROR',
+];
 
 const MCP_CLOG_MAX_LINES = 200;
 const MCP_CLOG_DEFAULT_LINES = 50;
 const MCP_CLOG_MAX_BYTES = 1048576;
 const MCP_CLOG_MAX_LINE_LENGTH = 2048;
-const MCP_CLOG_SEVERITIES = ['ALL', 'DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR', 'CRITICAL', 'ALERT', 'EMERGENCY', 'FATAL', 'STATS', 'POLLER', 'SYSTEM'];
+const MCP_CLOG_SEVERITIES = [
+	'ALL', 'DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR',
+	'CRITICAL', 'ALERT', 'EMERGENCY', 'FATAL', 'STATS', 'POLLER', 'SYSTEM',
+];
 
 /* Filter and order fields for devices, in the mcp_filter_sql() format. Columns
  * are written for the outer h1 alias; get_allowed_devices() applies the WHERE
@@ -62,7 +68,10 @@ const MCP_TREE_FIELDS = [
 const MCP_GRAPH_FIELDS = [
 	'title'         => ['column' => 'gtg.title_cache', 'type' => 'string', 'filter' => true, 'order' => true],
 	'device'        => ['column' => 'gl.host_id', 'type' => 'reference', 'collection' => 'devices', 'filter' => true],
-	'graphTemplate' => ['column' => 'gl.graph_template_id', 'type' => 'reference', 'collection' => 'graphTemplates', 'filter' => true],
+	'graphTemplate' => [
+		'column' => 'gl.graph_template_id', 'type' => 'reference',
+		'collection' => 'graphTemplates', 'filter' => true,
+	],
 	'templateName'  => ['column' => 'gt.name', 'type' => 'string', 'filter' => true, 'order' => true],
 	'name'          => ['column' => 'gtg.local_graph_id', 'type' => 'int', 'order' => true],
 ];
@@ -70,7 +79,10 @@ const MCP_GRAPH_FIELDS = [
 const MCP_DATA_SOURCE_FIELDS = [
 	'displayName'  => ['column' => 'dtd.name_cache', 'type' => 'string', 'filter' => true, 'order' => true],
 	'device'       => ['column' => 'dl.host_id', 'type' => 'reference', 'collection' => 'devices', 'filter' => true],
-	'dataTemplate' => ['column' => 'dl.data_template_id', 'type' => 'reference', 'collection' => 'dataTemplates', 'filter' => true],
+	'dataTemplate' => [
+		'column' => 'dl.data_template_id', 'type' => 'reference',
+		'collection' => 'dataTemplates', 'filter' => true,
+	],
 	'active'       => ['column' => 'dtd.active', 'type' => 'bool', 'filter' => true],
 	'name'         => ['column' => 'dl.id', 'type' => 'int', 'order' => true],
 ];
@@ -87,181 +99,221 @@ function mcp_registry() : AbilitiesRegistry {
 	return $registry;
 }
 
-/** @return array<string, mixed> */
-function mcp_list_input_schema() : array {
+/**
+ * Shared closed object schema builder for resource schemas.
+ *
+ * @param array<string, array<string, mixed>> $properties
+ * @return array<string, mixed>
+ */
+function mcp_object_schema(array $properties) : array {
 	return [
-		'type'       => 'object',
-		'properties' => [
-			'pageSize'  => ['type' => 'integer', 'minimum' => 0, 'maximum' => 1000],
-			'pageToken' => ['type' => 'string', 'maxLength' => 512],
-			'filter'    => ['type' => 'string', 'maxLength' => 1024],
-			'orderBy'   => ['type' => 'string', 'maxLength' => 128]
-		],
-		'additionalProperties' => false
+		'type'                 => 'object',
+		'properties'           => $properties,
+		'required'             => array_keys($properties),
+		'additionalProperties' => false,
 	];
+}
+
+/**
+ * Shared input/output schema and paginated execution wrapper for AIP list abilities.
+ *
+ * @param array<string, mixed>                                          $itemSchema
+ * @param array<string, array<string, mixed>>                           $filterFields
+ * @param array<string, array<string, mixed>>                           $orderFields
+ * @param callable(int): bool                                           $permission
+ * @param callable(int, string, string, array{size: int, offset: int}): list<array<string, mixed>> $fetch
+ * @param callable(array<string, mixed>): array<string, mixed>          $mapper
+ */
+function mcp_register_list_ability(
+	AbilitiesRegistry $registry,
+	string $id,
+	string $label,
+	string $description,
+	string $category,
+	string $listKey,
+	array $itemSchema,
+	array $filterFields,
+	array $orderFields,
+	string $tieBreakerColumn,
+	string $fingerprintPrefix,
+	callable $permission,
+	callable $fetch,
+	callable $mapper
+) : void {
+	$registry->register($id, [
+		'label'        => $label,
+		'description'  => $description,
+		'category'     => $category,
+		'input_schema' => [
+			'type'       => 'object',
+			'properties' => [
+				'pageSize'  => ['type' => 'integer', 'minimum' => 0, 'maximum' => 1000],
+				'pageToken' => ['type' => 'string', 'maxLength' => 512],
+				'filter'    => ['type' => 'string', 'maxLength' => 1024],
+				'orderBy'   => ['type' => 'string', 'maxLength' => 128],
+			],
+			'additionalProperties' => false,
+		],
+		'output_schema' => mcp_object_schema([
+			$listKey        => ['type' => 'array', 'items' => $itemSchema, 'maxItems' => MCP_PAGE_SIZE_MAX],
+			'nextPageToken' => ['type' => ['string', 'null']],
+		]),
+		'annotations' => ['readOnly' => true, 'destructive' => false, 'idempotent' => true],
+		'permission'  => $permission,
+		'execute'     => function (int $user, stdClass $args) use (
+			$listKey,
+			$filterFields,
+			$orderFields,
+			$tieBreakerColumn,
+			$fingerprintPrefix,
+			$fetch,
+			$mapper
+		) {
+			$filter      = (string) ($args->filter ?? '');
+			$orderBy     = trim((string) ($args->orderBy ?? ''));
+			$fingerprint = sha1($fingerprintPrefix . $filter . "\0" . $orderBy);
+			$page        = mcp_page($args, $fingerprint);
+			$where       = mcp_filter_sql($filter, $filterFields);
+			// The id tie-breaker keeps offset paging stable when the requested order has ties.
+			$order = $orderBy === ''
+				? $tieBreakerColumn . ' ASC'
+				: mcp_order_sql($orderBy, $orderFields, '') . ', ' . $tieBreakerColumn . ' ASC';
+			$rows = $fetch($user, $where, $order, $page);
+			$more = count($rows) > $page['size'];
+
+			return [
+				$listKey        => array_map($mapper, array_slice($rows, 0, $page['size'])),
+				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null,
+			];
+		},
+	]);
 }
 
 function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 	$annotations = ['readOnly' => true, 'destructive' => false, 'idempotent' => true];
 	$nullable    = fn (string $type) => ['type' => [$type, 'null']];
-	$listInput   = mcp_list_input_schema();
 
-	$device = [
-		'type'       => 'object',
-		'properties' => [
-			'name'               => ['type' => 'string'],
-			'displayName'        => ['type' => 'string'],
-			'hostname'           => ['type' => 'string'],
-			'deviceTemplate'     => $nullable('string'),
-			'site'               => $nullable('string'),
-			'poller'             => $nullable('string'),
-			'externalId'         => $nullable('string'),
-			'location'           => $nullable('string'),
-			'notes'              => $nullable('string'),
-			'disabled'           => ['type' => 'boolean'],
-			'snmpVersion'        => $nullable('integer'),
-			'snmpPort'           => $nullable('integer'),
-			'snmpTimeout'        => $nullable('integer'),
-			'snmpRetries'        => $nullable('integer'),
-			'maxOids'            => $nullable('integer'),
-			'bulkWalkSize'       => $nullable('integer'),
-			'deviceThreads'      => $nullable('integer'),
-			'availabilityMethod' => $nullable('integer'),
-			'pingMethod'         => $nullable('integer'),
-			'pingPort'           => $nullable('integer'),
-			'pingTimeout'        => $nullable('integer'),
-			'pingRetries'        => $nullable('integer'),
-			'state'              => $nullable('string'),
-			'availability'       => $nullable('number'),
-			'lastError'          => $nullable('string'),
-			'failTime'           => $nullable('string'),
-			'recoveryTime'       => $nullable('string'),
-			'createTime'         => $nullable('string'),
-		],
-		'additionalProperties' => false
-	];
-	$device['required'] = array_keys($device['properties']);
+	$device = mcp_object_schema([
+		'name'               => ['type' => 'string'],
+		'displayName'        => ['type' => 'string'],
+		'hostname'           => ['type' => 'string'],
+		'deviceTemplate'     => $nullable('string'),
+		'site'               => $nullable('string'),
+		'poller'             => $nullable('string'),
+		'externalId'         => $nullable('string'),
+		'location'           => $nullable('string'),
+		'notes'              => $nullable('string'),
+		'disabled'           => ['type' => 'boolean'],
+		'snmpVersion'        => $nullable('integer'),
+		'snmpPort'           => $nullable('integer'),
+		'snmpTimeout'        => $nullable('integer'),
+		'snmpRetries'        => $nullable('integer'),
+		'maxOids'            => $nullable('integer'),
+		'bulkWalkSize'       => $nullable('integer'),
+		'deviceThreads'      => $nullable('integer'),
+		'availabilityMethod' => $nullable('integer'),
+		'pingMethod'         => $nullable('integer'),
+		'pingPort'           => $nullable('integer'),
+		'pingTimeout'        => $nullable('integer'),
+		'pingRetries'        => $nullable('integer'),
+		'state'              => $nullable('string'),
+		'availability'       => $nullable('number'),
+		'lastError'          => $nullable('string'),
+		'failTime'           => $nullable('string'),
+		'recoveryTime'       => $nullable('string'),
+		'createTime'         => $nullable('string'),
+	]);
 
-	$site = [
-		'type'       => 'object',
-		'properties' => [
-			'name'        => ['type' => 'string'],
-			'displayName' => ['type' => 'string'],
-			'address1'    => $nullable('string'),
-			'address2'    => $nullable('string'),
-			'city'        => $nullable('string'),
-			'state'       => $nullable('string'),
-			'postalCode'  => $nullable('string'),
-			'country'     => $nullable('string'),
-			'timezone'    => $nullable('string'),
-			'latitude'    => $nullable('number'),
-			'longitude'   => $nullable('number'),
-			'zoom'        => $nullable('integer'),
-			'alternateId' => $nullable('string'),
-			'notes'       => $nullable('string'),
-		],
-		'additionalProperties' => false
-	];
-	$site['required'] = array_keys($site['properties']);
+	$site = mcp_object_schema([
+		'name'        => ['type' => 'string'],
+		'displayName' => ['type' => 'string'],
+		'address1'    => $nullable('string'),
+		'address2'    => $nullable('string'),
+		'city'        => $nullable('string'),
+		'state'       => $nullable('string'),
+		'postalCode'  => $nullable('string'),
+		'country'     => $nullable('string'),
+		'timezone'    => $nullable('string'),
+		'latitude'    => $nullable('number'),
+		'longitude'   => $nullable('number'),
+		'zoom'        => $nullable('integer'),
+		'alternateId' => $nullable('string'),
+		'notes'       => $nullable('string'),
+	]);
 
-	$poller = [
-		'type'       => 'object',
-		'properties' => [
-			'name'           => ['type' => 'string'],
-			'displayName'    => ['type' => 'string'],
-			'hostname'       => ['type' => 'string'],
-			'disabled'       => ['type' => 'boolean'],
-			'state'          => $nullable('string'),
-			'timezone'       => $nullable('string'),
-			'notes'          => $nullable('string'),
-			'processes'      => $nullable('integer'),
-			'threads'        => $nullable('integer'),
-			'totalPolls'     => $nullable('integer'),
-			'syncInterval'   => $nullable('integer'),
-			'snmpItems'      => $nullable('integer'),
-			'scriptItems'    => $nullable('integer'),
-			'serverItems'    => $nullable('integer'),
-			'totalTime'      => $nullable('number'),
-			'maxTime'        => $nullable('number'),
-			'minTime'        => $nullable('number'),
-			'avgTime'        => $nullable('number'),
-			'requiresSync'   => ['type' => 'boolean'],
-			'lastUpdateTime' => $nullable('string'),
-			'lastStatusTime' => $nullable('string'),
-			'lastSyncTime'   => $nullable('string'),
-		],
-		'additionalProperties' => false
-	];
-	$poller['required'] = array_keys($poller['properties']);
+	$poller = mcp_object_schema([
+		'name'           => ['type' => 'string'],
+		'displayName'    => ['type' => 'string'],
+		'hostname'       => ['type' => 'string'],
+		'disabled'       => ['type' => 'boolean'],
+		'state'          => $nullable('string'),
+		'timezone'       => $nullable('string'),
+		'notes'          => $nullable('string'),
+		'processes'      => $nullable('integer'),
+		'threads'        => $nullable('integer'),
+		'totalPolls'     => $nullable('integer'),
+		'syncInterval'   => $nullable('integer'),
+		'snmpItems'      => $nullable('integer'),
+		'scriptItems'    => $nullable('integer'),
+		'serverItems'    => $nullable('integer'),
+		'totalTime'      => $nullable('number'),
+		'maxTime'        => $nullable('number'),
+		'minTime'        => $nullable('number'),
+		'avgTime'        => $nullable('number'),
+		'requiresSync'   => ['type' => 'boolean'],
+		'lastUpdateTime' => $nullable('string'),
+		'lastStatusTime' => $nullable('string'),
+		'lastSyncTime'   => $nullable('string'),
+	]);
 
-	$tree = [
-		'type'       => 'object',
-		'properties' => [
-			'name'             => ['type' => 'string'],
-			'displayName'      => ['type' => 'string'],
-			'enabled'          => ['type' => 'boolean'],
-			'locked'           => $nullable('boolean'),
-			'sortType'         => $nullable('integer'),
-			'sequence'         => $nullable('integer'),
-			'lastModifiedTime' => $nullable('string'),
-		],
-		'additionalProperties' => false
-	];
-	$tree['required'] = array_keys($tree['properties']);
+	$tree = mcp_object_schema([
+		'name'             => ['type' => 'string'],
+		'displayName'      => ['type' => 'string'],
+		'enabled'          => ['type' => 'boolean'],
+		'locked'           => $nullable('boolean'),
+		'sortType'         => $nullable('integer'),
+		'sequence'         => $nullable('integer'),
+		'lastModifiedTime' => $nullable('string'),
+	]);
 
-	$graph = [
-		'type'       => 'object',
-		'properties' => [
-			'name'              => ['type' => 'string'],
-			'title'             => ['type' => 'string'],
-			'device'            => $nullable('string'),
-			'deviceDisplayName' => $nullable('string'),
-			'graphTemplate'     => $nullable('string'),
-			'templateName'      => $nullable('string'),
-			'width'             => $nullable('integer'),
-			'height'            => $nullable('integer'),
-			'snmpQuery'         => $nullable('string'),
-			'snmpIndex'         => $nullable('string'),
-		],
-		'additionalProperties' => false
-	];
-	$graph['required'] = array_keys($graph['properties']);
+	$graph = mcp_object_schema([
+		'name'              => ['type' => 'string'],
+		'title'             => ['type' => 'string'],
+		'device'            => $nullable('string'),
+		'deviceDisplayName' => $nullable('string'),
+		'graphTemplate'     => $nullable('string'),
+		'templateName'      => $nullable('string'),
+		'width'             => $nullable('integer'),
+		'height'            => $nullable('integer'),
+		'snmpQuery'         => $nullable('string'),
+		'snmpIndex'         => $nullable('string'),
+	]);
 
-	$dataSource = [
-		'type'       => 'object',
-		'properties' => [
-			'name'              => ['type' => 'string'],
-			'displayName'       => ['type' => 'string'],
-			'device'            => $nullable('string'),
-			'deviceDisplayName' => $nullable('string'),
-			'dataTemplate'      => $nullable('string'),
-			'templateName'      => $nullable('string'),
-			'dataSourceProfile' => $nullable('string'),
-			'active'            => ['type' => 'boolean'],
-			'rrdStep'           => $nullable('integer'),
-			'snmpQuery'         => $nullable('string'),
-			'snmpIndex'         => $nullable('string'),
-			'orphan'            => $nullable('boolean'),
-		],
-		'additionalProperties' => false
-	];
-	$dataSource['required'] = array_keys($dataSource['properties']);
+	$dataSource = mcp_object_schema([
+		'name'              => ['type' => 'string'],
+		'displayName'       => ['type' => 'string'],
+		'device'            => $nullable('string'),
+		'deviceDisplayName' => $nullable('string'),
+		'dataTemplate'      => $nullable('string'),
+		'templateName'      => $nullable('string'),
+		'dataSourceProfile' => $nullable('string'),
+		'active'            => ['type' => 'boolean'],
+		'rrdStep'           => $nullable('integer'),
+		'snmpQuery'         => $nullable('string'),
+		'snmpIndex'         => $nullable('string'),
+		'orphan'            => $nullable('boolean'),
+	]);
 
 	$registry->register('cacti-get-system-info', [
 		'label'         => 'Get system information',
 		'description'   => 'Read the Cacti, plugin, and abilities API versions.',
 		'category'      => 'system',
 		'input_schema'  => ['type' => 'object', 'properties' => new stdClass(), 'additionalProperties' => false],
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'cactiVersion'        => ['type' => 'string'],
-				'pluginVersion'       => ['type' => 'string'],
-				'abilitiesApiVersion' => ['type' => 'string']
-			],
-			'required'             => ['cactiVersion', 'pluginVersion', 'abilitiesApiVersion'],
-			'additionalProperties' => false
-		],
+		'output_schema' => mcp_object_schema([
+			'cactiVersion'        => ['type' => 'string'],
+			'pluginVersion'       => ['type' => 'string'],
+			'abilitiesApiVersion' => ['type' => 'string'],
+		]),
 		'annotations' => $annotations,
 		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-get-system-info'], $user),
 		'execute'     => function () {
@@ -271,102 +323,71 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 			return [
 				'cactiVersion'        => (string) ($config['cacti_version'] ?? ''),
 				'pluginVersion'       => (string) ($info['version'] ?? ''),
-				'abilitiesApiVersion' => '2'
+				'abilitiesApiVersion' => '2',
 			];
-		}
+		},
 	]);
 
-	$registry->register('cacti-list-devices', [
-		'label'         => 'List devices',
-		'description'   => 'List permitted devices, up to 100 per page, with AIP-160 filter and AIP-132 orderBy. Credentials are excluded.',
-		'category'      => 'inventory',
-		'input_schema'  => $listInput,
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'devices'       => ['type' => 'array', 'items' => $device, 'maxItems' => MCP_PAGE_SIZE_MAX],
-				'nextPageToken' => ['type' => ['string', 'null']]
-			],
-			'required'             => ['devices', 'nextPageToken'],
-			'additionalProperties' => false
-		],
-		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-devices'], $user),
-		'execute'     => function (int $user, stdClass $args) {
-			$filter      = (string) ($args->filter ?? '');
-			$orderBy     = (string) ($args->orderBy ?? '');
-			$fingerprint = sha1($filter . "\0" . $orderBy);
-			$page        = mcp_page($args, $fingerprint);
-			$where       = mcp_filter_sql($filter, mcp_device_filter_fields());
-			// The id tie-breaker keeps offset paging stable when the requested order has ties.
-			$order = $orderBy === '' ? 'h1.id ASC' : mcp_order_sql($orderBy, MCP_DEVICE_FIELDS, '') . ', h1.id ASC';
-			$total = -1;
-			// One extra row tells whether another page exists.
+	mcp_register_list_ability(
+		$registry,
+		'cacti-list-devices',
+		'List devices',
+		'List permitted devices, up to 100 per page, with AIP-160 filter and AIP-132 orderBy. Credentials are excluded.',
+		'inventory',
+		'devices',
+		$device,
+		mcp_device_filter_fields(),
+		MCP_DEVICE_FIELDS,
+		'h1.id',
+		'',
+		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-devices'], $user),
+		function (int $user, string $where, string $order, array $page) : array {
+			$total   = -1;
 			$fetched = get_allowed_devices($where, $order, $page['offset'] . ',' . ($page['size'] + 1), $total, $user);
-			$rows    = is_array($fetched) ? array_values($fetched) : [];
-			$more    = count($rows) > $page['size'];
 
-			return [
-				'devices'       => array_map('mcp_device_resource', array_slice($rows, 0, $page['size'])),
-				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null
-			];
-		}
-	]);
+			return is_array($fetched) ? array_values($fetched) : [];
+		},
+		'mcp_device_resource'
+	);
 
 	$registry->register('cacti-get-device', [
 		'label'        => 'Get device',
 		'description'  => 'Read one permitted device by resource name, for example devices/12. Credentials are excluded.',
 		'category'     => 'inventory',
-		'input_schema' => [
-			'type'                 => 'object',
-			'properties'           => ['name' => ['type' => 'string', 'pattern' => '^devices/[1-9][0-9]{0,9}$', 'maxLength' => 32]],
-			'required'             => ['name'],
-			'additionalProperties' => false
-		],
-		'output_schema' => [
-			'type'                 => 'object',
-			'properties'           => ['device' => $device],
-			'required'             => ['device'],
-			'additionalProperties' => false
-		],
-		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-get-device'], $user),
-		'execute'     => function (int $user, stdClass $args) {
+		'input_schema' => mcp_object_schema([
+			'name' => ['type' => 'string', 'pattern' => '^devices/[1-9][0-9]{0,9}$', 'maxLength' => 32],
+		]),
+		'output_schema' => mcp_object_schema(['device' => $device]),
+		'annotations'   => $annotations,
+		'permission'    => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-get-device'], $user),
+		'execute'       => function (int $user, stdClass $args) {
 			$total = -1;
-			$rows  = get_allowed_devices('', 'h1.id ASC', '1', $total, $user, (int) substr((string) $args->name, strlen('devices/')));
+			$id    = (int) substr((string) $args->name, strlen('devices/'));
+			$rows  = get_allowed_devices('', 'h1.id ASC', '1', $total, $user, $id);
 
 			if (!$rows) {
 				throw new AbilitiesError('NOT_FOUND', 'DEVICE_NOT_FOUND');
 			}
 
 			return ['device' => mcp_device_resource(reset($rows))];
-		}
+		},
 	]);
 
-	$registry->register('cacti-list-sites', [
-		'label'         => 'List sites',
-		'description'   => 'List Cacti sites, up to 100 per page, with AIP-160 filter and AIP-132 orderBy.',
-		'category'      => 'inventory',
-		'input_schema'  => $listInput,
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'sites'         => ['type' => 'array', 'items' => $site, 'maxItems' => MCP_PAGE_SIZE_MAX],
-				'nextPageToken' => ['type' => ['string', 'null']]
-			],
-			'required'             => ['sites', 'nextPageToken'],
-			'additionalProperties' => false
-		],
-		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-sites'], $user),
-		'execute'     => function (int $user, stdClass $args) {
-			$filter      = (string) ($args->filter ?? '');
-			$orderBy     = (string) ($args->orderBy ?? '');
-			$fingerprint = sha1('sites' . "\0" . $filter . "\0" . $orderBy);
-			$page        = mcp_page($args, $fingerprint);
-			$where       = mcp_filter_sql($filter, MCP_SITE_FIELDS);
-			$order       = $orderBy === '' ? 's.id ASC' : mcp_order_sql($orderBy, MCP_SITE_FIELDS, '') . ', s.id ASC';
-			$sql         = 'SELECT s.id, s.name, s.address1, s.address2, s.city, s.state, s.postal_code, s.country, '
+	mcp_register_list_ability(
+		$registry,
+		'cacti-list-sites',
+		'List sites',
+		'List Cacti sites, up to 100 per page, with AIP-160 filter and AIP-132 orderBy.',
+		'inventory',
+		'sites',
+		$site,
+		MCP_SITE_FIELDS,
+		MCP_SITE_FIELDS,
+		's.id',
+		"sites\0",
+		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-sites'], $user),
+		function (int $user, string $where, string $order, array $page) : array {
+			$sql = 'SELECT s.id, s.name, s.address1, s.address2, s.city, s.state, s.postal_code, s.country, '
 				. 's.timezone, s.latitude, s.longitude, s.zoom, s.alternate_id, s.notes '
 				. 'FROM sites AS s'
 				. ($where !== '' ? ' WHERE ' . $where : '')
@@ -377,39 +398,27 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 			if ($rows === false) {
 				throw new RuntimeException('Site query failed');
 			}
-			$rows = array_values($rows);
-			$more = count($rows) > $page['size'];
 
-			return [
-				'sites'         => array_map('mcp_site_resource', array_slice($rows, 0, $page['size'])),
-				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null
-			];
-		}
-	]);
+			return array_values($rows);
+		},
+		'mcp_site_resource'
+	);
 
-	$registry->register('cacti-list-pollers', [
-		'label'         => 'List pollers',
-		'description'   => 'List Cacti data collectors, up to 100 per page, with AIP-160 filter and AIP-132 orderBy. Database credentials and TLS keys are excluded.',
-		'category'      => 'system',
-		'input_schema'  => $listInput,
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'pollers'       => ['type' => 'array', 'items' => $poller, 'maxItems' => MCP_PAGE_SIZE_MAX],
-				'nextPageToken' => ['type' => ['string', 'null']]
-			],
-			'required'             => ['pollers', 'nextPageToken'],
-			'additionalProperties' => false
-		],
-		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-pollers'], $user),
-		'execute'     => function (int $user, stdClass $args) {
-			$filter      = (string) ($args->filter ?? '');
-			$orderBy     = (string) ($args->orderBy ?? '');
-			$fingerprint = sha1('pollers' . "\0" . $filter . "\0" . $orderBy);
-			$page        = mcp_page($args, $fingerprint);
-			$where       = mcp_filter_sql($filter, MCP_POLLER_FIELDS);
-			$order       = $orderBy === '' ? 'p.id ASC' : mcp_order_sql($orderBy, MCP_POLLER_FIELDS, '') . ', p.id ASC';
+	mcp_register_list_ability(
+		$registry,
+		'cacti-list-pollers',
+		'List pollers',
+		'List Cacti data collectors, up to 100 per page, with AIP-160 filter and AIP-132 orderBy. '
+			. 'Database credentials and TLS keys are excluded.',
+		'system',
+		'pollers',
+		$poller,
+		MCP_POLLER_FIELDS,
+		MCP_POLLER_FIELDS,
+		'p.id',
+		"pollers\0",
+		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-pollers'], $user),
+		function (int $user, string $where, string $order, array $page) : array {
 			// Never select dbpass, dbuser, dbsslkey, dbsslcert, or dbsslca.
 			$sql = 'SELECT p.id, p.disabled, p.name, p.notes, p.status, p.timezone, p.hostname, '
 				. 'p.total_time, p.max_time, p.min_time, p.avg_time, p.total_polls, p.processes, '
@@ -424,122 +433,95 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 			if ($rows === false) {
 				throw new RuntimeException('Poller query failed');
 			}
-			$rows = array_values($rows);
-			$more = count($rows) > $page['size'];
 
-			return [
-				'pollers'       => array_map('mcp_poller_resource', array_slice($rows, 0, $page['size'])),
-				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null
-			];
-		}
-	]);
+			return array_values($rows);
+		},
+		'mcp_poller_resource'
+	);
 
-	$registry->register('cacti-list-trees', [
-		'label'         => 'List graph trees',
-		'description'   => 'List permitted graph trees, up to 100 per page, with AIP-160 filter and AIP-132 orderBy.',
-		'category'      => 'inventory',
-		'input_schema'  => $listInput,
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'trees'         => ['type' => 'array', 'items' => $tree, 'maxItems' => MCP_PAGE_SIZE_MAX],
-				'nextPageToken' => ['type' => ['string', 'null']]
-			],
-			'required'             => ['trees', 'nextPageToken'],
-			'additionalProperties' => false
-		],
-		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-trees'], $user) || is_realm_allowed(4, $user),
-		'execute'     => function (int $user, stdClass $args) {
-			$filter      = (string) ($args->filter ?? '');
-			$orderBy     = (string) ($args->orderBy ?? '');
-			$fingerprint = sha1('trees' . "\0" . $filter . "\0" . $orderBy);
-			$page        = mcp_page($args, $fingerprint);
-			$where       = mcp_filter_sql($filter, MCP_TREE_FIELDS);
-			$order       = $orderBy === '' ? 'gt.id ASC' : mcp_order_sql($orderBy, MCP_TREE_FIELDS, '') . ', gt.id ASC';
-			$total       = -1;
-			$rows        = get_allowed_trees(false, false, $where, $order, $page['offset'] . ',' . ($page['size'] + 1), $total, $user);
-			$rows        = is_array($rows) ? array_values($rows) : [];
+	mcp_register_list_ability(
+		$registry,
+		'cacti-list-trees',
+		'List graph trees',
+		'List permitted graph trees, up to 100 per page, with AIP-160 filter and AIP-132 orderBy.',
+		'inventory',
+		'trees',
+		$tree,
+		MCP_TREE_FIELDS,
+		MCP_TREE_FIELDS,
+		'gt.id',
+		"trees\0",
+		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-trees'], $user)
+			|| is_realm_allowed(4, $user),
+		function (int $user, string $where, string $order, array $page) : array {
+			$total = -1;
+			$limit = $page['offset'] . ',' . ($page['size'] + 1);
+			$rows  = get_allowed_trees(false, false, $where, $order, $limit, $total, $user);
+			$rows  = is_array($rows) ? array_values($rows) : [];
 
 			if (function_exists('is_tree_allowed')) {
-				$rows = array_values(array_filter($rows, fn (array $row) => is_tree_allowed((int) ($row['id'] ?? 0), $user)));
+				$rows = array_values(array_filter(
+					$rows,
+					fn (array $row) => is_tree_allowed((int) ($row['id'] ?? 0), $user)
+				));
 			}
-			$more = count($rows) > $page['size'];
 
-			return [
-				'trees'         => array_map('mcp_tree_resource', array_slice($rows, 0, $page['size'])),
-				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null
-			];
-		}
-	]);
+			return $rows;
+		},
+		'mcp_tree_resource'
+	);
 
-	$registry->register('cacti-list-graphs', [
-		'label'         => 'List graphs',
-		'description'   => 'List permitted graphs, up to 100 per page, with AIP-160 filter and AIP-132 orderBy.',
-		'category'      => 'inventory',
-		'input_schema'  => $listInput,
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'graphs'        => ['type' => 'array', 'items' => $graph, 'maxItems' => MCP_PAGE_SIZE_MAX],
-				'nextPageToken' => ['type' => ['string', 'null']]
-			],
-			'required'             => ['graphs', 'nextPageToken'],
-			'additionalProperties' => false
-		],
-		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-graphs'], $user) || is_realm_allowed(5, $user),
-		'execute'     => function (int $user, stdClass $args) {
-			$filter      = (string) ($args->filter ?? '');
-			$orderBy     = (string) ($args->orderBy ?? '');
-			$fingerprint = sha1('graphs' . "\0" . $filter . "\0" . $orderBy);
-			$page        = mcp_page($args, $fingerprint);
-			$where       = mcp_filter_sql($filter, MCP_GRAPH_FIELDS);
-			$order       = $orderBy === '' ? 'gtg.local_graph_id ASC' : mcp_order_sql($orderBy, MCP_GRAPH_FIELDS, '') . ', gtg.local_graph_id ASC';
-			$total       = -1;
-			$rows        = get_allowed_graphs($where, $order, $page['offset'] . ',' . ($page['size'] + 1), $total, $user);
-			$rows        = is_array($rows) ? array_values($rows) : [];
+	mcp_register_list_ability(
+		$registry,
+		'cacti-list-graphs',
+		'List graphs',
+		'List permitted graphs, up to 100 per page, with AIP-160 filter and AIP-132 orderBy.',
+		'inventory',
+		'graphs',
+		$graph,
+		MCP_GRAPH_FIELDS,
+		MCP_GRAPH_FIELDS,
+		'gtg.local_graph_id',
+		"graphs\0",
+		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-graphs'], $user)
+			|| is_realm_allowed(5, $user),
+		function (int $user, string $where, string $order, array $page) : array {
+			$total = -1;
+			$limit = $page['offset'] . ',' . ($page['size'] + 1);
+			$rows  = get_allowed_graphs($where, $order, $limit, $total, $user);
+			$rows  = is_array($rows) ? array_values($rows) : [];
 
 			if (function_exists('is_graph_allowed')) {
-				$rows = array_values(array_filter($rows, fn (array $row) => is_graph_allowed((int) ($row['local_graph_id'] ?? 0), $user)));
+				$rows = array_values(array_filter(
+					$rows,
+					fn (array $row) => is_graph_allowed((int) ($row['local_graph_id'] ?? 0), $user)
+				));
 			}
-			$more = count($rows) > $page['size'];
 
-			return [
-				'graphs'        => array_map('mcp_graph_resource', array_slice($rows, 0, $page['size'])),
-				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null
-			];
-		}
-	]);
+			return $rows;
+		},
+		'mcp_graph_resource'
+	);
 
-	$registry->register('cacti-list-data-sources', [
-		'label'         => 'List data sources',
-		'description'   => 'List data sources belonging to permitted devices, up to 100 per page, with AIP-160 filter and AIP-132 orderBy. Secret input values are excluded.',
-		'category'      => 'inventory',
-		'input_schema'  => $listInput,
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'dataSources'   => ['type' => 'array', 'items' => $dataSource, 'maxItems' => MCP_PAGE_SIZE_MAX],
-				'nextPageToken' => ['type' => ['string', 'null']]
-			],
-			'required'             => ['dataSources', 'nextPageToken'],
-			'additionalProperties' => false
-		],
-		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-data-sources'], $user),
-		'execute'     => function (int $user, stdClass $args) {
-			$filter      = (string) ($args->filter ?? '');
-			$orderBy     = (string) ($args->orderBy ?? '');
-			$fingerprint = sha1('dataSources' . "\0" . $filter . "\0" . $orderBy);
-			$page        = mcp_page($args, $fingerprint);
-			$where       = mcp_filter_sql($filter, MCP_DATA_SOURCE_FIELDS);
-			$order       = $orderBy === '' ? 'dl.id ASC' : mcp_order_sql($orderBy, MCP_DATA_SOURCE_FIELDS, '') . ', dl.id ASC';
-
+	mcp_register_list_ability(
+		$registry,
+		'cacti-list-data-sources',
+		'List data sources',
+		'List data sources belonging to permitted devices, up to 100 per page, with AIP-160 filter '
+			. 'and AIP-132 orderBy. Secret input values are excluded.',
+		'inventory',
+		'dataSources',
+		$dataSource,
+		MCP_DATA_SOURCE_FIELDS,
+		MCP_DATA_SOURCE_FIELDS,
+		'dl.id',
+		"dataSources\0",
+		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-data-sources'], $user),
+		function (int $user, string $where, string $order, array $page) : array {
 			$deviceIds = mcp_allowed_device_ids($user);
 
 			if ($deviceIds === []) {
-				return ['dataSources' => [], 'nextPageToken' => null];
+				return [];
 			}
 
 			$placeholders = implode(', ', array_fill(0, count($deviceIds), '?'));
@@ -563,16 +545,16 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 			$rows = array_values($rows);
 
 			if (function_exists('is_device_allowed')) {
-				$rows = array_values(array_filter($rows, fn (array $row) => is_device_allowed((int) ($row['host_id'] ?? 0), $user)));
+				$rows = array_values(array_filter(
+					$rows,
+					fn (array $row) => is_device_allowed((int) ($row['host_id'] ?? 0), $user)
+				));
 			}
-			$more = count($rows) > $page['size'];
 
-			return [
-				'dataSources'   => array_map('mcp_data_source_resource', array_slice($rows, 0, $page['size'])),
-				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null
-			];
-		}
-	]);
+			return $rows;
+		},
+		'mcp_data_source_resource'
+	);
 
 	$registry->register('cacti-get-clog', [
 		'label'        => 'Read Cacti log tail',
@@ -585,27 +567,23 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 				'severity' => ['type' => 'string', 'enum' => MCP_CLOG_SEVERITIES],
 				'search'   => ['type' => 'string', 'maxLength' => 256],
 			],
-			'additionalProperties' => false
+			'additionalProperties' => false,
 		],
-		'output_schema' => [
-			'type'       => 'object',
-			'properties' => [
-				'lines'     => ['type' => 'array', 'items' => ['type' => 'string'], 'maxItems' => MCP_CLOG_MAX_LINES],
-				'count'     => ['type' => 'integer', 'minimum' => 0],
-				'truncated' => ['type' => 'boolean'],
-			],
-			'required'             => ['lines', 'count', 'truncated'],
-			'additionalProperties' => false
-		],
+		'output_schema' => mcp_object_schema([
+			'lines'     => ['type' => 'array', 'items' => ['type' => 'string'], 'maxItems' => MCP_CLOG_MAX_LINES],
+			'count'     => ['type' => 'integer', 'minimum' => 0],
+			'truncated' => ['type' => 'boolean'],
+		]),
 		'annotations' => $annotations,
-		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-get-clog'], $user) || is_realm_allowed(18, $user),
-		'execute'     => function (int $user, stdClass $args) {
+		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-get-clog'], $user)
+			|| is_realm_allowed(18, $user),
+		'execute' => function (int $user, stdClass $args) {
 			$limit    = isset($args->lines) ? (int) $args->lines : MCP_CLOG_DEFAULT_LINES;
 			$severity = isset($args->severity) ? (string) $args->severity : 'ALL';
 			$search   = isset($args->search) ? (string) $args->search : '';
 
 			return mcp_read_clog_tail(mcp_clog_path(), $limit, $severity, $search);
-		}
+		},
 	]);
 }
 
@@ -618,8 +596,10 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 function mcp_dispatch_ability_hooks(AbilitiesRegistry $registry) : void {
 	global $plugins_integrated;
 
-	$hooks = db_fetch_assoc_prepared('SELECT name, file, function FROM plugin_hooks WHERE hook = ? AND status = 1 ORDER BY name, function',
-		['abilities_register']);
+	$hooks = db_fetch_assoc_prepared(
+		'SELECT name, file, function FROM plugin_hooks WHERE hook = ? AND status = 1 ORDER BY name, function',
+		['abilities_register']
+	);
 
 	foreach ($hooks ?: [] as $hook) {
 		$name = (string) $hook['name'];
@@ -655,7 +635,11 @@ function mcp_dispatch_ability_hooks(AbilitiesRegistry $registry) : void {
 			($hook['function'])(new AbilitiesRegistrar($scratch, $name));
 			$registry->adopt($scratch);
 		} catch (Throwable $error) {
-			cacti_log('MCP: ability registration failed for plugin ' . $name . ' (' . mcp_exception_class($error) . ')', false, 'MCP');
+			cacti_log(
+				'MCP: ability registration failed for plugin ' . $name . ' (' . mcp_exception_class($error) . ')',
+				false,
+				'MCP'
+			);
 		}
 	}
 }
@@ -715,7 +699,10 @@ function mcp_allowed_device_ids(int $user) : array {
  * @return array<string, array<string, mixed>>
  */
 function mcp_device_filter_fields() : array {
-	return array_map(fn ($spec) => ['column' => preg_replace('/^h1\./', 'h.', $spec['column'])] + $spec, MCP_DEVICE_FIELDS);
+	return array_map(
+		fn ($spec) => ['column' => preg_replace('/^h1\./', 'h.', $spec['column'])] + $spec,
+		MCP_DEVICE_FIELDS
+	);
 }
 
 /**
@@ -770,12 +757,14 @@ function mcp_device_resource(array $row) : array {
 		'pingPort'           => $int('ping_port'),
 		'pingTimeout'        => $int('ping_timeout'),
 		'pingRetries'        => $int('ping_retries'),
-		'state'              => isset($row['status']) ? (MCP_DEVICE_STATES[(int) $row['status']] ?? MCP_DEVICE_STATES[0]) : null,
+		'state'              => isset($row['status'])
+			? (MCP_DEVICE_STATES[(int) $row['status']] ?? MCP_DEVICE_STATES[0])
+			: null,
 		'availability'       => isset($row['availability']) ? (float) $row['availability'] : null,
 		'lastError'          => $str('status_last_error'),
 		'failTime'           => mcp_time($row['status_fail_date'] ?? null),
 		'recoveryTime'       => mcp_time($row['status_rec_date'] ?? null),
-		'createTime'         => mcp_time($row['created'] ?? null)
+		'createTime'         => mcp_time($row['created'] ?? null),
 	];
 }
 
@@ -933,11 +922,17 @@ function mcp_clog_path() : string {
  * communities, API keys, and URL userinfo from a log line. Fails closed.
  */
 function mcp_redact_log_line(string $line) : string {
-	$keys = 'authorization|password|passwd|passphrase|pass|secret|token|community|api[_-]?key|auth[_-]?key|priv(?:ate)?[_-]?key|dbpass|dbsslkey';
+	$keys     = 'authorization|password|passwd|passphrase|pass|secret|token|community|'
+		. 'api[_-]?key|auth[_-]?key|priv(?:ate)?[_-]?key|dbpass|dbsslkey';
+	$quoted   = '/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(["\'])'
+		. '(?:\\\\[^\r\n]|(?!\2)[^\\\\\r\n])*+(?:\2|\\\\?(?=\r?$))/im';
+	$spaceQuoted = '/(\b\w*(?:' . $keys . ')\b\s+)(["\'])'
+		. '(?:\\\\[^\r\n]|(?!\2)[^\\\\\r\n])*+(?:\2|\\\\?(?=\r?$))/im';
 	$patterns = [
 		['/\bcmcp_pat_[a-f0-9]+\b/i', '[redacted]'],
 		['/(\b(?:Bearer|Basic)[ \t]+)(?:\\\\[^\r\n]|[^\s;,"\'\\\\\r\n])+/i', '$1[redacted]'],
-		['/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(["\'])(?:\\\\[^\r\n]|(?!\2)[^\\\\\r\n])*+(?:\2|\\\\?(?=\r?$))/im', '$1$2[redacted]$2'],
+		[$quoted, '$1$2[redacted]$2'],
+		[$spaceQuoted, '$1$2[redacted]$2'],
 		['/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(?!["\'])[^\s;,"\'\r\n]+/i', '$1[redacted]'],
 		['/(\b\w*(?:' . $keys . ')\b\s+)(?!["\'])[^\s;,"\'\r\n]+/i', '$1[redacted]'],
 		['/(\b[a-z][a-z0-9+.\-]*:\/\/[^:\/@?#\s]+:)[^\/\s?#]+(@)/i', '$1[redacted]$2'],
@@ -964,7 +959,13 @@ function mcp_redact_log_line(string $line) : string {
  *
  * @return array{lines: list<string>, count: int, truncated: bool}
  */
-function mcp_read_clog_tail(string $path, int $limit, string $severity = 'ALL', string $search = '', int $maxBytes = MCP_CLOG_MAX_BYTES) : array {
+function mcp_read_clog_tail(
+	string $path,
+	int $limit,
+	string $severity = 'ALL',
+	string $search = '',
+	int $maxBytes = MCP_CLOG_MAX_BYTES
+) : array {
 	if ($path === '' || str_contains($path, '://') || !is_file($path) || !is_readable($path)) {
 		throw new AbilitiesError('FAILED_PRECONDITION', 'LOG_UNAVAILABLE');
 	}
@@ -977,9 +978,12 @@ function mcp_read_clog_tail(string $path, int $limit, string $severity = 'ALL', 
 	}
 
 	$byteTruncated = $size > $maxBytes;
+	$dropFirstLine = false;
 
 	if ($byteTruncated) {
-		fseek($handle, -$maxBytes, SEEK_END);
+		fseek($handle, -($maxBytes + 1), SEEK_END);
+		$preceding     = fread($handle, 1);
+		$dropFirstLine = $preceding !== "\n";
 	}
 	$contents = stream_get_contents($handle);
 	fclose($handle);
@@ -994,7 +998,7 @@ function mcp_read_clog_tail(string $path, int $limit, string $severity = 'ALL', 
 		$rawLines = [];
 	}
 
-	if ($byteTruncated && $rawLines !== []) {
+	if ($dropFirstLine && $rawLines !== []) {
 		array_shift($rawLines);
 	}
 
@@ -1005,15 +1009,18 @@ function mcp_read_clog_tail(string $path, int $limit, string $severity = 'ALL', 
 			continue;
 		}
 
-		if ($severity !== 'ALL' && preg_match('/\b' . preg_quote($severity, '/') . '\b/i', $line) !== 1) {
+		// Redact before applying caller search filters so search cannot act as a secret oracle.
+		$redacted = mcp_redact_log_line($line);
+
+		if ($severity !== 'ALL' && preg_match('/\b' . preg_quote($severity, '/') . '\b/i', $redacted) !== 1) {
 			continue;
 		}
 
-		if ($search !== '' && stripos($line, $search) === false) {
+		if ($search !== '' && stripos($redacted, $search) === false) {
 			continue;
 		}
 
-		$matched[] = mcp_redact_log_line($line);
+		$matched[] = $redacted;
 	}
 
 	$truncated = $byteTruncated || count($matched) > $limit;

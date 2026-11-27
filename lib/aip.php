@@ -69,7 +69,11 @@ function mcp_schema_json(array $schema) : array {
 	return $schema;
 }
 
-/** Read pageSize and pageToken. The token binds the offset to the query fingerprint. @return array{size: int, offset: int} */
+/**
+ * Read pageSize and pageToken. The token binds the offset to the query fingerprint.
+ *
+ * @return array{size: int, offset: int}
+ */
 function mcp_page(stdClass $args, string $fingerprint, int $default = MCP_PAGE_SIZE_DEFAULT, int $max = MCP_PAGE_SIZE_MAX) : array {
 	$size = $default;
 

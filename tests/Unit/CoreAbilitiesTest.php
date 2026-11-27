@@ -454,9 +454,18 @@ namespace Tests\Unit {
 			$this->assertStringNotContainsString('public123', $allText);
 			$this->assertStringContainsString('[redacted]', $allText);
 
-			// Search filter is case-insensitive plain substring
+			// Search filter is case-insensitive plain substring and runs after redaction (no secret oracle)
 			$searched = $this->registry->execute($this->principal(7), 'cacti-get-clog', (object) ['search' => 'snmp timeout'], $this->audit)['result'];
 			$this->assertSame(1, $searched['count']);
+			$secretOracle = $this->registry->execute($this->principal(7), 'cacti-get-clog', (object) ['search' => 'my-db-password'], $this->audit)['result'];
+			$this->assertSame(0, $secretOracle['count']);
+
+			// Whitespace-separated quoted secrets are redacted
+			$this->assertStringNotContainsString('space secret', mcp_redact_log_line('DB_Pass "space secret" host=db'));
+
+			// Whitespace-only orderBy falls back cleanly to default ordering
+			$wsOrder = $this->registry->execute($this->principal(7), 'cacti-list-sites', (object) ['orderBy' => '   '], $this->audit)['result'];
+			$this->assertCount(2, $wsOrder['sites']);
 
 			// Realm 18 (Log Administration) also permitted
 			$adminLog = $this->registry->execute($this->principal(9), 'cacti-get-clog', (object) ['lines' => 1], $this->audit)['result'];
