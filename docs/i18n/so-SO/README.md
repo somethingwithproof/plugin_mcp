@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -41,7 +41,9 @@ muuqdaan sidii qalab iyadoon la qorin wax koodh borotokool ah.
 
 Waxyaabaha maanta diyaarka ah:
 
-- Awoodo ku dhex jira oo akhris-kaliya ah kuwaas oo loogu talagalay noocyada nidaamka iyo liiska qalabka.
+- Sagaal awoodood oo ku dhex jira oo akhris-kaliya ah kuwaas oo daboolaya
+  noocyada nidaamka, qalabka, goobaha, pollers, geedaha garaafyada, garaafyada,
+  ilaha xogta, iyo dhammaadka diiwaanka Cacti oo xaddidan lagana saaray sirta.
 - Calaamadaha gelitaanka shaqsiga ah (`cmcp_pat_...`) oo ah aqoonsiga kaliya.
 - Koonsoolka Management > MCP: bandhig ama qari awoodaha, abuur oo buri
   calaamadaha, akhri diiwaanka hubinta.
@@ -63,28 +65,69 @@ taxanaha dhismuhuna wuxuu ku jiraa [docs/plan.md](../../plan.md).
 
 ## Awoodaha ku dhex jira
 
-| Aqoonsiga | Doodaha | Qaybta Cacti ee loo baahan yahay |
-| --- | --- | --- |
-| `cacti-get-system-info` | waxba | 15 |
-| `cacti-list-devices` | ikhtiyaari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | loo baahan yahay `name`, sida `devices/12` | 3 |
+| Aqoonsiga | Qaybta | Doodaha | Qaybta Cacti ee loo baahan yahay |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | waxba | 15 |
+| `cacti-list-devices` | `inventory` | ikhtiyaari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | loo baahan yahay `name`, sida `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | ikhtiyaari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | ikhtiyaari `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | ikhtiyaari `pageSize`, `pageToken`, `filter`, `orderBy` | 7 ama 4 |
+| `cacti-list-graphs` | `inventory` | ikhtiyaari `pageSize`, `pageToken`, `filter`, `orderBy` | 7 ama 5 |
+| `cacti-list-data-sources` | `inventory` | ikhtiyaari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | ikhtiyaari `lines` (1 ilaa 200, qaabka caadiga ah 50), `severity`, `search` | 19 ama 18 |
 
 Wicitaan kastaa wuxuu sidoo kale u baahan yahay qaybta **MCP and Abilities API** ee
 milkiilaha calaamadda, baaxadda `abilities:read` (calaamad kasta oo shaqsi ah way leedahay),
-iyo awood la bandhigay. Qaybta Abilities ee koonsoolku waxay muujisaa qaybta ay u baahan tahay
+iyo awood la bandhigay. Qaybta Abilities ee koonsoolku waxay muujisaa qaybta asaasiga ah ee ay u baahan tahay
 mid kasta oo ka mid ah kuwa ku dhex jira.
 
-- `cacti-list-devices` waxay soo celisaa bogag ka kooban ilaa 100 qalab (qaabka caadiga ah waa 50)
-  iyo `nextPageToken`. Calaamad bog waxay shaqaynaysaa oo keliya isla `filter` iyo
-  `orderBy`. `filter` waa weedh AIP-160 ah oo isbarbardhigyo ah oo lagu xidhay `AND`,
-  tusaale ahaan `state = "DOWN" AND disabled = false`. Goobaha shaandhaynta waa
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId`, iyo `state`. `orderBy` waxay qaadataa `displayName`, `hostname`, ama `name`,
-  iyadoo mid kasta ikhtiyaari ahaan ay raaci karto `desc`.
-- Weydiimaha qalabku waxay maraan `get_allowed_devices()` ee Cacti, si isticmaaluhu u arko
-  oo keliya qalabka ay Cacti u tusi lahayd.
-- Goobaha qalabku kama mid aha xargaha bulshada SNMP, ereyada sirta ah, iyo
-  aqoonsiyada kale.
+Dhammaan lixda awoodood ee `cacti-list-*` waxay soo celiyaan bogag ka kooban ilaa
+100 shay (qaabka caadiga ah waa 50) iyo `nextPageToken`. Calaamad bog waxay
+shaqaynaysaa oo keliya isla `filter` iyo `orderBy`. `filter` waa weedh AIP-160 ah
+oo isbarbardhigyo ah (`=`, `!=`, `<`, `<=`, `>`, `>=`) oo lagu xidhay `AND`,
+tusaale ahaan `state = "DOWN" AND disabled = false`. `orderBy` waxay qaadataa
+liis goobo la kala habayn karo oo ay kala saaraan hakad, iyadoo mid kasta
+ikhtiyaari ahaan ay raaci karto `asc` ama `desc`.
+
+| Awoodda | Goobaha shaandhaynta | Goobaha kala habaynta |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Xaddidaadda oggolaanshaha iyo ka saarista sirta:
+
+- `cacti-list-devices` iyo `cacti-get-device` waxay weydiiyaan iyagoo sii maraya
+  `get_allowed_devices()` ee Cacti waxayna ka saaraan xargaha bulshada SNMP,
+  ereyada sirta ah, iyo aqoonsiyada kale.
+- `cacti-list-trees` waxay weydiisaa iyadoo sii maraysa `get_allowed_trees()`
+  (waxayna ku shaandhaysaa `is_tree_allowed()` marka la heli karo);
+  `cacti-list-graphs` waxay weydiisaa iyadoo sii maraysa `get_allowed_graphs()`
+  (waxayna ku shaandhaysaa `is_graph_allowed()` marka la heli karo).
+- `cacti-list-data-sources` waxay ku koobtaa safafka qalabka loo oggol yahay
+  wacaha ee ka yimaadda `get_allowed_devices()` (iyo `is_device_allowed()` marka
+  la heli karo) waxayna soo celisaa xogta tilmaamta oo keliya iyadoo aan weydiin
+  `data_input_data` ama soo bandhigin qiimayaasha gelinta ee qarsoon.
+- `cacti-list-pollers` waxay ka saartaa aqoonsiyada kaydka xogta (`dbpass`,
+  `dbuser`) iyo tiirarka furaha iyo shahaadada TLS (`dbsslkey`, `dbsslcert`,
+  `dbsslca`).
+- `cacti-get-clog` waxay akhridaa ilaa 1 MiB ee ugu dambeeya diiwaanka Cacti ee
+  la habeeyay (iyadoo goynaysa sadarrada gaarka ah ee ka weyn 2048 bayt), waxayna
+  ku shaandhaysaa `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`,
+  `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`,
+  `SYSTEM`; qaabka caadiga ah `ALL`) iyo `search` aan kala soocin xarfaha waaweyn
+  iyo kuwa yaryar (ilaa 256 xaraf), waxayna soo celisaa `lines`, `count`, iyo
+  `truncated`. Sadar kasta waxaa laga masaxaa calaamadaha gaarka ah, madaxyada
+  bearer/basic, ereyada sirta ah, siraha, bulshooyinka SNMP, furayaasha,
+  `dbpass`, `dbsslkey`, iyo macluumaadka isticmaalaha URL ka hor inta aysan
+  shaandhooyinka `severity` iyo `search` shaqayn si `search` uusan u noqon karin
+  qalab lagu ogaado sirta. Haddii nadiifintu fashilanto waxay si xiran ugu
+  beddeshaa `[redacted]`, diiwaanka aan la akhriyi karinna wuxuu soo celiyaa
+  `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Rakibidda
 
@@ -375,7 +418,7 @@ Khaladaadku waxay raacaan AIP-193: shay `error` ah oo leh `code`, `message`, `st
 
 | HTTP | Qiimayaasha `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (sidoo kale wuxuu diraa `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -449,14 +492,27 @@ Joojinta kordhinta waxay xirtaa labada dhammaad. Ka-saarista waxay burisaa calaa
 
 ## Horumarinta iyo tijaabooyinka
 
-Tijaabooyinku waa qoraallo PHP ah oo caadi ah oo shaqeeya Cacti la'aanteed:
+Qalabka tijaabada waxaa ka mid ah qoraallo PHP ah oo caadi ah oo ku jira `tests/`
+iyo tijaabooyinka cutubyada ee PHPUnit ee ku jira `tests/Unit/` iyo falanqaynta
+taagan ee PHPStan (heerka 6), kuwaas oo dhammaantood shaqeeya iyadoo aan Cacti
+rakibnayn:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI waxay hubisaa tayada koodhka PHP waxayna ka dhex waddaa qoraallada ku jira `tests/` (mid kasta wuxuu ku qoran yahay `.github/workflows/ci.yml`) noocyada PHP 8.2 ilaa 8.5, ka dibna waxay dhistaa kaydka la rakibi karo ee `mcp/` iyo checksum-kiisa. Tijaabooyinka taabta Cacti waxay adeegsadaan qalab-tijaabo oo ku yaal xadka caawiyaha Cacti; ma tijaabiyaan rakibaad Cacti oo buuxda.
+CI waxay ku shaqaysaa PHP 8.2 ilaa 8.5: shaqo `test` ah oo hubisa hab-qoraalka
+PHP (`php -l`) isla markaana wadda 13-ka qoraal tijaabo ee PHP ah ee ku qoran
+`.github/workflows/ci.yml`, shaqo `quality` ah oo wadda `composer phpstan` iyo
+`composer test`, iyo shaqo `package` ah oo dhista kaydka la rakibi karo ee
+`mcp/` (iyadoo laga saarayo faylasha horumarinta iyo tijaabada ee ku qoran
+`.gitattributes`) iyo `SHA256SUMS`-keeda. Tijaabooyinka taabta Cacti waxay
+adeegsadaan qalab-tijaabo oo ku yaal xadka caawiyaha Cacti; ma tijaabiyaan
+rakibaad Cacti oo buuxda.
 
 ### Tijaabooyinka is-dhexgalka
 

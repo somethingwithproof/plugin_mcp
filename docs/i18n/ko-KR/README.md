@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -38,7 +38,8 @@ Cacti 데이터를 읽을 수 있게 해주는 Cacti 플러그인입니다. 플�
 
 현재 사용 가능한 기능:
 
-- 시스템 버전 및 장치 인벤토리를 조회하는 읽기 전용 내장 어빌리티
+- 시스템 버전, 장치, 사이트, 폴러, 그래프 트리, 그래프, 데이터 소스 및
+  제한되고 마스킹된 Cacti 로그 끝부분(tail)을 다루는 9개의 읽기 전용 내장 어빌리티
 - 유일한 인증 수단으로서의 개인 액세스 토큰(`cmcp_pat_...`)
 - Management > MCP 콘솔: 어빌리티 공개 또는 숨김, 토큰 생성 및 폐기,
   감사 로그 조회
@@ -60,27 +61,61 @@ Cacti 데이터를 읽을 수 있게 해주는 Cacti 플러그인입니다. 플�
 
 ## 내장 어빌리티
 
-| ID | 인수 | 필요한 Cacti 영역 |
-| --- | --- | --- |
-| `cacti-get-system-info` | 없음 | 15 |
-| `cacti-list-devices` | 선택 사항: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | 필수: `name` (예: `devices/12`) | 3 |
+| ID | 카테고리 | 인수 | 필요한 Cacti 영역 |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | 없음 | 15 |
+| `cacti-list-devices` | `inventory` | 선택 사항: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | 필수: `name` (예: `devices/12`) | 3 |
+| `cacti-list-sites` | `inventory` | 선택 사항: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | 선택 사항: `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | 선택 사항: `pageSize`, `pageToken`, `filter`, `orderBy` | 7 또는 4 |
+| `cacti-list-graphs` | `inventory` | 선택 사항: `pageSize`, `pageToken`, `filter`, `orderBy` | 7 또는 5 |
+| `cacti-list-data-sources` | `inventory` | 선택 사항: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | 선택 사항: `lines` (1~200, 기본값 50), `severity`, `search` | 19 또는 18 |
 
 모든 호출에는 토큰 소유자의 **MCP and Abilities API** 영역, `abilities:read`
 스코프(모든 개인 토큰에 기본 포함), 그리고 공개된 어빌리티가 추가로 필요합니다.
-각 내장 어빌리티에 필요한 영역은 콘솔의 Abilities 탭에서 확인할 수 있습니다.
+각 내장 어빌리티에 필요한 기본 영역은 콘솔의 Abilities 탭에서 확인할 수 있습니다.
 
-- `cacti-list-devices`는 최대 100개의 장치(기본값 50개)와 `nextPageToken`을
-  페이지 단위로 반환합니다. 페이지 토큰은 동일한 `filter` 및 `orderBy` 조건에서만
-  유효합니다. `filter`는 `AND`로 연결된 비교식의 AIP-160 표현식입니다(예:
-  `state = "DOWN" AND disabled = false`). 필터 필드로는 `displayName`,
-  `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`,
-  `state`를 사용할 수 있습니다. `orderBy`는 `displayName`, `hostname`, `name`을
-  지원하며, 각 필드 뒤에 선택적으로 `desc`를 붙일 수 있습니다.
-- 장치 조회는 Cacti의 `get_allowed_devices()`를 거치므로, 사용자는 Cacti에서 본래
-  접근 권한이 있는 장치만 볼 수 있습니다.
-- 장치 필드에는 SNMP 커뮤니티 문자열, 패스프레이즈 및 기타 자격 증명이 포함되지
-  않습니다.
+6개의 `cacti-list-*` 어빌리티는 모두 최대 100개 항목(기본값 50개)과
+`nextPageToken`을 페이지 단위로 반환합니다. 페이지 토큰은 동일한 `filter` 및
+`orderBy` 조건에서만 유효합니다. `filter`는 `AND`로 연결된 비교식(`=`, `!=`,
+`<`, `<=`, `>`, `>=`)의 AIP-160 표현식입니다(예:
+`state = "DOWN" AND disabled = false`). `orderBy`는 쉼표로 구분된 정렬 가능
+필드 목록을 허용하며, 각 필드 뒤에 선택적으로 `asc` 또는 `desc`를 붙일 수
+있습니다.
+
+| 어빌리티 | 필터 필드 | 정렬 필드 |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+권한 범위 제한 및 비밀 정보 제외:
+
+- `cacti-list-devices`와 `cacti-get-device`는 Cacti의 `get_allowed_devices()`를
+  통해 조회하며 SNMP 커뮤니티 문자열, 패스프레이즈 및 기타 자격 증명을 제외합니다.
+- `cacti-list-trees`는 `get_allowed_trees()`를 통해 조회하고(가능한 경우
+  `is_tree_allowed()`로 필터링), `cacti-list-graphs`는 `get_allowed_graphs()`를
+  통해 조회합니다(가능한 경우 `is_graph_allowed()`로 필터링).
+- `cacti-list-data-sources`는 `get_allowed_devices()`(및 가능한 경우
+  `is_device_allowed()`)에서 얻은 호출자의 허용 장치로 행을 제한하며,
+  `data_input_data`를 조회하거나 비밀 입력값을 노출하지 않고 메타데이터만 반환합니다.
+- `cacti-list-pollers`는 데이터베이스 자격 증명(`dbpass`, `dbuser`)과 TLS 키 및
+  인증서 열(`dbsslkey`, `dbsslcert`, `dbsslca`)을 제외합니다.
+- `cacti-get-clog`는 구성된 Cacti 로그의 마지막 최대 1 MiB를 읽고(2048바이트를
+  초과하는 개별 줄은 자름), `severity`(`ALL`, `DEBUG`, `INFO`, `NOTICE`,
+  `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`,
+  `POLLER`, `SYSTEM`; 기본값 `ALL`)와 대소문자를 구분하지 않는 `search`(최대
+  256자)로 필터링하여 `lines`, `count`, `truncated`를 반환합니다. `search`가
+  비밀 정보 추측 수단(secret oracle)으로 악용되지 않도록 `severity`와 `search`
+  필터를 실행하기 전에 각 줄에서 개인 토큰, Bearer/Basic 헤더, 비밀번호, 비밀값,
+  SNMP 커뮤니티, 키, `dbpass`, `dbsslkey` 및 URL 사용자 정보를 마스킹합니다.
+  마스킹은 `[redacted]`로 fail-closed 동작하며, 읽을 수 없는 로그는
+  `FAILED_PRECONDITION`(`LOG_UNAVAILABLE`)을 반환합니다.
 
 ## 설치
 
@@ -379,7 +414,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | `reason` 값 |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (`WWW-Authenticate: Bearer`도 함께 전송) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -490,17 +525,25 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## 개발 및 테스트
 
-테스트는 Cacti 없이 실행되는 일반 PHP 스크립트입니다.
+테스트 모음에는 `tests/`의 일반 PHP 스크립트와 함께 `tests/Unit/`의 PHPUnit 단위
+테스트 및 PHPStan 정적 분석(레벨 6)이 포함되어 있으며, 모두 Cacti 설치 없이
+실행됩니다:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI는 PHP 8.2부터 8.5 환경에서 PHP 린트를 수행하고 `tests/`의 스크립트(각 항목은
-`.github/workflows/ci.yml`에 나열됨)를 실행한 뒤, 설치 가능한 `mcp/` 아카이브와
-체크섬을 빌드합니다. Cacti와 연동되는 테스트는 Cacti 헬퍼 경계에서 픽스처를
-사용하며 전체 Cacti 설치 환경을 실행하지는 않습니다.
+CI는 PHP 8.2부터 8.5 환경에서 실행됩니다. PHP 구문 검사(`php -l`)와
+`.github/workflows/ci.yml`에 나열된 13개의 일반 PHP 테스트 스크립트를 실행하는
+`test` 작업, `composer phpstan`과 `composer test`를 실행하는 `quality` 작업,
+그리고 설치 가능한 `mcp/` 아카이브(`.gitattributes`에 나열된 개발 및 테스트 파일
+제외)와 `SHA256SUMS`를 빌드하는 `package` 작업으로 구성됩니다. Cacti와 연동되는
+테스트는 Cacti 헬퍼 경계에서 픽스처를 사용하며 전체 Cacti 설치 환경을 실행하지는
+않습니다.
 
 ### 통합 테스트
 

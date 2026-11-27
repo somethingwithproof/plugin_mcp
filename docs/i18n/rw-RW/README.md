@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -39,7 +39,10 @@ porotokole basabwa kwandika.
 
 Ibiboneka ubu:
 
-- Ubushobozi busanzwemo (built-in) bwo gusoma gusa bujyanye na verisiyo za sisitemu n'urutonde rw'ibikoresho.
+- Ubushobozi icyenda busanzwemo bwo gusoma gusa bujyanye na verisiyo za sisitemu,
+  ibikoresho, ahantu (sites), pollers, ibiti by'imishusho, imishusho, amasoko
+  y'amakuru, n'igice cyo ku mpera cy'inyandiko y'ibikorwa bya Cacti gifite
+  imipaka kandi cyahishwe amakuru y'ibanga.
 - Impapuro z'uburenganzira zihariye (`cmcp_pat_...`) nk'uburyo bwonyine bwo kwemeza umwirondoro.
 - Urubuga rw'ubuyobozi rwa Management > MCP: gushyira ahagaragara cyangwa guhisha ubushobozi, guhanga no gutesha agaciro
   impapuro z'uburenganzira, no gusoma inyandiko z'igenzura (audit log).
@@ -61,27 +64,66 @@ naho urukurikirane rw'iyubaka ruri muri [docs/plan.md](../../plan.md).
 
 ## Ubushobozi busanzwemo
 
-| ID | Ibishingirwaho | Urubibi rwa Cacti rukenewe |
-| --- | --- | --- |
-| `cacti-get-system-info` | ntacyo | 15 |
-| `cacti-list-devices` | bidategetswe `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | bitegetswe `name`, urugero `devices/12` | 3 |
+| ID | Icyiciro | Ibishingirwaho | Urubibi rwa Cacti rukenewe |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | ntacyo | 15 |
+| `cacti-list-devices` | `inventory` | bidategetswe `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | bitegetswe `name`, urugero `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | bidategetswe `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | bidategetswe `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | bidategetswe `pageSize`, `pageToken`, `filter`, `orderBy` | 7 cyangwa 4 |
+| `cacti-list-graphs` | `inventory` | bidategetswe `pageSize`, `pageToken`, `filter`, `orderBy` | 7 cyangwa 5 |
+| `cacti-list-data-sources` | `inventory` | bidategetswe `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | bidategetswe `lines` (1 kugeza kuri 200, mu busanzwe 50), `severity`, `search` | 19 cyangwa 18 |
 
 Buri muhamagaro na wo ukenera urubibi rwa **MCP and Abilities API** kuri nyir'urufunguzo,
 uburenganzira bwa `abilities:read` (buri rufunguzo rwihariye rurabufite), n'ubushobozi
-bwashyizwe ahagaragara. Agashami ka Abilities mu rubuga rw'ubuyobozi kerekana urubibi buri bushobozi busanzwemo bukenera.
+bwashyizwe ahagaragara. Agashami ka Abilities mu rubuga rw'ubuyobozi kerekana urubibi rw'ibanze buri bushobozi busanzwemo bukenera.
 
-- `cacti-list-devices` isubiza amapaji agera ku bikoresho 100 (mu busanzwe 50) na
-  `nextPageToken`. Urufunguzo rw'ipaji rukora gusa kuri `filter` na
-  `orderBy` bimwe. `filter` ni imvugo ya AIP-160 y'ibigereranyo bihujwe na `AND`,
-  urugero `state = "DOWN" AND disabled = false`. Ibice byo kuyungurura ni
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId`, na `state`. `orderBy` yakira `displayName`, `hostname`, cyangwa `name`,
-  buri kimwe gishobora gukurikirwa na `desc`.
-- Ibibazo by'ibikoresho binyura muri `get_allowed_devices()` ya Cacti, bityo umukoresha abona gusa
-  ibikoresho Cacti yari kumwereka.
-- Ibice by'igikoresho bikuramo imigozi y'imiryango ya SNMP, amagambo y'ibanga, n'ibindi
-  byemezo by'umwirondoro.
+Ubushobozi bwose butandatu bwa `cacti-list-*` busubiza amapaji agera ku bikoresho
+100 (mu busanzwe 50) na `nextPageToken`. Urufunguzo rw'ipaji rukora gusa kuri
+`filter` na `orderBy` bimwe. `filter` ni imvugo ya AIP-160 y'ibigereranyo (`=`,
+`!=`, `<`, `<=`, `>`, `>=`) bihujwe na `AND`, urugero
+`state = "DOWN" AND disabled = false`. `orderBy` yakira urutonde rw'ibice bishobora
+gutondekwa bitandukanyijwe n'akitso, buri kimwe gishobora gukurikirwa na `asc`
+cyangwa `desc`.
+
+| Ubushobozi | Ibice byo kuyungurura | Ibice byo gutondeka |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Imipaka y'uburenganzira no gukuramo amakuru y'ibanga:
+
+- `cacti-list-devices` na `cacti-get-device` bisaba amakuru binyuze muri
+  `get_allowed_devices()` ya Cacti kandi bigakuramo imigozi y'imiryango ya SNMP,
+  amagambo y'ibanga, n'ibindi byemezo by'umwirondoro.
+- `cacti-list-trees` isaba amakuru binyuze muri `get_allowed_trees()` (kandi
+  ikayungurura ikoresheje `is_tree_allowed()` igihe biboneka); `cacti-list-graphs`
+  isaba amakuru binyuze muri `get_allowed_graphs()` (kandi ikayungurura ikoresheje
+  `is_graph_allowed()` igihe biboneka).
+- `cacti-list-data-sources` igenera imirongo ku bikoresho uwahamagaye yemerewe
+  bivuye muri `get_allowed_devices()` (na `is_device_allowed()` igihe biboneka)
+  kandi igasubiza amakuru ndangamiterere gusa itabajije `data_input_data` cyangwa
+  ngo igaragaze agaciro k'ibanga kinjijwe.
+- `cacti-list-pollers` ikuramo ibyemezo by'ububiko bw'amakuru (`dbpass`, `dbuser`)
+  n'inkingi z'imfunguzo n'ibyemezo bya TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` isoma nibura 1 MiB ya nyuma y'inyandiko y'ibikorwa ya Cacti
+  yashyizweho (igakata imirongo ku giti cyayo irengeje bayite 2048), ikayungurura
+  ikurikije `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`,
+  `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; mu
+  busanzwe `ALL`) na `search` ititaye ku nyuguti nkuru cyangwa nto (kugeza ku
+  nyuguti 256), maze igasubiza `lines`, `count`, na `truncated`. Buri murongo
+  ukurwamo impapuro z'uburenganzira zihariye, imitwe ya bearer/basic, amagambo
+  y'ibanga, amabanga, imiryango ya SNMP, imfunguzo, `dbpass`, `dbsslkey`,
+  n'amakuru y'umukoresha muri URL mbere y'uko muyunguruzi za `severity` na
+  `search` zikora kugira ngo `search` itaba uburyo bwo kumenya ibanga. Iyo
+  ikurwamo ry'ibanga rinaniranye rirafunga rigasiga `[redacted]`, kandi inyandiko
+  idasomeka isubiza `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Kwinjiza
 
@@ -424,7 +466,7 @@ cyangwa seriveri atari yo poller nyamukuru.
 
 | HTTP | Uducisho twa `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (byohereza kandi `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -530,14 +572,26 @@ Guhagarika iyi mugereka bifunga impero zombi. Kuyikuraho (uninstalling) bihagari
 
 ## Iterambere n'isuzuma
 
-Isuzuma ni inyandiko zisanzwe za PHP zikora nta Cacti:
+Urutonde rw'isuzuma rurimo inyandiko zisanzwe za PHP ziri muri `tests/` hamwe
+n'isuzuma ry'ibice bya PHPUnit muri `tests/Unit/` n'isesengura ridakoresha ikorwa
+rya PHPStan (urwego rwa 6), byose bikora nta iyishyirwaho rya Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI igenzura imyandikire ya PHP kandi igakoresha inyandiko ziri muri `tests/` (buri yose iranditse muri `.github/workflows/ci.yml`) kuri PHP 8.2 kugeza kuri 8.5, hanyuma ikubaka ububiko bwa `mcp/` bishoboka gushyirwaho na checksum yabwo. Isuzuma rikora kuri Cacti rikoresha fixtures ku mupaka w'ubufasha bwa Cacti; ntirigerageza iyishyirwaho ryuzuye rya Cacti.
+CI ikora kuri PHP 8.2 kugeza kuri 8.5: umurimo wa `test` ugenzura imyandikire ya
+PHP (`php -l`) kandi ugakoresha inyandiko 13 zisanzwe z'isuzuma za PHP zanditse
+muri `.github/workflows/ci.yml`, umurimo wa `quality` ukoresha `composer phpstan`
+na `composer test`, n'umurimo wa `package` wubaka ububiko bwa `mcp/` bishoboka
+gushyirwaho (budashyiramo amadosiye y'iterambere n'isuzuma yanditse muri
+`.gitattributes`) hamwe na `SHA256SUMS` yabwo. Isuzuma rikora kuri Cacti
+rikoresha fixtures ku mupaka w'ubufasha bwa Cacti; ntirigerageza iyishyirwaho
+ryuzuye rya Cacti.
 
 ### Isuzuma ry'imikoranire
 

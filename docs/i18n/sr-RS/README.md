@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -39,7 +39,9 @@ Cacti MCP је Cacti додатак који омогућава AI клијен�
 
 Доступно данас:
 
-- Уграђене могућности само за читање за верзије система и инвентар уређаја.
+- Девет уграђених могућности само за читање које обухватају верзије система,
+  уређаје, локације (sites), поллере, стабла графикона, графиконе, изворе
+  података и ограничени, редиговани завршни део Cacti дневника.
 - Лични приступни токени (`cmcp_pat_...`) као једини акредитив.
 - Конзола Управљање > MCP: излагање или сакривање могућности, прављење и опозив токена,
   као и преглед дневника ревизије.
@@ -61,25 +63,65 @@ Cacti MCP је Cacti додатак који омогућава AI клијен�
 
 ## Уграђене могућности
 
-| ID | Аргументи | Потребна Cacti област |
-| --- | --- | --- |
-| `cacti-get-system-info` | нема | 15 |
-| `cacti-list-devices` | опциони `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | обавезни `name`, на пример `devices/12` | 3 |
+| ID | Категорија | Аргументи | Потребна Cacti област |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | нема | 15 |
+| `cacti-list-devices` | `inventory` | опциони `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | обавезни `name`, на пример `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | опциони `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | опциони `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | опциони `pageSize`, `pageToken`, `filter`, `orderBy` | 7 или 4 |
+| `cacti-list-graphs` | `inventory` | опциони `pageSize`, `pageToken`, `filter`, `orderBy` | 7 или 5 |
+| `cacti-list-data-sources` | `inventory` | опциони `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | опциони `lines` (1 до 200, подразумевано 50), `severity`, `search` | 19 или 18 |
 
 Сваки позив такође захтева област **MCP и Abilities API** за власника токена, опсег
 `abilities:read` (који сваки лични токен поседује) и изложену могућност. Картица Могућности
-на конзоли приказује коју област захтева свака уграђена могућност.
+на конзоли приказује коју примарну област захтева свака уграђена могућност.
 
-- `cacti-list-devices` враћа странице до 100 уређаја (подразумевано 50) и `nextPageToken`.
-  Токен странице важи само за исти `filter` и `orderBy`. `filter` је AIP-160 израз поређења
-  повезаних оператором `AND`, на пример `state = "DOWN" AND disabled = false`. Поља за
-  филтрирање су `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId` и `state`. `orderBy` прима `displayName`, `hostname` или `name`, при чему
-  свако поље опционо може бити праћено са `desc`.
-- Упити за уређаје пролазе кроз Cacti функцију `get_allowed_devices()`, тако да корисник
-  види само оне уређаје које би му и Cacti приказао.
-- Поља уређаја искључују SNMP community низове, приступне фразе и друге акредитиве.
+Свих шест могућности `cacti-list-*` враћају странице до 100 ставки
+(подразумевано 50) и `nextPageToken`. Токен странице важи само за исти
+`filter` и `orderBy`. `filter` је AIP-160 израз поређења (`=`, `!=`, `<`, `<=`,
+`>`, `>=`) повезаних оператором `AND`, на пример
+`state = "DOWN" AND disabled = false`. `orderBy` прима зарезом раздвојену листу
+поља за сортирање, при чему свако поље опционо може бити праћено са `asc` или
+`desc`.
+
+| Могућност | Поља за филтрирање | Поља за сортирање |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Ограничавање дозвола и искључивање тајни:
+
+- `cacti-list-devices` и `cacti-get-device` упитују преко Cacti функције
+  `get_allowed_devices()` и искључују SNMP community низове, приступне фразе и
+  друге акредитиве.
+- `cacti-list-trees` упитује преко `get_allowed_trees()` (и филтрира помоћу
+  `is_tree_allowed()` када је доступна); `cacti-list-graphs` упитује преко
+  `get_allowed_graphs()` (и филтрира помоћу `is_graph_allowed()` када је
+  доступна).
+- `cacti-list-data-sources` ограничава редове на дозвољене уређаје позиваоца из
+  `get_allowed_devices()` (и `is_device_allowed()` када је доступна) и враћа само
+  метаподатке без упита ка табели `data_input_data` и без откривања тајних
+  улазних вредности.
+- `cacti-list-pollers` искључује акредитиве базе података (`dbpass`, `dbuser`) и
+  колоне за TLS кључеве и сертификате (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` чита највише последњи 1 MiB подешеног Cacti дневника
+  (скраћујући појединачне редове дуже од 2048 бајтова), филтрира према
+  `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`,
+  `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; подразумевано `ALL`)
+  и `search` без обзира на величину слова (до 256 знакова), и враћа `lines`,
+  `count` и `truncated`. Из сваког реда се уклањају лични токени, bearer/basic
+  заглавља, лозинке, тајне, SNMP заједнице, кључеви, `dbpass`, `dbsslkey` и
+  подаци о кориснику из URL-а пре него што се покрену филтери `severity` и
+  `search`, како `search` не би могао да послужи као пророк за тајне. Редакција
+  отказује затворено са `[redacted]`, а нечитљив дневник враћа
+  `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Инсталација
 
@@ -417,7 +459,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | Вредности поља `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (такође шаље `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -556,16 +598,24 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## Развој и тестови
 
-Тестови су обичне PHP скрипте које се покрећу без Cacti-ја:
+Скуп тестова обухвата обичне PHP скрипте у `tests/`, као и PHPUnit јединичне
+тестове у `tests/Unit/` и PHPStan статичку анализу (ниво 6), а све се покреће
+без Cacti инсталације:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI проверава PHP синтаксу и покреће скрипте у `tests/` (свака је наведена у
-`.github/workflows/ci.yml`) на верзијама PHP 8.2 до 8.5, затим прави инсталабилну архиву
-`mcp/` и њен контролни збир. Тестови који додирују Cacti користе заменске податке на граници
+CI се извршава на верзијама PHP 8.2 до 8.5: посао `test` који проверава PHP
+синтаксу (`php -l`) и покреће 13 обичних PHP тест скрипти наведених у
+`.github/workflows/ci.yml`, посао `quality` који покреће `composer phpstan` и
+`composer test`, и посао `package` који прави инсталабилну архиву `mcp/`
+(искључујући развојне и тестне датотеке наведене у `.gitattributes`) и њен
+`SHA256SUMS`. Тестови који додирују Cacti користе заменске податке на граници
 Cacti помоћних функција; не тестирају потпуну Cacti инсталацију.
 
 ### Интеграциони тестови

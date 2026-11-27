@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP ایک Cacti پلگ ان ہے جو AI کلائنٹس کو نامزد �
 
 آج دستیاب خصوصیات:
 
-- سسٹم کے ورژنز اور ڈیوائس انوینٹری کے لیے صرف پڑھنے کی بلٹ ان صلاحیتیں۔
+- سسٹم کے ورژنز، ڈیوائسز، سائٹس، پولرز، گراف ٹریز، گرافس، ڈیٹا سورسز، اور ایک محدود، ریڈیکٹ شدہ Cacti لاگ ٹیل کا احاطہ کرنے والی نو صرف پڑھنے کی بلٹ ان صلاحیتیں۔
 - واحد اسناد کے طور پر ذاتی رسائی کے ٹوکنز (`cmcp_pat_...`)۔
 - مینجمنٹ > MCP کنسول: صلاحیتیں ظاہر یا مخفی کریں، ٹوکنز بنائیں اور منسوخ کریں، آڈٹ لاگ پڑھیں۔
 - مینجمنٹ > میرے MCP ٹوکنز: صارفین اپنے ٹوکنز کا انتظام خود کرتے ہیں، اپنی سرگرمی دیکھتے ہیں، اور یہ دیکھتے ہیں کہ ان کے ٹوکنز کون سے ٹولز استعمال کر سکتے ہیں۔
@@ -47,17 +47,38 @@ Cacti MCP ایک Cacti پلگ ان ہے جو AI کلائنٹس کو نامزد �
 
 ## بلٹ ان صلاحیتیں
 
-| شناخت (ID) | دلائل (Arguments) | درکار Cacti ریم |
+| شناخت (ID) | زمرہ | دلائل (Arguments) | درکار Cacti ریم |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | کوئی نہیں | 15 |
+| `cacti-list-devices` | `inventory` | اختیاری `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | لازمی `name`، جیسے `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | اختیاری `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | اختیاری `pageSize`، `pageToken`، `filter`، `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | اختیاری `pageSize`، `pageToken`، `filter`، `orderBy` | 7 یا 4 |
+| `cacti-list-graphs` | `inventory` | اختیاری `pageSize`، `pageToken`، `filter`، `orderBy` | 7 یا 5 |
+| `cacti-list-data-sources` | `inventory` | اختیاری `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-get-clog` | `system` | اختیاری `lines` (1 سے 200، ڈیفالٹ 50)، `severity`، `search` | 19 یا 18 |
+
+ہر کال کے لیے ٹوکن کے مالک کے پاس **MCP اور Abilities API** ریم، `abilities:read` اسکوپ (یہ ہر ذاتی ٹوکن میں ہوتا ہے)، اور ایک ظاہر کردہ صلاحیت کا ہونا بھی ضروری ہے۔ کنسول کا صلاحیتوں (Abilities) والا ٹیب دکھاتا ہے کہ ہر بلٹ ان صلاحیت کو کون سا بنیادی ریم درکار ہے۔
+
+تمام چھ `cacti-list-*` صلاحیتیں زیادہ سے زیادہ 100 آئٹمز کے صفحات (ڈیفالٹ 50) اور ایک `nextPageToken` لوٹاتی ہیں۔ صفحے کا ٹوکن صرف اسی `filter` اور `orderBy` کے لیے درست ہوتا ہے۔ `filter` موازنوں (`=`, `!=`, `<`, `<=`, `>`, `>=`) کا ایک AIP-160 ایکسپریشن ہے جو `AND` سے جڑا ہوتا ہے، مثال کے طور پر `state = "DOWN" AND disabled = false`۔ `orderBy` کوما سے الگ کیے گئے ترتیب دینے کے قابل فیلڈز کی فہرست قبول کرتا ہے، جن میں سے ہر ایک کے بعد اختیاری طور پر `asc` یا `desc` آ سکتا ہے۔
+
+| صلاحیت | فلٹر فیلڈز | ترتیب کے فیلڈز |
 | --- | --- | --- |
-| `cacti-get-system-info` | کوئی نہیں | 15 |
-| `cacti-list-devices` | اختیاری `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
-| `cacti-get-device` | لازمی `name`، جیسے `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`، `hostname`، `disabled`، `site`، `poller`، `deviceTemplate`، `externalId`، `state` (`UNKNOWN`، `DOWN`، `RECOVERING`، `UP`، `ERROR`) | `displayName`، `hostname`، `name` |
+| `cacti-list-sites` | `displayName`، `city`، `state`، `country`، `timezone`، `alternateId` | `displayName`، `city`، `state`، `country`، `name` |
+| `cacti-list-pollers` | `displayName`، `hostname`، `disabled`، `state` (`NEW`، `RUNNING`، `IDLE`، `UNKNOWN`، `DISABLED`، `RECOVERING`، `ERROR`) | `displayName`، `hostname`، `name` |
+| `cacti-list-trees` | `displayName`، `enabled` | `displayName`، `name` |
+| `cacti-list-graphs` | `title`، `device`، `graphTemplate`، `templateName` | `title`، `templateName`، `name` |
+| `cacti-list-data-sources` | `displayName`، `device`، `dataTemplate`، `active` | `displayName`، `name` |
 
-ہر کال کے لیے ٹوکن کے مالک کے پاس **MCP اور Abilities API** ریم، `abilities:read` اسکوپ (یہ ہر ذاتی ٹوکن میں ہوتا ہے)، اور ایک ظاہر کردہ صلاحیت کا ہونا بھی ضروری ہے۔ کنسول کا صلاحیتوں (Abilities) والا ٹیب دکھاتا ہے کہ ہر بلٹ ان صلاحیت کو کون سا ریم درکار ہے۔
+اجازت کا دائرہ کار اور خفیہ معلومات کا اخراج:
 
-- `cacti-list-devices` زیادہ سے زیادہ 100 ڈیوائسز کے صفحات (ڈیفالٹ 50) اور ایک `nextPageToken` لوٹاتا ہے۔ صفحے کا ٹوکن صرف اسی `filter` اور `orderBy` کے لیے درست ہوتا ہے۔ `filter` موازنوں کا ایک AIP-160 ایکسپریشن ہے جو `AND` سے جڑا ہوتا ہے، مثال کے طور پر `state = "DOWN" AND disabled = false`۔ فلٹر کے فیلڈز `displayName`، `hostname`، `disabled`، `site`، `poller`، `deviceTemplate`، `externalId`، اور `state` ہیں۔ `orderBy` میں `displayName`، `hostname`، یا `name` لیا جاتا ہے، جن میں سے ہر ایک کے بعد اختیاری طور پر `desc` آ سکتا ہے۔
-- ڈیوائس کے استفسارات Cacti کے `get_allowed_devices()` سے گزرتے ہیں، اس لیے صارف صرف وہی ڈیوائسز دیکھتا ہے جو Cacti اسے دکھائے گا۔
-- ڈیوائس کے فیلڈز میں SNMP کمیونٹی سٹرنگز، پاس فریزز، اور دیگر اسناد شامل نہیں ہوتیں۔
+- `cacti-list-devices` اور `cacti-get-device` Cacti کے `get_allowed_devices()` کے ذریعے استفسار کرتے ہیں اور SNMP کمیونٹی سٹرنگز، پاس فریزز، اور دیگر اسناد کو خارج کرتے ہیں۔
+- `cacti-list-trees` `get_allowed_trees()` کے ذریعے استفسار کرتا ہے (اور دستیاب ہونے پر `is_tree_allowed()` سے فلٹر کرتا ہے)؛ `cacti-list-graphs` `get_allowed_graphs()` کے ذریعے استفسار کرتا ہے (اور دستیاب ہونے پر `is_graph_allowed()` سے فلٹر کرتا ہے)۔
+- `cacti-list-data-sources` قطاروں کو `get_allowed_devices()` (اور دستیاب ہونے پر `is_device_allowed()`) سے کالر کی مجاز ڈیوائسز تک محدود کرتا ہے اور `data_input_data` سے استفسار کیے بغیر یا خفیہ ان پٹ اقدار کو ظاہر کیے بغیر صرف میٹا ڈیٹا لوٹاتا ہے۔
+- `cacti-list-pollers` ڈیٹا بیس کی اسناد (`dbpass`، `dbuser`) اور TLS کلید و سرٹیفکیٹ کے کالمز (`dbsslkey`، `dbsslcert`، `dbsslca`) کو خارج کرتا ہے۔
+- `cacti-get-clog` کنفیگر کردہ Cacti لاگ کے آخری 1 MiB تک پڑھتا ہے (2048 بائٹس سے زیادہ کی انفرادی سطروں کو کاٹتے ہوئے)، `severity` (`ALL`، `DEBUG`، `INFO`، `NOTICE`، `WARNING`، `ERROR`، `CRITICAL`، `ALERT`، `EMERGENCY`، `FATAL`، `STATS`، `POLLER`، `SYSTEM`؛ ڈیفالٹ `ALL`) اور کیس سے غیر حساس `search` (256 حروف تک) کے ذریعے فلٹر کرتا ہے، اور `lines`، `count`، اور `truncated` لوٹاتا ہے۔ `severity` اور `search` فلٹرز چلنے سے پہلے ہی ہر سطر کو ذاتی ٹوکنز، bearer/basic ہیڈرز، پاس ورڈز، اسرار، SNMP کمیونٹیز، کلیدوں، `dbpass`، `dbsslkey`، اور URL صارف معلومات کے لیے ریڈیکٹ کیا جاتا ہے تاکہ `search` خفیہ معلومات کے اوریکل کے طور پر کام نہ کر سکے۔ ریڈیکشن ناکامی کی صورت میں `[redacted]` کے ساتھ بند ہو جاتی ہے، اور ناقابلِ مطالعہ لاگ `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`) لوٹاتا ہے۔
 
 ## تنصیب
 
@@ -272,7 +293,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | `reason` کی قدریں |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`، `INVALID_FILTER`، `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`، `INVALID_FILTER`، `INVALID_PAGE_TOKEN`، `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (`WWW-Authenticate: Bearer` بھی بھیجتا ہے) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`، `DEVICE_NOT_FOUND`، `UNKNOWN_PATH` |
@@ -346,14 +367,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## ڈیولپمنٹ اور ٹیسٹس
 
-ٹیسٹس سادہ PHP اسکرپٹس ہیں جو Cacti کے بغیر چلتے ہیں:
+ٹیسٹ سوٹ میں `tests/` میں سادہ PHP اسکرپٹس کے ساتھ ساتھ `tests/Unit/` میں PHPUnit یونٹ ٹیسٹس اور PHPStan جامد تجزیہ (لیول 6) شامل ہیں، جو سب Cacti انسٹالیشن کے بغیر چلتے ہیں:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI، PHP کو لنٹ کرتا ہے اور PHP 8.2 سے 8.5 تک پر `tests/` میں موجود اسکرپٹس (جن میں سے ہر ایک `.github/workflows/ci.yml` میں درج ہے) کو چلاتا ہے، پھر انسٹال کے قابل `mcp/` آرکائیو اور اس کا چیک سم تیار کرتا ہے۔ وہ ٹیسٹس جو Cacti کو چھوتے ہیں وہ Cacti ہیلپر کی حد پر فکسچرز استعمال کرتے ہیں؛ وہ مکمل Cacti انسٹالیشن کی جانچ نہیں کرتے۔
+CI، PHP 8.2 سے 8.5 تک پر چلتا ہے: ایک `test` جاب جو PHP نحو کی لنٹنگ (`php -l`) کرتا ہے اور `.github/workflows/ci.yml` میں درج 13 سادہ PHP ٹیسٹ اسکرپٹس چلاتا ہے، ایک `quality` جاب جو `composer phpstan` اور `composer test` چلاتا ہے، اور ایک `package` جاب جو انسٹال کے قابل `mcp/` آرکائیو (`.gitattributes` میں درج ڈیولپمنٹ اور ٹیسٹ فائلوں کو چھوڑ کر) اور اس کا `SHA256SUMS` تیار کرتا ہے۔ وہ ٹیسٹس جو Cacti کو چھوتے ہیں وہ Cacti ہیلپر کی حد پر فکسچرز استعمال کرتے ہیں؛ وہ مکمل Cacti انسٹالیشن کی جانچ نہیں کرتے۔
 
 ### انٹیگریشن ٹیسٹس
 

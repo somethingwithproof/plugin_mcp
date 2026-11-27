@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP jẹ́ ohun èlò àfikún Cacti tí ó ń gba àwọn ètò olùlo AI
 
 Ohun tí ó wà lónìí:
 
-- Àwọn agbára kíkà-nìkan àkọ́mọ́lé fún àwọn ẹ̀dà ètò àti àkójọ àwọn ẹ̀rọ.
+- Àwọn agbára kíkà-nìkan àkọ́mọ́lé mẹ́sàn-án tí ó bo àwọn ẹ̀dà ètò, àwọn ẹ̀rọ, àwọn ààyè (sites), àwọn olùṣàkóso ìwádìí (pollers), àwọn igi àwòrán, àwọn àwòrán, àwọn orísun dátà, àti ìrù àkọsílẹ̀ Cacti tí a pààlà tí a sì bo àṣírí rẹ̀.
 - Àwọn àmì-àṣẹ ìwọlé ti ara-ẹni (`cmcp_pat_...`) gẹ́gẹ́ bí ìdánimọ̀ kan ṣoṣo.
 - Pátákó ìṣàkóso Management > MCP: ṣí tàbí pa àwọn agbára mọ́, ṣẹ̀dá kí o sì fagilé àwọn àmì-àṣẹ, ka àkọsílẹ̀ ìṣàyẹ̀wò.
 - Management > My MCP Tokens: àwọn olùlo ń ṣàkóso àwọn àmì-àṣẹ tiwọn, rí ìṣe wọn, kí wọ́n sì rí irú àwọn ohun èlò tí àmì-àṣẹ wọn lè lò.
@@ -49,17 +49,38 @@ Ohun tí kò tíì sí lọ́wọ́lọ́wọ́:
 
 ## Àwọn agbára àkọ́mọ́lé
 
-| ID | Àwọn pàrámítà (Arguments) | Agbègbè Cacti tí a nílò |
+| ID | Ẹ̀ka | Àwọn pàrámítà (Arguments) | Agbègbè Cacti tí a nílò |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | kò sí | 15 |
+| `cacti-list-devices` | `inventory` | àṣàyàn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | dandan `name`, bíi `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | àṣàyàn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | àṣàyàn `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | àṣàyàn `pageSize`, `pageToken`, `filter`, `orderBy` | 7 tàbí 4 |
+| `cacti-list-graphs` | `inventory` | àṣàyàn `pageSize`, `pageToken`, `filter`, `orderBy` | 7 tàbí 5 |
+| `cacti-list-data-sources` | `inventory` | àṣàyàn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | àṣàyàn `lines` (1 sí 200, àkọ́ṣẹ̀ṣe 50), `severity`, `search` | 19 tàbí 18 |
+
+Ìpè kọ̀ọ̀kan tún nílò agbègbè **MCP and Abilities API** fún olúwá àmì-àṣẹ náà, ààyè `abilities:read` (gbogbo àmì-àṣẹ ti ara-ẹni ní i), àti agbára tí a ṣí sílẹ̀. Táàbù Abilities nínú pátákó ìṣàkóso fi agbègbè àkọ́kọ́ tí àkọ́mọ́lé kọ̀ọ̀kan nílò hàn.
+
+Gbogbo àwọn agbára `cacti-list-*` mẹ́fẹ̀ẹ̀fà máa ń dá àwọn ojú-ìwé tí ó tó ohun 100 padà (àkọ́ṣẹ̀ṣe 50) àti `nextPageToken` kan. Àmì ojú-ìwé wúlò fún `filter` àti `orderBy` kan náà nìkan. `filter` jẹ́ ìsọ̀rọ̀ AIP-160 ti àwọn ìfiwéra (`=`, `!=`, `<`, `<=`, `>`, `>=`) tí a so pọ̀ pẹ̀lú `AND`, fún àpẹẹrẹ `state = "DOWN" AND disabled = false`. `orderBy` gba àtòjọ àwọn pápá tí a lè tò tí a pín pẹ̀lú kọ́mà, tí `asc` tàbí `desc` lè tẹ̀lé kọ̀ọ̀kan lọ́nà àṣàyàn.
+
+| Agbára | Àwọn pápá àsẹ̀ (Filter fields) | Àwọn pápá ìtò (Order fields) |
 | --- | --- | --- |
-| `cacti-get-system-info` | kò sí | 15 |
-| `cacti-list-devices` | àṣàyàn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | dandan `name`, bíi `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-Ìpè kọ̀ọ̀kan tún nílò agbègbè **MCP and Abilities API** fún olúwá àmì-àṣẹ náà, ààyè `abilities:read` (gbogbo àmì-àṣẹ ti ara-ẹni ní i), àti agbára tí a ṣí sílẹ̀. Táàbù Abilities nínú pátákó ìṣàkóso fi agbègbè tí àkọ́mọ́lé kọ̀ọ̀kan nílò hàn.
+Ìpín ààyè ìwọlé àti yíyọ àṣírí kúrò:
 
-- `cacti-list-devices` máa ń dá àwọn ojú-ìwé tí ó tó ẹ̀rọ 100 padà (àkọ́ṣẹ̀ṣe 50) àti `nextPageToken` kan. Àmì ojú-ìwé wúlò fún `filter` àti `orderBy` kan náà nìkan. `filter` jẹ́ ìsọ̀rọ̀ AIP-160 ti àwọn ìfiwéra tí a so pọ̀ pẹ̀lú `AND`, fún àpẹẹrẹ `state = "DOWN" AND disabled = false`. Àwọn pápá àṣàyàn ni `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, àti `state`. `orderBy` gba `displayName`, `hostname`, tàbí `name`, tí `desc` lè tẹ̀lé kọ̀ọ̀kan lọ́nà àṣàyàn.
-- Àwọn ìbéèrè ẹ̀rọ máa ń gba inú `get_allowed_devices()` ti Cacti kọjá, nítorí náà olùlo máa ń rí àwọn ẹ̀rọ tí Cacti yóò fi hàn wọ́n nìkan.
-- Àwọn pápá ẹ̀rọ yọ àwọn okùn àwùjọ SNMP, àwọn ọ̀rọ̀-ìkọ̀kọ̀, àti àwọn ìdánimọ̀ mìíràn kúrò.
+- `cacti-list-devices` àti `cacti-get-device` máa ń ṣe ìbéèrè láti inú `get_allowed_devices()` ti Cacti, wọ́n sì ń yọ àwọn okùn àwùjọ SNMP, àwọn ọ̀rọ̀-ìkọ̀kọ̀, àti àwọn ìdánimọ̀ mìíràn kúrò.
+- `cacti-list-trees` máa ń ṣe ìbéèrè láti inú `get_allowed_trees()` (ó sì ń sẹ̀ pẹ̀lú `is_tree_allowed()` nígbà tí ó bá wà); `cacti-list-graphs` máa ń ṣe ìbéèrè láti inú `get_allowed_graphs()` (ó sì ń sẹ̀ pẹ̀lú `is_graph_allowed()` nígbà tí ó bá wà).
+- `cacti-list-data-sources` máa ń pààlà àwọn ìlà sí àwọn ẹ̀rọ tí a gbà fún olùpè láti inú `get_allowed_devices()` (àti `is_device_allowed()` nígbà tí ó bá wà), ó sì máa ń dá dátà-àpèjúwe (metadata) nìkan padà láì ṣe ìbéèrè `data_input_data` tàbí ṣíṣí àwọn ìní ìkọ̀kọ̀ sílẹ̀.
+- `cacti-list-pollers` máa ń yọ àwọn ìdánimọ̀ ibi-ìpamọ́ dátà (`dbpass`, `dbuser`) àti àwọn ọ̀wọ̀n kọ́kọ́rọ́ àti ìwé-ẹ̀rí TLS (`dbsslkey`, `dbsslcert`, `dbsslca`) kúrò.
+- `cacti-get-clog` máa ń ka títí dé 1 MiB ìkẹyìn ti àkọsílẹ̀ Cacti tí a ṣètò (nípa gígé àwọn ìlà kọ̀ọ̀kan tí ó ju 2048 bytes lọ), ó ń sẹ̀ nípa `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; àkọ́ṣẹ̀ṣe `ALL`) àti `search` tí kò wo lẹ́tà ńlá tàbí kékeré (títí dé lẹ́tà 256), ó sì ń dá `lines`, `count`, àti `truncated` padà. Ìlà kọ̀ọ̀kan ni a máa ń bo fún àwọn àmì-àṣẹ ti ara-ẹni, àwọn àkọlé bearer/basic, àwọn ọ̀rọ̀-ìkọ̀kọ̀, àwọn àṣírí, àwọn àwùjọ SNMP, àwọn kọ́kọ́rọ́, `dbpass`, `dbsslkey`, àti àlàyé olùlo URL kí àwọn àsẹ̀ `severity` àti `search` tó ṣiṣẹ́ kí `search` má baà lè ṣiṣẹ́ gẹ́gẹ́ bí olùwádìí àṣírí. Ìbò-àṣírí máa ń kùnà ní ìtìpa pẹ̀lú `[redacted]`, àti àkọsílẹ̀ tí kò ṣeé kà máa ń dá `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`) padà.
 
 ## Ìfisílẹ̀
 
@@ -333,7 +354,7 @@ olùpèsè kò bá ṣe olùṣàwárí pàtàkì.
 
 | HTTP | Àwọn iye `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (ó tún ń fi `WWW-Authenticate: Bearer` ránṣẹ́) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -477,16 +498,17 @@ níta àfikún náà.
 
 ## Ìdàgbàsókè àti àwọn àyẹ̀wò
 
-Àwọn àyẹ̀wò náà jẹ́ àwọn ìwé-àṣẹ PHP lásán tí ó máa ń ṣiṣẹ́ láìsí Cacti:
+Àkójọ àyẹ̀wò náà ní àwọn ìwé-àṣẹ PHP lásán nínú `tests/` pẹ̀lú àwọn àyẹ̀wò ẹ̀yà PHPUnit nínú `tests/Unit/` àti àyẹ̀wò àìyípadà PHPStan (ìpele 6), gbogbo wọn ń ṣiṣẹ́ láìsí ìfisílẹ̀ Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI máa ń ṣàyẹ̀wò àṣìṣe (lints) PHP ó sì máa ń ṣiṣẹ́ àwọn ìwé-àṣẹ inú `tests/` (ọ̀kọ̀ọ̀kan wọn wà ní àkọsílẹ̀ nínú
-`.github/workflows/ci.yml`) lórí PHP 8.2 títí dé 8.5, lẹ́yìn náà ó máa ń ṣẹ̀dá àpò `mcp/` tí a lè gbé kalẹ̀ àti ìṣirò ìdánilójú (checksum) rẹ̀. Àwọn àyẹ̀wò tí ó kan Cacti máa ń lo
-àwọn ohun ìṣe-àyẹ̀wò (fixtures) ní ààlà olùrànlọ́wọ́ Cacti; wọn kì í dán ìgbékalẹ̀ Cacti kíkún wò.
+CI máa ń ṣiṣẹ́ lórí PHP 8.2 títí dé 8.5: iṣẹ́ `test` tí ó máa ń ṣàyẹ̀wò gírámà PHP (`php -l`) tí ó sì máa ń ṣiṣẹ́ àwọn ìwé-àṣẹ àyẹ̀wò PHP lásán 13 tí a tò sínú `.github/workflows/ci.yml`, iṣẹ́ `quality` tí ó máa ń ṣiṣẹ́ `composer phpstan` àti `composer test`, àti iṣẹ́ `package` tí ó máa ń ṣẹ̀dá àpò `mcp/` tí a lè gbé kalẹ̀ (tí ó yọ àwọn fáìlì ìdàgbàsókè àti àyẹ̀wò tí a tò sínú `.gitattributes` kúrò) àti `SHA256SUMS` rẹ̀. Àwọn àyẹ̀wò tí ó kan Cacti máa ń lo àwọn ohun ìṣe-àyẹ̀wò (fixtures) ní ààlà olùrànlọ́wọ́ Cacti; wọn kì í dán ìgbékalẹ̀ Cacti kíkún wò.
 
 ### Àwọn àyẹ̀wò ìsopọ̀pọ̀
 

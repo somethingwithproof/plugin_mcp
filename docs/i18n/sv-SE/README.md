@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -40,7 +40,9 @@ protokollkod behöver skrivas.
 
 Tillgängligt idag:
 
-- Skrivskyddade inbyggda förmågor för systemversioner och enhetsinventering.
+- Nio skrivskyddade inbyggda förmågor som täcker systemversioner, enheter,
+  platser (sites), pollers, grafträd, grafer, datakällor samt en begränsad och
+  maskerad svans av Cacti-loggen.
 - Personliga åtkomsttoken (`cmcp_pat_...`) som enda autentiseringsuppgift.
 - Konsolen under Management > MCP: exponera eller dölj förmågor, skapa och
   återkalla token, läs granskningsloggen.
@@ -63,28 +65,65 @@ och byggordningen finns i [docs/plan.md](../../plan.md).
 
 ## Inbyggda förmågor
 
-| ID | Argument | Nödvändig Cacti-realm |
-| --- | --- | --- |
-| `cacti-get-system-info` | inga | 15 |
-| `cacti-list-devices` | valfria `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | obligatoriskt `name`, till exempel `devices/12` | 3 |
+| ID | Kategori | Argument | Nödvändig Cacti-realm |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | inga | 15 |
+| `cacti-list-devices` | `inventory` | valfria `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | obligatoriskt `name`, till exempel `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | valfria `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | valfria `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | valfria `pageSize`, `pageToken`, `filter`, `orderBy` | 7 eller 4 |
+| `cacti-list-graphs` | `inventory` | valfria `pageSize`, `pageToken`, `filter`, `orderBy` | 7 eller 5 |
+| `cacti-list-data-sources` | `inventory` | valfria `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | valfria `lines` (1 till 200, standard 50), `severity`, `search` | 19 eller 18 |
 
 Varje anrop kräver dessutom realmen **MCP and Abilities API** för tokenägaren,
 omfånget (scope) `abilities:read` (alla personliga token har det) samt att
-förmågan är exponerad. Fliken Abilities i konsolen visar vilken realm varje
+förmågan är exponerad. Fliken Abilities i konsolen visar vilken primär realm varje
 inbyggd förmåga kräver.
 
-- `cacti-list-devices` returnerar sidor med upp till 100 enheter (standard 50)
-  och en `nextPageToken`. En sidtoken är endast giltig för samma `filter` och
-  `orderBy`. `filter` är ett AIP-160-uttryck av jämförelser förenade med
-  `AND`, till exempel `state = "DOWN" AND disabled = false`. Filterfält är
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId` och `state`. `orderBy` tar `displayName`, `hostname` eller
-  `name`, vart och ett valfritt följt av `desc`.
-- Enhetsfrågor går via Cactis `get_allowed_devices()`, så en användare ser
-  endast de enheter som Cacti normalt visar för den användaren.
-- Enhetsfälten exkluderar SNMP-communitysträngar, lösenfraser och andra
-  autentiseringsuppgifter.
+Alla sex `cacti-list-*`-förmågor returnerar sidor med upp till 100 objekt
+(standard 50) och en `nextPageToken`. En sidtoken är endast giltig för samma
+`filter` och `orderBy`. `filter` är ett AIP-160-uttryck av jämförelser (`=`,
+`!=`, `<`, `<=`, `>`, `>=`) förenade med `AND`, till exempel
+`state = "DOWN" AND disabled = false`. `orderBy` accepterar en kommaseparerad
+lista över sorterbara fält, vart och ett valfritt följt av `asc` eller `desc`.
+
+| Förmåga | Filterfält | Sorteringsfält |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Behörighetsavgränsning och exkludering av hemligheter:
+
+- `cacti-list-devices` och `cacti-get-device` frågar via Cactis
+  `get_allowed_devices()` och exkluderar SNMP-communitysträngar, lösenfraser och
+  andra autentiseringsuppgifter.
+- `cacti-list-trees` frågar via `get_allowed_trees()` (och filtrerar med
+  `is_tree_allowed()` när den finns tillgänglig); `cacti-list-graphs` frågar via
+  `get_allowed_graphs()` (och filtrerar med `is_graph_allowed()` när den finns
+  tillgänglig).
+- `cacti-list-data-sources` begränsar rader till anroparens tillåtna enheter från
+  `get_allowed_devices()` (och `is_device_allowed()` när den finns tillgänglig)
+  och returnerar endast metadata utan att fråga `data_input_data` eller exponera
+  hemliga indatavärden.
+- `cacti-list-pollers` exkluderar databasuppgifter (`dbpass`, `dbuser`) samt
+  kolumner för TLS-nycklar och certifikat (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` läser upp till den sista 1 MiB av den konfigurerade
+  Cacti-loggen (och klipper enskilda rader över 2048 byte), filtrerar efter
+  `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`,
+  `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; standard `ALL`) och
+  skiftlägesokänslig `search` (upp till 256 tecken), samt returnerar `lines`,
+  `count` och `truncated`. Varje rad maskeras för personliga token,
+  bearer/basic-huvuden, lösenord, hemligheter, SNMP-communities, nycklar,
+  `dbpass`, `dbsslkey` och URL-userinfo innan filtren `severity` och `search`
+  körs så att `search` inte kan fungera som ett hemlighetsorakel. Maskeringen
+  fallerar säkert (fail-closed) med `[redacted]`, och en oläsbar logg
+  returnerar `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Installation
 
@@ -443,7 +482,7 @@ eller servern inte är huvudpollern.
 
 | HTTP | `reason`-värden |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (skickar även `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -590,16 +629,24 @@ och tillämpa en lagringspolicy för granskningsloggen utanför insticksprogramm
 
 ## Utveckling och tester
 
-Tester är vanliga PHP-skript som körs utan Cacti:
+Testsviten omfattar vanliga PHP-skript i `tests/` samt PHPUnit-enhetstester i
+`tests/Unit/` och statisk analys med PHPStan (nivå 6), som alla körs utan en
+Cacti-installation:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI lintar PHP och kör skripten i `tests/` (varje skript listas i
-`.github/workflows/ci.yml`) på PHP 8.2 till och med 8.5, och bygger sedan det
-installerbara `mcp/`-arkivet och dess kontrollsumma. Tester som berör Cacti använder
+CI körs på PHP 8.2 till och med 8.5: ett `test`-jobb som lintar PHP-syntax
+(`php -l`) och kör de 13 vanliga PHP-testskripten som listas i
+`.github/workflows/ci.yml`, ett `quality`-jobb som kör `composer phpstan` och
+`composer test`, samt ett `package`-jobb som bygger det installerbara
+`mcp/`-arkivet (exklusive utvecklings- och testfiler som listas i
+`.gitattributes`) och dess `SHA256SUMS`. Tester som berör Cacti använder
 fixturer vid gränsen mot Cacti-hjälpfunktionerna; de testar inte en fullständig
 Cacti-installation.
 

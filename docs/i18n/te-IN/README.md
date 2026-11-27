@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP అనేది ఒక Cacti ప్లగిన్, ఇది AI క�
 
 ప్రస్తుతం అందుబాటులో ఉన్నవి:
 
-- సిస్టమ్ వెర్షన్‌లు మరియు పరికరాల ఇన్వెంటరీ కోసం రీడ్-ఓన్లీ అంతర్నిర్మిత ఎబిలిటీలు.
+- సిస్టమ్ వెర్షన్‌లు, పరికరాలు, సైట్‌లు, పోలర్‌లు, గ్రాఫ్ ట్రీలు, గ్రాఫ్‌లు, డేటా సోర్స్‌లు మరియు పరిమిత, సంస్కరించబడిన (redacted) Cacti లాగ్ టెయిల్‌ను కవర్ చేసే తొమ్మిది రీడ్-ఓన్లీ అంతర్నిర్మిత ఎబిలిటీలు.
 - ఏకైక క్రెడెన్షియల్‌గా వ్యక్తిగత యాక్సెస్ టోకెన్‌లు (`cmcp_pat_...`).
 - Management > MCP కన్సోల్: ఎబిలిటీలను బహిర్గతం చేయండి లేదా దాచండి, టోకెన్‌లను సృష్టించండి మరియు రద్దు చేయండి, ఆడిట్ లాగ్‌ను చదవండి.
 - Management > My MCP Tokens: వినియోగదారులు తమ స్వంత టోకెన్‌లను నిర్వహించగలరు, తమ కార్యాచరణను చూడగలరు మరియు తమ టోకెన్‌లు ఏ టూల్స్‌ను ఉపయోగించగలవో చూడగలరు.
@@ -47,17 +47,38 @@ Cacti MCP అనేది ఒక Cacti ప్లగిన్, ఇది AI క�
 
 ## అంతర్నిర్మిత ఎబిలిటీలు
 
-| ID | ఆర్గ్యుమెంట్లు | అవసరమైన Cacti రెల్మ్ |
+| ID | వర్గం | ఆర్గ్యుమెంట్లు | అవసరమైన Cacti రెల్మ్ |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | ఏదీ లేదు | 15 |
+| `cacti-list-devices` | `inventory` | ఐచ్ఛికం `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | తప్పనిసరి `name`, ఉదాహరణకు `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | ఐచ్ఛికం `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | ఐచ్ఛికం `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | ఐచ్ఛికం `pageSize`, `pageToken`, `filter`, `orderBy` | 7 లేదా 4 |
+| `cacti-list-graphs` | `inventory` | ఐచ్ఛికం `pageSize`, `pageToken`, `filter`, `orderBy` | 7 లేదా 5 |
+| `cacti-list-data-sources` | `inventory` | ఐచ్ఛికం `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | ఐచ్ఛికం `lines` (1 నుండి 200, డిఫాల్ట్ 50), `severity`, `search` | 19 లేదా 18 |
+
+ప్రతి కాల్‌కు టోకెన్ యజమాని కోసం **MCP and Abilities API** రెల్మ్, `abilities:read` స్కోప్ (ప్రతి వ్యక్తిగత టోకెన్‌కు ఇది ఉంటుంది), మరియు బహిర్గతం చేయబడిన ఎబిలిటీ కూడా అవసరం. కన్సోల్‌లోని Abilities ట్యాబ్ ప్రతి అంతర్నిర్మిత ఎబిలిటీకి అవసరమైన ప్రాథమిక రెల్మ్‌ను చూపుతుంది.
+
+మొత్తం ఆరు `cacti-list-*` ఎబిలిటీలు గరిష్టంగా 100 అంశాల పేజీలను (డిఫాల్ట్ 50) మరియు ఒక `nextPageToken` ను తిరిగి ఇస్తాయి. పేజీ టోకెన్ అదే `filter` మరియు `orderBy` కోసం మాత్రమే చెల్లుబాటు అవుతుంది. `filter` అనేది `AND` ద్వారా అనుసంధానించబడిన పోలికల (`=`, `!=`, `<`, `<=`, `>`, `>=`) యొక్క AIP-160 ఎక్స్‌ప్రెషన్, ఉదాహరణకు `state = "DOWN" AND disabled = false`. `orderBy` కామాతో వేరు చేయబడిన క్రమబద్ధీకరించగల ఫీల్డ్‌ల జాబితాను తీసుకుంటుంది, ప్రతిదాని తర్వాత ఐచ్ఛికంగా `asc` లేదా `desc` ఉండవచ్చు.
+
+| ఎబిలిటీ | ఫిల్టర్ ఫీల్డ్‌లు | క్రమబద్ధీకరణ ఫీల్డ్‌లు |
 | --- | --- | --- |
-| `cacti-get-system-info` | ఏదీ లేదు | 15 |
-| `cacti-list-devices` | ఐచ్ఛికం `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | తప్పనిసరి `name`, ఉదాహరణకు `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-ప్రతి కాల్‌కు టోకెన్ యజమాని కోసం **MCP and Abilities API** రెల్మ్, `abilities:read` స్కోప్ (ప్రతి వ్యక్తిగత టోకెన్‌కు ఇది ఉంటుంది), మరియు బహిర్గతం చేయబడిన ఎబిలిటీ కూడా అవసరం. కన్సోల్‌లోని Abilities ట్యాబ్ ప్రతి అంతర్నిర్మిత ఎబిలిటీకి అవసరమైన రెల్మ్‌ను చూపుతుంది.
+అనుమతి పరిధి మరియు రహస్య మినహాయింపు:
 
-- `cacti-list-devices` గరిష్టంగా 100 పరికరాల పేజీలను (డిఫాల్ట్ 50) మరియు ఒక `nextPageToken` ను తిరిగి ఇస్తుంది. పేజీ టోకెన్ అదే `filter` మరియు `orderBy` కోసం మాత్రమే చెల్లుబాటు అవుతుంది. `filter` అనేది `AND` ద్వారా అనుసంధానించబడిన పోలికల యొక్క AIP-160 ఎక్స్‌ప్రెషన్, ఉదాహరణకు `state = "DOWN" AND disabled = false`. ఫిల్టర్ ఫీల్డ్‌లు `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, మరియు `state`. `orderBy` అనేది `displayName`, `hostname`, లేదా `name` ను తీసుకుంటుంది, ప్రతిదాని తర్వాత ఐచ్ఛికంగా `desc` ఉండవచ్చు.
-- పరికర క్వెరీలు Cacti యొక్క `get_allowed_devices()` ద్వారా వెళ్తాయి, కాబట్టి వినియోగదారు Cacti వారికి చూపించే పరికరాలను మాత్రమే చూస్తారు.
-- పరికర ఫీల్డ్‌లలో SNMP కమ్యూనిటీ స్ట్రింగ్‌లు, పాస్‌ఫ్రేజ్‌లు మరియు ఇతర క్రెడెన్షియల్‌లు మినహాయించబడ్డాయి.
+- `cacti-list-devices` మరియు `cacti-get-device` Cacti యొక్క `get_allowed_devices()` ద్వారా క్వెరీ చేస్తాయి మరియు SNMP కమ్యూనిటీ స్ట్రింగ్‌లు, పాస్‌ఫ్రేజ్‌లు మరియు ఇతర క్రెడెన్షియల్‌లను మినహాయిస్తాయి.
+- `cacti-list-trees` `get_allowed_trees()` ద్వారా క్వెరీ చేస్తుంది (మరియు అందుబాటులో ఉన్నప్పుడు `is_tree_allowed()` తో ఫిల్టర్ చేస్తుంది); `cacti-list-graphs` `get_allowed_graphs()` ద్వారా క్వెరీ చేస్తుంది (మరియు అందుబాటులో ఉన్నప్పుడు `is_graph_allowed()` తో ఫిల్టర్ చేస్తుంది).
+- `cacti-list-data-sources` వరుసలను `get_allowed_devices()` (మరియు అందుబాటులో ఉన్నప్పుడు `is_device_allowed()`) నుండి కాలర్‌కు అనుమతించబడిన పరికరాలకు పరిమితం చేస్తుంది మరియు `data_input_data` ను క్వెరీ చేయకుండా లేదా రహస్య ఇన్‌పుట్ విలువలను బహిర్గతం చేయకుండా మెటాడేటాను మాత్రమే తిరిగి ఇస్తుంది.
+- `cacti-list-pollers` డేటాబేస్ క్రెడెన్షియల్‌లను (`dbpass`, `dbuser`) మరియు TLS కీ మరియు సర్టిఫికేట్ నిలువు వరుసలను (`dbsslkey`, `dbsslcert`, `dbsslca`) మినహాయిస్తుంది.
+- `cacti-get-clog` కాన్ఫిగర్ చేయబడిన Cacti లాగ్ యొక్క చివరి 1 MiB వరకు చదువుతుంది (2048 బైట్‌లకు మించిన వ్యక్తిగత లైన్‌లను కత్తిరిస్తుంది), `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; డిఫాల్ట్ `ALL`) మరియు కేస్-ఇన్సెన్సిటివ్ `search` (256 అక్షరాల వరకు) ద్వారా ఫిల్టర్ చేస్తుంది, మరియు `lines`, `count`, మరియు `truncated` ను తిరిగి ఇస్తుంది. `search` ఒక రహస్య ఆరాకిల్‌గా పనిచేయకుండా ఉండటానికి `severity` మరియు `search` ఫిల్టర్‌లు అమలు కావడానికి ముందే ప్రతి లైన్ వ్యక్తిగత టోకెన్‌లు, బేరర్/బేసిక్ హెడర్‌లు, పాస్‌వర్డ్‌లు, రహస్యాలు, SNMP కమ్యూనిటీలు, కీలు, `dbpass`, `dbsslkey`, మరియు URL userinfo కోసం సంస్కరించబడుతుంది. సంస్కరణ `[redacted]` తో ఫెయిల్-క్లోజ్డ్‌గా పనిచేస్తుంది, మరియు చదవలేని లాగ్ `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`) ను తిరిగి ఇస్తుంది.
 
 ## ఇన్‌స్టాల్
 
@@ -272,7 +293,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | `reason` విలువలు |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (`WWW-Authenticate: Bearer`ను కూడా పంపుతుంది) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -346,14 +367,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## అభివృద్ధి మరియు పరీక్షలు
 
-పరీక్షలు Cacti లేకుండానే అమలయ్యే సాధారణ PHP స్క్రిప్ట్‌లు:
+పరీక్షా సూట్‌లో `tests/` లోని సాధారణ PHP స్క్రిప్ట్‌లతో పాటు `tests/Unit/` లోని PHPUnit యూనిట్ పరీక్షలు మరియు PHPStan స్టాటిక్ విశ్లేషణ (స్థాయి 6) ఉన్నాయి, ఇవన్నీ Cacti ఇన్‌స్టాలేషన్ లేకుండానే అమలవుతాయి:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI అనేది PHP ను లింట్ చేస్తుంది మరియు PHP 8.2 నుండి 8.5 వరకు `tests/` లోని స్క్రిప్ట్‌లను (ప్రతి ఒక్కటి `.github/workflows/ci.yml` లో జాబితా చేయబడింది) అమలు చేస్తుంది, ఆపై ఇన్‌స్టాల్ చేయగల `mcp/` ఆర్కైవ్‌ను మరియు దాని చెక్‌సమ్‌ను నిర్మిస్తుంది. Cacti ని తాకే పరీక్షలు Cacti హెల్పర్ సరిహద్దు వద్ద ఫిక్చర్‌లను ఉపయోగిస్తాయి; అవి పూర్తి Cacti ఇన్‌స్టాలేషన్‌ను పరీక్షించవు.
+CI అనేది PHP 8.2 నుండి 8.5 వరకు అమలవుతుంది: PHP సింటాక్స్‌ను లింట్ చేసి (`php -l`) `.github/workflows/ci.yml` లో జాబితా చేయబడిన 13 సాధారణ PHP పరీక్షా స్క్రిప్ట్‌లను అమలు చేసే `test` జాబ్, `composer phpstan` మరియు `composer test` లను అమలు చేసే `quality` జాబ్, మరియు ఇన్‌స్టాల్ చేయగల `mcp/` ఆర్కైవ్‌ను (`.gitattributes` లో జాబితా చేయబడిన అభివృద్ధి మరియు పరీక్షా ఫైళ్లను మినహాయించి) మరియు దాని `SHA256SUMS` ను నిర్మించే `package` జాబ్. Cacti ని తాకే పరీక్షలు Cacti హెల్పర్ సరిహద్దు వద్ద ఫిక్చర్‌లను ఉపయోగిస్తాయి; అవి పూర్తి Cacti ఇన్‌స్టాలేషన్‌ను పరీక్షించవు.
 
 ### ఇంటిగ్రేషన్ పరీక్షలు
 

@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -42,8 +42,10 @@ publiée.
 
 Disponible dès maintenant :
 
-- Capacités intégrées en lecture seule pour les versions système et l'inventaire
-  des équipements.
+- Neuf capacités intégrées en lecture seule couvrant les versions système, les
+  équipements, les sites, les collecteurs (*pollers*), les arborescences de
+  graphiques, les graphiques, les sources de données et une fin de journal Cacti
+  bornée et expurgée.
 - Jetons d'accès personnels (`cmcp_pat_...`) comme unique moyen
   d'authentification.
 - La console Management > MCP : exposer ou masquer des capacités, créer et
@@ -68,30 +70,67 @@ et la séquence de réalisation figure dans [docs/plan.md](../../plan.md).
 
 ## Capacités intégrées
 
-| ID | Arguments | Domaine Cacti requis |
-| --- | --- | --- |
-| `cacti-get-system-info` | aucun | 15 |
-| `cacti-list-devices` | `pageSize`, `pageToken`, `filter`, `orderBy` (facultatifs) | 3 |
-| `cacti-get-device` | `name` (obligatoire), par exemple `devices/12` | 3 |
+| ID | Catégorie | Arguments | Domaine Cacti requis |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | aucun | 15 |
+| `cacti-list-devices` | `inventory` | `pageSize`, `pageToken`, `filter`, `orderBy` (facultatifs) | 3 |
+| `cacti-get-device` | `inventory` | `name` (obligatoire), par exemple `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | `pageSize`, `pageToken`, `filter`, `orderBy` (facultatifs) | 3 |
+| `cacti-list-pollers` | `system` | `pageSize`, `pageToken`, `filter`, `orderBy` (facultatifs) | 15 |
+| `cacti-list-trees` | `inventory` | `pageSize`, `pageToken`, `filter`, `orderBy` (facultatifs) | 7 ou 4 |
+| `cacti-list-graphs` | `inventory` | `pageSize`, `pageToken`, `filter`, `orderBy` (facultatifs) | 7 ou 5 |
+| `cacti-list-data-sources` | `inventory` | `pageSize`, `pageToken`, `filter`, `orderBy` (facultatifs) | 3 |
+| `cacti-get-clog` | `system` | `lines` (1 à 200, 50 par défaut), `severity`, `search` (facultatifs) | 19 ou 18 |
 
 Chaque appel nécessite également le domaine **MCP and Abilities API** pour le
 propriétaire du jeton, la portée (*scope*) `abilities:read` (tout jeton
 personnel la possède) et une capacité exposée. L'onglet Abilities de la console
-indique le domaine requis par chaque capacité intégrée.
+indique le domaine principal requis par chaque capacité intégrée.
 
-- `cacti-list-devices` renvoie des pages contenant jusqu'à 100 équipements
-  (50 par défaut) ainsi qu'un `nextPageToken`. Un jeton de pagination n'est
-  valide que pour les mêmes valeurs de `filter` et `orderBy`. `filter` est une
-  expression AIP-160 composée de comparaisons reliées par `AND`, par exemple
-  `state = "DOWN" AND disabled = false`. Les champs filtrables sont
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId` et `state`. `orderBy` accepte `displayName`, `hostname` ou
-  `name`, chacun pouvant être suivi de `desc`.
-- Les requêtes sur les équipements passent par la fonction
-  `get_allowed_devices()` de Cacti, de sorte qu'un utilisateur ne voit que les
-  équipements auxquels Cacti lui donne accès.
-- Les champs des équipements excluent les chaînes de communauté SNMP, les
-  phrases secrètes et tout autre identifiant.
+Les six capacités `cacti-list-*` renvoient des pages contenant jusqu'à 100
+éléments (50 par défaut) ainsi qu'un `nextPageToken`. Un jeton de pagination
+n'est valide que pour les mêmes valeurs de `filter` et `orderBy`. `filter` est
+une expression AIP-160 composée de comparaisons (`=`, `!=`, `<`, `<=`, `>`,
+`>=`) reliées par `AND`, par exemple `state = "DOWN" AND disabled = false`.
+`orderBy` accepte une liste de champs triables séparés par des virgules, chacun
+pouvant être suivi de `asc` ou `desc`.
+
+| Capacité | Champs filtrables | Champs de tri |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Périmètre des permissions et exclusion des secrets :
+
+- `cacti-list-devices` et `cacti-get-device` passent par `get_allowed_devices()`
+  de Cacti et excluent les chaînes de communauté SNMP, les phrases secrètes et
+  les autres identifiants.
+- `cacti-list-trees` passe par `get_allowed_trees()` (et filtre avec
+  `is_tree_allowed()` lorsqu'elle est disponible) ; `cacti-list-graphs` passe par
+  `get_allowed_graphs()` (et filtre avec `is_graph_allowed()` lorsqu'elle est
+  disponible).
+- `cacti-list-data-sources` restreint les lignes aux équipements autorisés de
+  l'appelant issus de `get_allowed_devices()` (et `is_device_allowed()` lorsqu'elle
+  est disponible) et ne renvoie que les métadonnées sans interroger
+  `data_input_data` ni exposer les valeurs d'entrée secrètes.
+- `cacti-list-pollers` exclut les identifiants de base de données (`dbpass`,
+  `dbuser`) ainsi que les colonnes de clés et certificats TLS (`dbsslkey`,
+  `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` lit jusqu'au dernier Mio du journal Cacti configuré (en
+  tronquant les lignes individuelles de plus de 2048 octets), filtre selon
+  `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`,
+  `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM` ; `ALL` par défaut)
+  et `search` insensible à la casse (jusqu'à 256 caractères), et renvoie `lines`,
+  `count` et `truncated`. Chaque ligne est expurgée des jetons personnels,
+  en-têtes bearer/basic, mots de passe, secrets, communautés SNMP, clés,
+  `dbpass`, `dbsslkey` et informations utilisateur d'URL avant l'exécution des
+  filtres `severity` et `search` afin que `search` ne puisse pas servir d'oracle
+  à secrets. L'expurgation échoue de manière fermée avec `[redacted]`, et un
+  journal illisible renvoie `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Installation
 
@@ -467,7 +506,7 @@ ou que le serveur n'est pas le poller principal.
 
 | HTTP | Valeurs de `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (envoie également `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -616,18 +655,26 @@ rétention d'audit en dehors du plugin.
 
 ## Développement et tests
 
-Les tests sont de simples scripts PHP qui s'exécutent sans Cacti :
+La suite de tests comprend de simples scripts PHP dans `tests/` ainsi que des
+tests unitaires PHPUnit dans `tests/Unit/` et une analyse statique PHPStan
+(niveau 6), le tout s'exécutant sans installation Cacti :
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-La CI vérifie la syntaxe PHP et exécute les scripts dans `tests/` (chacun est listé dans
-`.github/workflows/ci.yml`) sur PHP 8.2 à 8.5, puis génère l'archive installable `mcp/` et sa
-somme de contrôle. Les tests qui interagissent avec Cacti utilisent des fixtures à la
-frontière des fonctions auxiliaires de Cacti ; ils n'exécutent pas une installation complète de
-Cacti.
+La CI s'exécute sur PHP 8.2 à 8.5 : un job `test` qui vérifie la syntaxe PHP
+(`php -l`) et exécute les 13 scripts de test PHP simples listés dans
+`.github/workflows/ci.yml`, un job `quality` qui exécute `composer phpstan` et
+`composer test`, et un job `package` qui génère l'archive installable `mcp/`
+(en excluant les fichiers de développement et de test listés dans
+`.gitattributes`) ainsi que son fichier `SHA256SUMS`. Les tests qui interagissent
+avec Cacti utilisent des fixtures à la frontière des fonctions auxiliaires de
+Cacti ; ils n'exécutent pas une installation complète de Cacti.
 
 ### Tests d'intégration
 

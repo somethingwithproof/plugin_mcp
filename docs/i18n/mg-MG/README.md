@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,10 @@ Ny mpanoratra plugin dia afaka manoratra ny fahafahany manokana tsy azo ovaina a
 
 Misy amin'izao fotoana izao:
 
-- Fahafahana raikitra tsy azo ovaina ho an'ny kinova rafitra sy ny lisitry ny fitaovana.
+- Fahafahana raikitra tsy azo ovaina sivy izay mandrakotra ny kinova rafitra,
+  ny fitaovana, ny toerana (sites), ny pollers, ny hazon-tsary (graph trees),
+  ny sary (graphs), ny loharanon-drakitra (data sources), ary ny rambon'ny
+  rakitra tatitra Cacti voafetra sy voasaron-tsiambaratelo.
 - Mari-pamantarana fidirana manokana (`cmcp_pat_...`) ihany no fitaovana fanamarinana ampiasaina.
 - Ny console Management > MCP: maneho na manafina fahafahana, mamorona sy manafoana mari-pamantarana, mamaky ny firaketana fanaraha-maso.
 - Management > My MCP Tokens: mitantana ny mari-pamantarany manokana ny mpampiasa, mijery ny hetsika nataony, ary mijery izay fitaovana azon'ny mari-pamantarany ampiasaina.
@@ -49,27 +52,65 @@ ary ny filaharan'ny fananganana dia ao amin'ny [docs/plan.md](../../plan.md).
 
 ## Fahafahana raikitra
 
-| ID | Parametra (Arguments) | Faritra Cacti ilaina |
-| --- | --- | --- |
-| `cacti-get-system-info` | tsy misy | 15 |
-| `cacti-list-devices` | azo isafidianana `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | ilaina `name`, toy ny `devices/12` | 3 |
+| ID | Sokajy | Parametra (Arguments) | Faritra Cacti ilaina |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | tsy misy | 15 |
+| `cacti-list-devices` | `inventory` | azo isafidianana `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | ilaina `name`, toy ny `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | azo isafidianana `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | azo isafidianana `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | azo isafidianana `pageSize`, `pageToken`, `filter`, `orderBy` | 7 na 4 |
+| `cacti-list-graphs` | `inventory` | azo isafidianana `pageSize`, `pageToken`, `filter`, `orderBy` | 7 na 5 |
+| `cacti-list-data-sources` | `inventory` | azo isafidianana `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | azo isafidianana `lines` (1 hatramin'ny 200, 50 raha tsy voafaritra), `severity`, `search` | 19 na 18 |
 
 Ny antso tsirairay dia mila ihany koa ny faritra **MCP and Abilities API** ho an'ny tompon'ny mari-pamantarana,
 ny sehatra `abilities:read` (ananan'ny mari-pamantarana manokana rehetra izany), ary fahafahana iray
-naseho. Ny tabilao Abilities ao amin'ny console dia mampiseho ny faritra ilain'ny fahafahana raikitra tsirairay.
+naseho. Ny tabilao Abilities ao amin'ny console dia mampiseho ny faritra voalohany ilain'ny fahafahana raikitra tsirairay.
 
-- `cacti-list-devices` dia mamerina pejy misy fitaovana hatramin'ny 100 (50 raha tsy voafaritra) sy
-  `nextPageToken`. Ny mari-pamantarana pejy dia tsy manan-kery afa-tsy ho an'ny `filter` sy
-  `orderBy` mitovy. Ny `filter` dia fanehoana AIP-160 misy fampitahana ampifandraisina amin'ny `AND`,
-  ohatra `state = "DOWN" AND disabled = false`. Ny saha fanivanana dia
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId`, ary `state`. Ny `orderBy` dia mandray `displayName`, `hostname`, na `name`,
-  ary azo arahina `desc` raha tiana.
-- Mandalo amin'ny `get_allowed_devices()` an'ny Cacti ny fangatahana fitaovana, ka ny fitaovana
-  asehon'ny Cacti aminy ihany no hitan'ny mpampiasa.
-- Tsy tafiditra ao amin'ny sahan'ny fitaovana ny SNMP community strings, tenimiafina, ary
-  fitaovana fanamarinana hafa.
+Ireo fahafahana `cacti-list-*` enina rehetra dia mamerina pejy misy singa hatramin'ny 100 (50 raha tsy voafaritra)
+sy `nextPageToken`. Ny mari-pamantarana pejy dia tsy manan-kery afa-tsy ho an'ny `filter` sy `orderBy` mitovy.
+Ny `filter` dia fanehoana AIP-160 misy fampitahana (`=`, `!=`, `<`, `<=`, `>`, `>=`) ampifandraisina amin'ny `AND`,
+ohatra `state = "DOWN" AND disabled = false`. Ny `orderBy` dia mandray lisitry ny saha azo alahatra
+sarahin'ny faingo, ka ny tsirairay dia azo arahina `asc` na `desc` raha tiana.
+
+| Fahafahana | Saha fanivanana | Saha fandaharana |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Famerana araka ny fahazoan-dalana sy fanesorana ny tsiambaratelo:
+
+- `cacti-list-devices` sy `cacti-get-device` dia manao fangatahana amin'ny alalan'ny
+  `get_allowed_devices()` an'ny Cacti ary manaisotra ny SNMP community strings, tenimiafina,
+  ary fitaovana fanamarinana hafa.
+- `cacti-list-trees` dia manao fangatahana amin'ny alalan'ny `get_allowed_trees()` (sy
+  manivana amin'ny `is_tree_allowed()` rehefa misy); `cacti-list-graphs` dia manao
+  fangatahana amin'ny alalan'ny `get_allowed_graphs()` (sy manivana amin'ny
+  `is_graph_allowed()` rehefa misy).
+- `cacti-list-data-sources` dia mametra ny andalana ho an'ireo fitaovana nahazoan'ny
+  mpiantso alalana avy amin'ny `get_allowed_devices()` (sy `is_device_allowed()` rehefa
+  misy) ary tsy mamerina afa-tsy metadata raha tsy manontany `data_input_data` na
+  mamoaka sanda fampidirana tsiambaratelo.
+- `cacti-list-pollers` dia manaisotra ny fitaovana fanamarinana tahiry angona (`dbpass`,
+  `dbuser`) ary ny tsanganana fanalahidy sy taratasy fanamarinana TLS (`dbsslkey`,
+  `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` dia mamaky hatramin'ny 1 MiB farany amin'ny rakitra tatitra Cacti
+  voakarakara (manapaka ny andalana tsirairay mihoatra ny 2048 bytes), manivana araka ny
+  `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`,
+  `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; `ALL` raha tsy
+  voafaritra) sy `search` tsy manavaka sora-baventy sy sora-madinika (hatramin'ny
+  tarehintsoratra 256), ary mamerina `lines`, `count`, ary `truncated`. Ny andalana
+  tsirairay dia asiana fanaronana tsiambaratelo ho an'ny mari-pamantarana manokana,
+  lohapejy bearer/basic, tenimiafina, tsiambaratelo, SNMP communities, fanalahidy,
+  `dbpass`, `dbsslkey`, ary mombamomba ny mpampiasa ao amin'ny URL alohan'ny handehanan'ny
+  sivana `severity` sy `search` mba tsy hahatonga ny `search` ho fitaovana hitsikilovana
+  tsiambaratelo. Ny fanaronana dia mikatona rehefa tsy mahomby amin'ny `[redacted]`, ary
+  ny rakitra tatitra tsy azo vakiana dia mamerina `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Fametrahana
 
@@ -364,7 +405,7 @@ Manaraka ny AIP-193 ny hadisoana: zavatra `error` miaraka amin'ny `code`, `messa
 
 | HTTP | Sanda `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (mandefa `WWW-Authenticate: Bearer` ihany koa) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -438,14 +479,24 @@ Ny fanakatonana ny plugin dia manakana ny teboka fidirana roa. Ny fanesorana ny 
 
 ## Fampandrosoana sy fitiliana
 
-Ny fitiliana dia script PHP tsotra mandeha tsy mila Cacti:
+Ny fitambaran'ny fitiliana dia ahitana script PHP tsotra ao amin'ny `tests/` miampy fitiliana singa PHPUnit
+ao amin'ny `tests/Unit/` sy fanadihadiana raikitra PHPStan (ambaratonga 6), izay samy mandeha avokoa tsy mila
+fametrahana Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-Ny CI dia manamarina ny syntaxe PHP ary mandefa ny script ao amin'ny `tests/` (samy voatanisa ao amin'ny `.github/workflows/ci.yml` avy) amin'ny PHP 8.2 hatramin'ny 8.5, avy eo manamboatra ny arisiva `mcp/` azo apetraka sy ny checksum-ny. Ny fitiliana mikasika ny Cacti dia mampiasa fixtures eo amin'ny sisin'ny mpanampy Cacti; tsy manandrana fametrahana Cacti feno izy ireo.
+Mandeha amin'ny PHP 8.2 hatramin'ny 8.5 ny CI: asa `test` izay manamarina ny syntaxe PHP (`php -l`)
+sy mandefa ireo script fitiliana PHP tsotra miisa 13 voatanisa ao amin'ny `.github/workflows/ci.yml`,
+asa `quality` izay mandefa ny `composer phpstan` sy ny `composer test`, ary asa `package` izay
+manamboatra ny arisiva `mcp/` azo apetraka (manaisotra ireo rakitra fampandrosoana sy fitiliana
+voatanisa ao amin'ny `.gitattributes`) sy ny `SHA256SUMS`-ny. Ny fitiliana mikasika ny Cacti dia mampiasa
+fixtures eo amin'ny sisin'ny mpanampy Cacti; tsy manandrana fametrahana Cacti feno izy ireo.
 
 ### Fitiliana fampidirana
 

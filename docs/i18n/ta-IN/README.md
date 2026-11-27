@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP என்பது திறன்கள் எனப்படும�
 
 தற்போது கிடைப்பவை:
 
-- கணினிப் பதிப்புகள் மற்றும் சாதனப் பட்டியலுக்கான படிக்க-மட்டுமான உள்ளமைக்கப்பட்ட திறன்கள்.
+- கணினிப் பதிப்புகள், சாதனங்கள், தளங்கள் (sites), pollers, வரைபட மரங்கள், வரைபடங்கள், தரவு மூலங்கள் மற்றும் வரம்புக்குட்பட்ட, மறைக்கப்பட்ட (redacted) Cacti பதிவு வால் (tail) ஆகியவற்றை உள்ளடக்கிய ஒன்பது படிக்க-மட்டுமான உள்ளமைக்கப்பட்ட திறன்கள்.
 - ஒரே சான்றாகத் தனிப்பட்ட அணுகல் டோக்கன்கள் (`cmcp_pat_...`).
 - மேலாண்மை > MCP கன்சோல்: திறன்களை வெளிப்படுத்தவும் அல்லது மறைக்கவும், டோக்கன்களை உருவாக்கவும் மற்றும் திரும்பப் பெறவும், தணிக்கைப் பதிவைப் படிக்கவும்.
 - மேலாண்மை > எனது MCP டோக்கன்கள்: பயனர்கள் தங்கள் சொந்த டோக்கன்களை நிர்வகிக்கிறார்கள், தங்கள் செயல்பாட்டைப் பார்க்கிறார்கள், மற்றும் தங்கள் டோக்கன்கள் எந்தக் கருவிகளைப் பயன்படுத்த முடியும் என்பதைப் பார்க்கிறார்கள்.
@@ -47,17 +47,38 @@ Cacti MCP என்பது திறன்கள் எனப்படும�
 
 ## உள்ளமைக்கப்பட்ட திறன்கள்
 
-| ஐடி | அளவுருக்கள் | தேவையான Cacti பகுதி |
+| ஐடி | வகை | அளவுருக்கள் | தேவையான Cacti பகுதி |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | எதுவுமில்லை | 15 |
+| `cacti-list-devices` | `inventory` | விருப்பத்தேர்வு `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | கட்டாயம் `name`, எடுத்துக்காட்டாக `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | விருப்பத்தேர்வு `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | விருப்பத்தேர்வு `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | விருப்பத்தேர்வு `pageSize`, `pageToken`, `filter`, `orderBy` | 7 அல்லது 4 |
+| `cacti-list-graphs` | `inventory` | விருப்பத்தேர்வு `pageSize`, `pageToken`, `filter`, `orderBy` | 7 அல்லது 5 |
+| `cacti-list-data-sources` | `inventory` | விருப்பத்தேர்வு `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | விருப்பத்தேர்வு `lines` (1 முதல் 200 வரை, இயல்புநிலை 50), `severity`, `search` | 19 அல்லது 18 |
+
+ஒவ்வொரு அழைப்பிற்கும் டோக்கன் உரிமையாளருக்கான **MCP மற்றும் திறன்கள் API** பகுதி, `abilities:read` வரம்பு (ஒவ்வொரு தனிப்பட்ட டோக்கனிலும் இது உள்ளது), மற்றும் வெளிப்படுத்தப்பட்ட திறன் ஆகியவை தேவை. கன்சோலின் திறன்கள் தாவல் ஒவ்வொரு உள்ளமைக்கப்பட்ட திறனுக்கும் தேவையான முதன்மைப் பகுதியைக் காட்டுகிறது.
+
+ஆறு `cacti-list-*` திறன்களும் அதிகபட்சம் 100 உருப்படிகள் கொண்ட பக்கங்களையும் (இயல்புநிலை 50) ஒரு `nextPageToken` ஐயும் திருப்பி அனுப்புகின்றன. ஒரு பக்க டோக்கன் அதே `filter` மற்றும் `orderBy` ஆகியவற்றுக்கு மட்டுமே செல்லுபடியாகும். `filter` என்பது `AND` மூலம் இணைக்கப்பட்ட ஒப்பீடுகளின் (`=`, `!=`, `<`, `<=`, `>`, `>=`) AIP-160 வெளிப்பாடாகும், எடுத்துக்காட்டாக `state = "DOWN" AND disabled = false`. `orderBy` என்பது காற்புள்ளியால் பிரிக்கப்பட்ட வரிசைப்படுத்தக்கூடிய புலங்களின் பட்டியலை ஏற்கிறது, ஒவ்வொன்றும் விருப்பமாக `asc` அல்லது `desc` ஐத் தொடர்ந்து வரலாம்.
+
+| திறன் | வடிகட்டிப் புலங்கள் | வரிசைப்படுத்தும் புலங்கள் |
 | --- | --- | --- |
-| `cacti-get-system-info` | எதுவுமில்லை | 15 |
-| `cacti-list-devices` | விருப்பத்தேர்வு `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | கட்டாயம் `name`, எடுத்துக்காட்டாக `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-ஒவ்வொரு அழைப்பிற்கும் டோக்கன் உரிமையாளருக்கான **MCP மற்றும் திறன்கள் API** பகுதி, `abilities:read` வரம்பு (ஒவ்வொரு தனிப்பட்ட டோக்கனிலும் இது உள்ளது), மற்றும் வெளிப்படுத்தப்பட்ட திறன் ஆகியவை தேவை. கன்சோலின் திறன்கள் தாவல் ஒவ்வொரு உள்ளமைக்கப்பட்ட திறனுக்கும் தேவையான பகுதியைக் காட்டுகிறது.
+அனுமதி வரம்பு மற்றும் இரகசியங்களைத் தவிர்த்தல்:
 
-- `cacti-list-devices` அதிகபட்சம் 100 சாதனங்கள் கொண்ட பக்கங்களையும் (இயல்புநிலை 50) ஒரு `nextPageToken` ஐயும் திருப்பி அனுப்புகிறது. ஒரு பக்க டோக்கன் அதே `filter` மற்றும் `orderBy` ஆகியவற்றுக்கு மட்டுமே செல்லுபடியாகும். `filter` என்பது `AND` மூலம் இணைக்கப்பட்ட ஒப்பீடுகளின் AIP-160 வெளிப்பாடாகும், எடுத்துக்காட்டாக `state = "DOWN" AND disabled = false`. வடிகட்டிப் புலங்கள் `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, மற்றும் `state` ஆகும். `orderBy` என்பது `displayName`, `hostname`, அல்லது `name` ஆகியவற்றை ஏற்கிறது, ஒவ்வொன்றும் விருப்பமாக `desc` ஐத் தொடர்ந்து வரலாம்.
-- சாதன வினவல்கள் Cacti இன் `get_allowed_devices()` வழியாகச் செல்கின்றன, எனவே Cacti தங்களுக்குக் காட்டும் சாதனங்களை மட்டுமே ஒரு பயனர் பார்க்கிறார்.
-- சாதனப் புலங்களில் SNMP சமூகச் சரங்கள், கடவுச்சொற்றொடர்கள் மற்றும் பிற சான்றுகள் தவிர்க்கப்படுகின்றன.
+- `cacti-list-devices` மற்றும் `cacti-get-device` ஆகியவை Cacti இன் `get_allowed_devices()` வழியாக வினவுகின்றன, மேலும் SNMP சமூகச் சரங்கள், கடவுச்சொற்றொடர்கள் மற்றும் பிற சான்றுகளைத் தவிர்க்கின்றன.
+- `cacti-list-trees` என்பது `get_allowed_trees()` வழியாக வினவுகிறது (மேலும் கிடைக்கும்போது `is_tree_allowed()` மூலம் வடிகட்டுகிறது); `cacti-list-graphs` என்பது `get_allowed_graphs()` வழியாக வினவுகிறது (மேலும் கிடைக்கும்போது `is_graph_allowed()` மூலம் வடிகட்டுகிறது).
+- `cacti-list-data-sources` என்பது அழைப்பாளருக்கு `get_allowed_devices()` இலிருந்து (மற்றும் கிடைக்கும்போது `is_device_allowed()` இலிருந்து) அனுமதிக்கப்பட்ட சாதனங்களுக்கு வரிசைகளை வரம்பிடுகிறது, மேலும் `data_input_data` ஐ வினவாமலும் இரகசிய உள்ளீட்டு மதிப்புகளை வெளிப்படுத்தாமலும் மெட்டாடேட்டாவை மட்டுமே திருப்பி அனுப்புகிறது.
+- `cacti-list-pollers` என்பது தரவுத்தளச் சான்றுகள் (`dbpass`, `dbuser`) மற்றும் TLS விசை மற்றும் சான்றிதழ் நெடுவரிசைகளை (`dbsslkey`, `dbsslcert`, `dbsslca`) தவிர்க்கிறது.
+- `cacti-get-clog` என்பது கட்டமைக்கப்பட்ட Cacti பதிவின் கடைசி 1 MiB வரை படிக்கிறது (2048 பைட்டுகளுக்கு மேல் உள்ள தனிப்பட்ட வரிகளைத் துண்டித்து), `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; இயல்புநிலை `ALL`) மற்றும் எழுத்து வடிவ வேறுபாடற்ற `search` (256 எழுத்துகள் வரை) ஆகியவற்றால் வடிகட்டி `lines`, `count`, மற்றும் `truncated` ஆகியவற்றைத் திருப்பி அனுப்புகிறது. `search` ஒரு இரகசியக் கண்டறியும் கருவியாகச் செயல்படாதவாறு `severity` மற்றும் `search` வடிகட்டிகள் இயங்கும் முன்பே ஒவ்வொரு வரியிலும் உள்ள தனிப்பட்ட டோக்கன்கள், bearer/basic தலைப்புகள், கடவுச்சொற்கள், இரகசியங்கள், SNMP சமூகங்கள், விசைகள், `dbpass`, `dbsslkey`, மற்றும் URL userinfo ஆகியவை மறைக்கப்படுகின்றன (redacted). மறைத்தல் தோல்வியுற்றால் `[redacted]` உடன் பாதுகாப்பாக மூடப்படும், மேலும் படிக்க முடியாத பதிவு `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`) என்பதைத் திருப்பி அனுப்புகிறது.
 
 ## நிறுவுதல்
 
@@ -272,7 +293,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | `reason` மதிப்புகள் |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (`WWW-Authenticate: Bearer` என்பதையும் அனுப்புகிறது) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -346,14 +367,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## உருவாக்கம் மற்றும் சோதனைகள்
 
-சோதனைகள் என்பவை Cacti இல்லாமலேயே இயங்கும் எளிய PHP ஸ்கிரிப்டுகள் ஆகும்:
+சோதனைத் தொகுப்பில் Cacti நிறுவல் இல்லாமலேயே இயங்கும் `tests/` இல் உள்ள எளிய PHP ஸ்கிரிப்டுகளுடன் `tests/Unit/` இல் உள்ள PHPUnit அலகுச் சோதனைகள் மற்றும் PHPStan நிலையான பகுப்பாய்வு (நிலை 6) ஆகியவை அடங்கும்:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI ஆனது PHP 8.2 முதல் 8.5 வரை PHP குறியீட்டை lint செய்து `tests/` இல் உள்ள ஸ்கிரிப்டுகளை இயக்குகிறது (ஒவ்வொன்றும் `.github/workflows/ci.yml` இல் பட்டியலிடப்பட்டுள்ளது), பின்னர் நிறுவக்கூடிய `mcp/` காப்பகத்தையும் அதன் checksum-ஐயும் உருவாக்குகிறது. Cacti-ஐத் தொடும் சோதனைகள் Cacti உதவி எல்லையில் fixtures-ஐப் பயன்படுத்துகின்றன; அவை முழுமையான Cacti நிறுவலைச் சோதிப்பதில்லை.
+CI ஆனது PHP 8.2 முதல் 8.5 வரை இயங்குகிறது: PHP தொடரியலை (`php -l`) சரிபார்த்து `.github/workflows/ci.yml` இல் பட்டியலிடப்பட்டுள்ள 13 எளிய PHP சோதனை ஸ்கிரிப்டுகளை இயக்கும் `test` பணி, `composer phpstan` மற்றும் `composer test` ஆகியவற்றை இயக்கும் `quality` பணி, மற்றும் நிறுவக்கூடிய `mcp/` காப்பகத்தையும் (`.gitattributes` இல் பட்டியலிடப்பட்டுள்ள உருவாக்கம் மற்றும் சோதனைக் கோப்புகளைத் தவிர்த்து) அதன் `SHA256SUMS` ஐயும் உருவாக்கும் `package` பணி. Cacti-ஐத் தொடும் சோதனைகள் Cacti உதவி எல்லையில் fixtures-ஐப் பயன்படுத்துகின்றன; அவை முழுமையான Cacti நிறுவலைச் சோதிப்பதில்லை.
 
 ### ஒருங்கிணைப்புச் சோதனைகள்
 

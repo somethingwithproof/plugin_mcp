@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -38,7 +38,9 @@ kwaye zivela kubaxhasi be-MCP njengezixhobo ngaphandle kwekhowudi yeprothokholi.
 
 Okukhoyo namhlanje:
 
-- Izakhono ezakhelwe ngaphakathi zokufunda kuphela zeenguqulelo zenkqubo noluhlu lwezixhobo.
+- Izakhono ezisithoba ezakhelwe ngaphakathi zokufunda kuphela eziquka iinguqulelo zenkqubo,
+  izixhobo, iisayithi, ii-pollers, imithi yeegrafu, iigrafu, imithombo yedatha, kunye nomsila
+  wencwadi yeziganeko ye-Cacti enomda nekhuselweyo.
 - Iithokheni zofikelelo lobuqu (`cmcp_pat_...`) njengesiqinisekiso esisodwa.
 - Ikhonsoli ye-Management > MCP: velisa okanye ufihle izakhono, yenza kwaye urhoxise
   iithokheni, ufunde nengxelo yophicotho.
@@ -59,26 +61,59 @@ kwaye ulandelelwano lolwakhiwo lusekwi-[docs/plan.md](../../plan.md).
 
 ## Izakhono ezakhelwe ngaphakathi
 
-| I-ID | Ii-argumenti | Indawo yolawulo ye-Cacti efunekayo |
-| --- | --- | --- |
-| `cacti-get-system-info` | akukho | 15 |
-| `cacti-list-devices` | ngokuzikhethela `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | kuyafuneka `name`, njenge-`devices/12` | 3 |
+| I-ID | Udidi | Ii-argumenti | Indawo yolawulo ye-Cacti efunekayo |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | akukho | 15 |
+| `cacti-list-devices` | `inventory` | ngokuzikhethela `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | kuyafuneka `name`, njenge-`devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | ngokuzikhethela `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | ngokuzikhethela `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | ngokuzikhethela `pageSize`, `pageToken`, `filter`, `orderBy` | 7 okanye 4 |
+| `cacti-list-graphs` | `inventory` | ngokuzikhethela `pageSize`, `pageToken`, `filter`, `orderBy` | 7 okanye 5 |
+| `cacti-list-data-sources` | `inventory` | ngokuzikhethela `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | ngokuzikhethela `lines` (1 ukuya ku-200, okungagqibekanga 50), `severity`, `search` | 19 okanye 18 |
 
 Umnxeba ngamnye kwakhona ufuna indawo yolawulo ye-**MCP and Abilities API** yomnini wethokheni,
 umda we-`abilities:read` (ithokheni yobuqu nganye inawo), kunye nesakhono esivelisiweyo.
-Ithebhu ye-Abilities yekhonsoli ibonisa indawo yolawulo efunwa sisakhono ngasinye esakhelwe ngaphakathi.
+Ithebhu ye-Abilities yekhonsoli ibonisa indawo yolawulo eyintloko efunwa sisakhono ngasinye esakhelwe ngaphakathi.
 
-- I-`cacti-list-devices` ibuyisela amaphepha ezixhobo ezifikelela kwi-100 (ezihlala ziyi-50) kunye
-  ne-`nextPageToken`. Ithokheni yephepha isebenza kuphela kwi-`filter` efanayo kunye ne-`orderBy` efanayo.
-  I-`filter` yintetho ye-AIP-160 yothelekiso edityaniswe ngu-`AND`, umzekelo
-  `state = "DOWN" AND disabled = false`. Imihlaba yokuhluzo ngu-`displayName`, `hostname`, `disabled`,
-  `site`, `poller`, `deviceTemplate`, `externalId`, kunye no-`state`. I-`orderBy` ithatha
-  u-`displayName`, `hostname`, okanye `name`, nganye inokulandelwa ngu-`desc` ngokuzikhethela.
-- Imibuzo yezixhobo idlula ku-`get_allowed_devices()` we-Cacti, ngoko ke umsebenzisi ubona kuphela
-  izixhobo ebeziya kuboniswa ngu-Cacti kuye.
-- Imihlaba yezixhobo ayibandakanyi imitya yoluntu ye-SNMP, amagama okugqitha amade, kunye nezinye
-  iziqinisekiso.
+Zonke izakhono ezintandathu ze-`cacti-list-*` zibuyisela amaphepha anezinto ezifikelela kwi-100
+(okungagqibekanga ngama-50) kunye ne-`nextPageToken`. Ithokheni yephepha isebenza kuphela
+kwi-`filter` efanayo kunye ne-`orderBy` efanayo. I-`filter` yintetho ye-AIP-160 yothelekiso
+(`=`, `!=`, `<`, `<=`, `>`, `>=`) edityaniswe ngu-`AND`, umzekelo
+`state = "DOWN" AND disabled = false`. I-`orderBy` yamkela uluhlu lwemihlaba enokuodolwa
+olwahlulwe ngeekhoma, umhlaba ngamnye unokulandelwa ngu-`asc` okanye u-`desc` ngokuzikhethela.
+
+| Isakhono | Imihlaba yokuhluzo | Imihlaba yokuodola |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Umda wemvume kunye nokukhutshelwa ngaphandle kweemfihlo:
+
+- I-`cacti-list-devices` kunye ne-`cacti-get-device` zibuza ngo-`get_allowed_devices()` we-Cacti
+  kwaye zikhuphela ngaphandle imitya yoluntu ye-SNMP, amagama okugqitha amade, kunye nezinye iziqinisekiso.
+- I-`cacti-list-trees` ibuza ngo-`get_allowed_trees()` (kwaye ihlunge ngo-`is_tree_allowed()` xa ifumaneka);
+  i-`cacti-list-graphs` ibuza ngo-`get_allowed_graphs()` (kwaye ihlunge ngo-`is_graph_allowed()` xa ifumaneka).
+- I-`cacti-list-data-sources` icutha imigca ibe zizixhobo ezivunyelwe umnxebi ezivela ku-`get_allowed_devices()`
+  (kunye no-`is_device_allowed()` xa ifumaneka) kwaye ibuyisela i-metadata kuphela ngaphandle kokubuza
+  i-`data_input_data` okanye ukudalula amaxabiso okufaka afihlakeleyo.
+- I-`cacti-list-pollers` ikhuphela ngaphandle iziqinisekiso zedatabase (`dbpass`, `dbuser`) kunye
+  neekholamu zesitshixo nesatifikethi se-TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- I-`cacti-get-clog` ifunda ukuya kuthi ga kwi-1 MiB yokugqibela yelog ye-Cacti eqwalaselweyo
+  (inqamla imigca engaphezu kwe-2048 bytes), ihlunga nge-`severity` (`ALL`, `DEBUG`, `INFO`,
+  `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`,
+  `SYSTEM`; okungagqibekanga `ALL`) kunye no-`search` ongakhethi nobumba abakhulu nabancinci
+  (ukuya kuma-256 characters), kwaye ibuyisela i-`lines`, `count`, kunye ne-`truncated`.
+  Umgca ngamnye uyasuswa iinkcukacha ezifihlakeleyo zeethokheni zobuqu, ii-header ze-bearer/basic,
+  amagama okugqitha, iimfihlo, uluntu lwe-SNMP, izitshixo, `dbpass`, `dbsslkey`, kunye neenkcukacha
+  zomsebenzisi ze-URL ngaphambi kokuba izihluzo ze-`severity` ne-`search` zisebenze ukuze
+  u-`search` angabi nakusebenza njengesiqinisekisi seemfihlo. Ukususwa kweenkcukacha kuyasila
+  ngokuvala ngo-`[redacted]`, kwaye ilog engafundekiyo ibuyisela i-`FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Faka
 
@@ -370,7 +405,7 @@ Iimpazamo zilandela i-AIP-193: i-object ye-`error` ene-`code`, `message`, `statu
 
 | HTTP | Amaxabiso e-`reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (ikwathumela ne-`WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -486,17 +521,24 @@ umgaqo-nkqubo wokugcina uphicotho ngaphandle kweplagini.
 
 ## Uphuhliso novavanyo
 
-Iimvavanyo zizikripthi ze-PHP eziqhelekileyo ezisebenza ngaphandle kwe-Cacti:
+Isuti yovavanyo iquka izikripthi ze-PHP eziqhelekileyo kwi-`tests/` kunye neemvavanyo zeyunithi ze-PHPUnit
+kwi-`tests/Unit/` kunye nohlalutyo olumileyo lwe-PHPStan (inqanaba 6), zonke zisebenza ngaphandle
+kokufakwa kwe-Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-I-CI ihlola i-PHP kwaye iqhuba izikripthi kwi-`tests/` (nganye idweliswe
-kwi-`.github/workflows/ci.yml`) kwi-PHP 8.2 ukuya kwi-8.5, emva koko yakha
-uvimba we-`mcp/` ofakekayo kunye ne-checksum yawo. Iimvavanyo ezichaphazela i-Cacti
-zisebenzisa ii-fixture kumda womncedisi we-Cacti; azivavanyi ukufakwa okupheleleyo kwe-Cacti.
+I-CI isebenza kwi-PHP 8.2 ukuya kwi-8.5: umsebenzi we-`test` ohlola isintaksi ye-PHP (`php -l`)
+kwaye uqhuba izikripthi zovavanyo ze-PHP ezi-13 ezidweliswe kwi-`.github/workflows/ci.yml`,
+umsebenzi we-`quality` oqhuba i-`composer phpstan` kunye ne-`composer test`, kunye nomsebenzi
+we-`package` owakha uvimba we-`mcp/` ofakekayo (ukhuphela ngaphandle iifayile zophuhliso
+novavanyo ezidweliswe kwi-`.gitattributes`) kunye ne-`SHA256SUMS` yawo. Iimvavanyo ezichaphazela
+i-Cacti zisebenzisa ii-fixture kumda womncedisi we-Cacti; azivavanyi ukufakwa okupheleleyo kwe-Cacti.
 
 ### Iimvavanyo zokudibanisa
 

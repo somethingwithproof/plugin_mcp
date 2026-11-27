@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -41,7 +41,9 @@ protokol kodu gerekmeden araç (tool) olarak görünür.
 
 Şu anda mevcut olanlar:
 
-- Sistem sürümleri ve aygıt envanteri için salt okunur yerleşik yetenekler.
+- Sistem sürümlerini, aygıtları, siteleri, yoklayıcıları (pollers), grafik
+  ağaçlarını, grafikleri, veri kaynaklarını ve sınırlandırılmış, sansürlenmiş
+  bir Cacti günlük kuyruğunu kapsayan dokuz salt okunur yerleşik yetenek.
 - Tek kimlik bilgisi olarak kişisel erişim belirteçleri (`cmcp_pat_...`).
 - Yönetim > MCP konsolu: yetenekleri kullanıma açma veya gizleme, belirteç
   oluşturma ve iptal etme, denetim günlüğünü okuma.
@@ -63,29 +65,68 @@ derleme sırası ise [docs/plan.md](../../plan.md) dosyasında yer almaktadır.
 
 ## Yerleşik yetenekler
 
-| Kimlik | Argümanlar | Gereken Cacti yetki alanı |
-| --- | --- | --- |
-| `cacti-get-system-info` | yok | 15 |
-| `cacti-list-devices` | isteğe bağlı `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | zorunlu `name`, örneğin `devices/12` | 3 |
+| Kimlik | Kategori | Argümanlar | Gereken Cacti yetki alanı |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | yok | 15 |
+| `cacti-list-devices` | `inventory` | isteğe bağlı `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | zorunlu `name`, örneğin `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | isteğe bağlı `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | isteğe bağlı `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | isteğe bağlı `pageSize`, `pageToken`, `filter`, `orderBy` | 7 veya 4 |
+| `cacti-list-graphs` | `inventory` | isteğe bağlı `pageSize`, `pageToken`, `filter`, `orderBy` | 7 veya 5 |
+| `cacti-list-data-sources` | `inventory` | isteğe bağlı `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | isteğe bağlı `lines` (1 ile 200 arası, varsayılan 50), `severity`, `search` | 19 veya 18 |
 
 Her çağrı ayrıca belirteç sahibi için **MCP ve Yetenekler API'si** yetki alanını,
 `abilities:read` kapsamını (her kişisel belirteç buna sahiptir) ve kullanıma
 açılmış bir yeteneği gerektirir. Konsolun Yetenekler sekmesi, her yerleşik
-yeteneğin hangi yetki alanına ihtiyaç duyduğunu gösterir.
+yeteneğin hangi birincil yetki alanına ihtiyaç duyduğunu gösterir.
 
-- `cacti-list-devices` en fazla 100 aygıttan oluşan sayfalar (varsayılan 50) ve
-  bir `nextPageToken` döndürür. Sayfa belirteci yalnızca aynı `filter` ve
-  `orderBy` değerleri için geçerlidir. `filter`, `AND` ile birleştirilmiş
-  karşılaştırmalardan oluşan bir AIP-160 ifadesidir; örneğin
-  `state = "DOWN" AND disabled = false`. Filtre alanları `displayName`,
-  `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId` ve
-  `state` şeklindedir. `orderBy`, her biri isteğe bağlı olarak `desc` ile
-  izlenebilen `displayName`, `hostname` veya `name` değerlerini alır.
-- Aygıt sorguları Cacti'nin `get_allowed_devices()` işlevinden geçer; böylece
-  bir kullanıcı yalnızca Cacti'nin kendisine göstereceği aygıtları görür.
-- Aygıt alanları SNMP topluluk dizelerini, parolaları ve diğer kimlik
-  bilgilerini hariç tutar.
+Altı `cacti-list-*` yeteneğinin tümü en fazla 100 öğeden oluşan sayfalar
+(varsayılan 50) ve bir `nextPageToken` döndürür. Sayfa belirteci yalnızca aynı
+`filter` ve `orderBy` değerleri için geçerlidir. `filter`, `AND` ile
+birleştirilmiş karşılaştırmalardan (`=`, `!=`, `<`, `<=`, `>`, `>=`) oluşan bir
+AIP-160 ifadesidir; örneğin `state = "DOWN" AND disabled = false`. `orderBy`,
+her biri isteğe bağlı olarak `asc` veya `desc` ile izlenebilen virgülle ayrılmış
+bir sıralanabilir alan listesi alır.
+
+| Yetenek | Filtre alanları | Sıralama alanları |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+İzin kapsamı ve gizli bilgi hariç tutma:
+
+- `cacti-list-devices` ve `cacti-get-device` Cacti'nin `get_allowed_devices()`
+  işlevi üzerinden sorgu yapar ve SNMP topluluk dizelerini, parolaları ve diğer
+  kimlik bilgilerini hariç tutar.
+- `cacti-list-trees` `get_allowed_trees()` üzerinden sorgu yapar (ve mevcut
+  olduğunda `is_tree_allowed()` ile filtreler); `cacti-list-graphs`
+  `get_allowed_graphs()` üzerinden sorgu yapar (ve mevcut olduğunda
+  `is_graph_allowed()` ile filtreler).
+- `cacti-list-data-sources` satırları çağıranın `get_allowed_devices()` (ve
+  mevcut olduğunda `is_device_allowed()`) üzerinden izin verilen aygıtlarıyla
+  sınırlandırır ve `data_input_data` tablosunu sorgulamadan veya gizli giriş
+  değerlerini açığa çıkarmadan yalnızca meta veri döndürür.
+- `cacti-list-pollers` veritabanı kimlik bilgilerini (`dbpass`, `dbuser`) ve TLS
+  anahtar ile sertifika sütunlarını (`dbsslkey`, `dbsslcert`, `dbsslca`) hariç
+  tutar.
+- `cacti-get-clog` yapılandırılmış Cacti günlüğünün son 1 MiB'a kadar olan
+  kısmını okur (2048 bayttan uzun tekil satırları kırpar), `severity` (`ALL`,
+  `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`,
+  `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; varsayılan `ALL`) ve büyük/küçük
+  harf duyarsız `search` (en fazla 256 karakter) ölçütlerine göre filtreler ve
+  `lines`, `count` ve `truncated` alanlarını döndürür. `search` parametresinin bir
+  gizli bilgi kâhini (secret oracle) gibi davranamaması için `severity` ve
+  `search` filtreleri çalışmadan önce her satır kişisel belirteçler, bearer/basic
+  üstbilgileri, parolalar, gizli anahtarlar, SNMP toplulukları, anahtarlar,
+  `dbpass`, `dbsslkey` ve URL kullanıcı bilgileri açısından sansürlenir. Sansürleme
+  hata durumunda `[redacted]` ile kapalı başarısızlık uygular ve okunamayan bir
+  günlük `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`) döndürür.
 
 ## Kurulum
 
@@ -401,7 +442,7 @@ Hatalar AIP-193 standardını izler: `cacti.net` etki alanına ve kararlı bir `
 
 | HTTP | `reason` değerleri |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (`WWW-Authenticate: Bearer` üstbilgisini de gönderir) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -520,18 +561,25 @@ yedekleyin ve eklenti dışında bir denetim saklama politikası uygulayın.
 
 ## Geliştirme ve testler
 
-Testler, Cacti olmadan çalışan düz PHP betikleridir:
+Test paketi, `tests/` içindeki düz PHP betiklerinin yanı sıra `tests/Unit/`
+altındaki PHPUnit birim testlerini ve PHPStan statik analizini (seviye 6)
+içerir; tümü Cacti kurulumu olmadan çalışır:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI, PHP 8.2'den 8.5'e kadar PHP kodunu lint'ler ve `tests/` altındaki betikleri
-(her biri `.github/workflows/ci.yml` içinde listelenmiştir) çalıştırır; ardından
-kurulabilir `mcp/` arşivini ve sağlama toplamını oluşturur. Cacti'ye dokunan testler,
-Cacti yardımcı sınırında test fikstürleri kullanır; tam bir Cacti kurulumunu
-çalıştırmaz.
+CI, PHP 8.2 ile 8.5 arasında çalışır: PHP sözdizimini denetleyen (`php -l`) ve
+`.github/workflows/ci.yml` içinde listelenen 13 düz PHP test betiğini çalıştıran
+bir `test` işi, `composer phpstan` ve `composer test` komutlarını çalıştıran bir
+`quality` işi ve kurulabilir `mcp/` arşivini (`.gitattributes` içinde
+listelenen geliştirme ve test dosyalarını hariç tutarak) ile `SHA256SUMS`
+dosyasını oluşturan bir `package` işi. Cacti'ye dokunan testler, Cacti yardımcı
+sınırında test fikstürleri kullanır; tam bir Cacti kurulumunu çalıştırmaz.
 
 ### Entegrasyon testleri
 
