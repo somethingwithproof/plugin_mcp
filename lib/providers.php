@@ -1123,6 +1123,7 @@ function mcp_read_clog_tail(
 		throw new AbilitiesError('FAILED_PRECONDITION', 'LOG_UNAVAILABLE');
 	}
 
+	clearstatcache(true, $path);
 	$size   = @filesize($path);
 	$handle = $size !== false ? @fopen($path, 'rb') : false;
 
