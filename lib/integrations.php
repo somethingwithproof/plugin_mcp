@@ -77,7 +77,7 @@ function mcp_casc_export(array $context = []) : array {
  * loopback), and any attempt to reconcile runtime state or tokens via CasC.
  *
  * @param array<string, mixed> $desired Desired declarative payload.
- * @return array{valid: bool, errors: list<string>}
+ * @return list<string>
  */
 function mcp_casc_validate(array $desired) : array {
 	$errors = [];
@@ -93,7 +93,9 @@ function mcp_casc_validate(array $desired) : array {
 	$config = array_key_exists('config', $desired) ? $desired['config'] : $desired;
 
 	if (!is_array($config)) {
-		return ['valid' => false, 'errors' => ['Configuration section must be an array.']];
+		$errors[] = 'Configuration section must be an array.';
+
+		return $errors;
 	}
 
 	$allowedConfigKeys = ['mcp_public_url'];
@@ -131,27 +133,32 @@ function mcp_casc_validate(array $desired) : array {
 		}
 	}
 
-	return [
-		'valid'  => $errors === [],
-		'errors' => $errors,
-	];
+	return $errors;
 }
 
 /**
  * Compute a declarative change plan comparing desired MCP config against live settings.
  *
  * @param array<string, mixed> $desired Desired declarative payload.
- * @return array{valid: bool, errors: list<string>, changes: list<array{field: string, action: string, before: string, after: string}>}
+ * @param array<string, mixed> $options Optional planner options.
+ * @return list<array<string, mixed>>
  */
-function mcp_casc_plan(array $desired) : array {
-	$validation = mcp_casc_validate($desired);
+function mcp_casc_plan(array $desired, array $options = []) : array {
+	unset($options);
+	$errors = mcp_casc_validate($desired);
 
-	if (!$validation['valid']) {
-		return [
-			'valid'   => false,
-			'errors'  => $validation['errors'],
-			'changes' => [],
-		];
+	if ($errors !== []) {
+		$items = [];
+
+		foreach ($errors as $error) {
+			$items[] = [
+				'operation' => 'error',
+				'key'       => 'mcp',
+				'message'   => $error,
+			];
+		}
+
+		return $items;
 	}
 
 	$config  = is_array($desired['config'] ?? null) ? $desired['config'] : $desired;
@@ -166,19 +173,17 @@ function mcp_casc_plan(array $desired) : array {
 
 		if ($target !== $current) {
 			$changes[] = [
-				'field'  => 'mcp_public_url',
-				'action' => 'update',
-				'before' => $current,
-				'after'  => $target,
+				'operation' => 'update',
+				'key'       => 'mcp_public_url',
+				'field'     => 'mcp_public_url',
+				'before'    => $current,
+				'after'     => $target,
+				'message'   => 'Update mcp_public_url.',
 			];
 		}
 	}
 
-	return [
-		'valid'   => true,
-		'errors'  => [],
-		'changes' => $changes,
-	];
+	return $changes;
 }
 
 /**
@@ -186,33 +191,40 @@ function mcp_casc_plan(array $desired) : array {
  *
  * Never mutates runtime token, audit, or exposure tables.
  *
- * @param array<string, mixed> $desired Desired declarative payload.
- * @param bool                 $dryRun  When true, compute plan without writing settings.
- * @return array{applied: bool, dryRun: bool, errors: list<string>, changes: list<array{field: string, action: string, before: string, after: string}>}
+ * @param array<string, mixed> $desired  Desired declarative payload.
+ * @param string               $planHash Confirmed plan hash from CasC.
+ * @param array<string, mixed> $options  Optional apply options (supports bool 'dryRun').
+ * @return array{ok: bool, applied: bool, dryRun: bool, errors: list<string>, changes: list<array<string, mixed>>}
  */
-function mcp_casc_apply(array $desired, bool $dryRun = false) : array {
-	$plan = mcp_casc_plan($desired);
+function mcp_casc_apply(array $desired, string $planHash = '', array $options = []) : array {
+	unset($planHash);
+	$dryRun = (bool) ($options['dryRun'] ?? false);
+	$errors = mcp_casc_validate($desired);
 
-	if (!$plan['valid']) {
+	if ($errors !== []) {
 		return [
+			'ok'      => false,
 			'applied' => false,
 			'dryRun'  => $dryRun,
-			'errors'  => $plan['errors'],
+			'errors'  => $errors,
 			'changes' => [],
 		];
 	}
 
-	if ($dryRun || $plan['changes'] === []) {
+	$changes = mcp_casc_plan($desired, $options);
+
+	if ($dryRun || $changes === []) {
 		return [
+			'ok'      => true,
 			'applied' => !$dryRun,
 			'dryRun'  => $dryRun,
 			'errors'  => [],
-			'changes' => $plan['changes'],
+			'changes' => $changes,
 		];
 	}
 
-	foreach ($plan['changes'] as $change) {
-		if ($change['field'] === 'mcp_public_url') {
+	foreach ($changes as $change) {
+		if (($change['field'] ?? '') === 'mcp_public_url' && isset($change['after']) && is_string($change['after'])) {
 			if (function_exists('set_config_option')) {
 				set_config_option('mcp_public_url', $change['after']);
 			} elseif (function_exists('db_execute_prepared')) {
@@ -223,6 +235,7 @@ function mcp_casc_apply(array $desired, bool $dryRun = false) : array {
 
 				if (!$saved) {
 					return [
+						'ok'      => false,
 						'applied' => false,
 						'dryRun'  => false,
 						'errors'  => ['Failed to persist mcp_public_url setting.'],
@@ -231,6 +244,7 @@ function mcp_casc_apply(array $desired, bool $dryRun = false) : array {
 				}
 			} else {
 				return [
+					'ok'      => false,
 					'applied' => false,
 					'dryRun'  => false,
 					'errors'  => ['No Cacti settings persistence helper is available.'],
@@ -241,10 +255,11 @@ function mcp_casc_apply(array $desired, bool $dryRun = false) : array {
 	}
 
 	return [
+		'ok'      => true,
 		'applied' => true,
 		'dryRun'  => false,
 		'errors'  => [],
-		'changes' => $plan['changes'],
+		'changes' => $changes,
 	];
 }
 
@@ -518,43 +533,98 @@ function mcp_doctor_register_debug_info(array $context = []) : array {
 }
 
 /**
+ * List read-only MCP ability metadata for the mcpAbilities API collection.
+ *
+ * @param array<string, mixed> $context Optional API handler context.
+ * @return list<array<string, mixed>>
+ */
+function mcp_api_list_abilities(array $context = []) : array {
+	unset($context);
+
+	if (function_exists('mcp_registry')) {
+		try {
+			$items = [];
+
+			foreach (mcp_registry()->all() as $ability) {
+				$id      = is_string($ability['id'] ?? null) ? $ability['id'] : '';
+				$items[] = [
+					'id'          => $id,
+					'name'        => 'mcpAbilities/' . $id,
+					'label'       => is_string($ability['label'] ?? null) ? $ability['label'] : $id,
+					'description' => is_string($ability['description'] ?? null) ? $ability['description'] : '',
+					'category'    => is_string($ability['category'] ?? null) ? $ability['category'] : '',
+					'namespace'   => is_string($ability['namespace'] ?? null) ? $ability['namespace'] : 'core',
+					'read_only'   => true,
+				];
+			}
+
+			return $items;
+		} catch (Throwable $error) {
+			// Fall back to static built-in catalog when the full registry cannot boot.
+		}
+	}
+
+	$items = [];
+
+	foreach (array_keys(MCP_BUILTIN_REALMS) as $id) {
+		$items[] = [
+			'id'          => $id,
+			'name'        => 'mcpAbilities/' . $id,
+			'label'       => $id,
+			'description' => 'Built-in read-only Cacti MCP ability.',
+			'category'    => 'cacti',
+			'namespace'   => 'core',
+			'read_only'   => true,
+		];
+	}
+
+	return $items;
+}
+
+/**
+ * Retrieve a single read-only MCP ability descriptor by identifier.
+ *
+ * @param string               $id      Ability identifier.
+ * @param array<string, mixed> $context Optional API handler context.
+ * @return array<string, mixed>|null
+ */
+function mcp_api_get_ability(string $id, array $context = []) : ?array {
+	$target = trim($id);
+
+	if ($target === '') {
+		return null;
+	}
+
+	foreach (mcp_api_list_abilities($context) as $item) {
+		if (($item['id'] ?? '') === $target) {
+			return $item;
+		}
+	}
+
+	return null;
+}
+
+/**
  * Append plain-array MCP resource descriptors for plugin_api discovery.
  *
  * @param array<int, array<string, mixed>> $resources Existing registered resource descriptors.
  * @return array<int, array<string, mixed>> Updated list including MCP resources.
  */
 function mcp_api_register_resources(array $resources = []) : array {
-	$mcpResources = [
-		[
-			'name'        => 'mcp/abilities',
-			'plugin'      => 'mcp',
-			'schema'      => MCP_SCHEMA_FILE,
-			'readOnly'    => true,
-			'methods'     => ['GET'],
-			'description' => 'Registered read-only MCP abilities and exposure metadata.',
-		],
-		[
-			'name'        => 'mcp/audit',
-			'plugin'      => 'mcp',
-			'schema'      => MCP_SCHEMA_FILE,
-			'readOnly'    => true,
-			'methods'     => ['GET'],
-			'description' => 'Append-only MCP ability execution and token lifecycle audit records.',
-		],
-		[
-			'name'                 => 'mcp/tokens',
-			'plugin'               => 'mcp',
-			'schema'               => MCP_SCHEMA_FILE,
-			'readOnly'             => true,
-			'methods'              => ['GET'],
-			'description'          => 'Personal access token metadata excluding secret values and hashes.',
-			'secretFieldsExcluded' => ['token_hash'],
+	$resources[] = [
+		'plugin'        => 'mcp',
+		'collection'    => 'mcpAbilities',
+		'singleton'     => 'mcpAbility',
+		'description'   => 'Registered read-only MCP abilities and exposure metadata.',
+		'realm_read'    => 'mcp.php',
+		'schema'        => MCP_SCHEMA_FILE,
+		'filter_fields' => ['id', 'name', 'category', 'label', 'namespace'],
+		'order_fields'  => ['id', 'name', 'category', 'label'],
+		'handlers'      => [
+			'list' => 'mcp_api_list_abilities',
+			'get'  => 'mcp_api_get_ability',
 		],
 	];
-
-	foreach ($mcpResources as $resource) {
-		$resources[] = $resource;
-	}
 
 	return $resources;
 }

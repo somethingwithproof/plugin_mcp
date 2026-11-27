@@ -77,44 +77,50 @@ final class IntegrationsTest extends TestCase {
 		$this->assertStringNotContainsString('token', strtolower((string) json_encode($exported)));
 
 		// Validate accepts valid HTTPS and loopback HTTP, rejects plain HTTP, state/tokens, unknown keys, and >255 chars.
-		$this->assertTrue(mcp_casc_validate(['schemaVersion' => '1.0', 'config' => ['mcp_public_url' => 'https://cacti.example.com/cacti']])['valid']);
-		$this->assertTrue(mcp_casc_validate(['config' => ['mcp_public_url' => 'http://localhost:8080/cacti']])['valid']);
-		$this->assertTrue(mcp_casc_validate(['config' => ['mcp_public_url' => '']])['valid']);
-		$this->assertFalse(mcp_casc_validate(['config' => ['mcp_public_url' => 'http://cacti.example.com']])['valid']);
-		$this->assertFalse(mcp_casc_validate(['config' => ['mcp_public_url' => 'https://example.com/' . str_repeat('a', 250)]])['valid']);
-		$this->assertFalse(mcp_casc_validate(['config' => ['mcp_public_url' => 123]])['valid']);
-		$this->assertFalse(mcp_casc_validate(['config' => ['unknown_key' => 'x']])['valid']);
-		$this->assertFalse(mcp_casc_validate(['schemaVersion' => '2.0', 'config' => []])['valid']);
-		$this->assertFalse(mcp_casc_validate(['config' => 'not-an-array'])['valid']);
-		$this->assertFalse(mcp_casc_validate(['state' => ['plugin_mcp_token' => []], 'config' => []])['valid']);
-		$this->assertFalse(mcp_casc_validate(['tokens' => ['cmcp_pat_' . str_repeat('a', 64)]])['valid']);
+		$this->assertSame([], mcp_casc_validate(['schemaVersion' => '1.0', 'config' => ['mcp_public_url' => 'https://cacti.example.com/cacti']]));
+		$this->assertSame([], mcp_casc_validate(['config' => ['mcp_public_url' => 'http://localhost:8080/cacti']]));
+		$this->assertSame([], mcp_casc_validate(['config' => ['mcp_public_url' => '']]));
+		$this->assertNotSame([], mcp_casc_validate(['config' => ['mcp_public_url' => 'http://cacti.example.com']]));
+		$this->assertNotSame([], mcp_casc_validate(['config' => ['mcp_public_url' => 'https://example.com/' . str_repeat('a', 250)]]));
+		$this->assertNotSame([], mcp_casc_validate(['config' => ['mcp_public_url' => 123]]));
+		$this->assertNotSame([], mcp_casc_validate(['config' => ['unknown_key' => 'x']]));
+		$this->assertNotSame([], mcp_casc_validate(['schemaVersion' => '2.0', 'config' => []]));
+		$this->assertNotSame([], mcp_casc_validate(['config' => 'not-an-array']));
+		$this->assertNotSame([], mcp_casc_validate(['state' => ['plugin_mcp_token' => []], 'config' => []]));
+		$this->assertNotSame([], mcp_casc_validate(['tokens' => ['cmcp_pat_' . str_repeat('a', 64)]]));
 
 		// Plan detects drift and dryRun does not write.
 		$plan = mcp_casc_plan(['config' => ['mcp_public_url' => 'https://new.example.com/cacti/']]);
-		$this->assertTrue($plan['valid']);
-		$this->assertCount(1, $plan['changes']);
-		$this->assertSame('https://cacti.example.com/cacti', $plan['changes'][0]['before']);
-		$this->assertSame('https://new.example.com/cacti', $plan['changes'][0]['after']);
+		$this->assertCount(1, $plan);
+		$this->assertSame('update', $plan[0]['operation']);
+		$this->assertSame('mcp_public_url', $plan[0]['key']);
+		$this->assertSame('https://cacti.example.com/cacti', $plan[0]['before']);
+		$this->assertSame('https://new.example.com/cacti', $plan[0]['after']);
 
-		$dry = mcp_casc_apply(['config' => ['mcp_public_url' => 'https://new.example.com/cacti/']], true);
+		$dry = mcp_casc_apply(['config' => ['mcp_public_url' => 'https://new.example.com/cacti/']], '', ['dryRun' => true]);
+		$this->assertTrue($dry['ok']);
 		$this->assertFalse($dry['applied']);
 		$this->assertTrue($dry['dryRun']);
 		$this->assertSame('HTTPS://Cacti.Example.com/cacti/', $GLOBALS['mcp_unit_state']['settings']['mcp_public_url']);
 
 		// Apply persists normalized URL.
-		$applied = mcp_casc_apply(['config' => ['mcp_public_url' => 'https://new.example.com/cacti/']]);
+		$applied = mcp_casc_apply(['config' => ['mcp_public_url' => 'https://new.example.com/cacti/']], 'planhash', []);
+		$this->assertTrue($applied['ok']);
 		$this->assertTrue($applied['applied']);
 		$this->assertSame('https://new.example.com/cacti', $GLOBALS['mcp_unit_state']['settings']['mcp_public_url']);
 
 		// Re-applying same config is a clean no-op.
 		$noop = mcp_casc_apply(['config' => ['mcp_public_url' => 'https://new.example.com/cacti']]);
+		$this->assertTrue($noop['ok']);
 		$this->assertTrue($noop['applied']);
 		$this->assertSame([], $noop['changes']);
 
 		// Invalid desired config fails plan and apply cleanly.
 		$badPlan  = mcp_casc_plan(['config' => ['mcp_public_url' => 'http://insecure.example']]);
 		$badApply = mcp_casc_apply(['config' => ['mcp_public_url' => 'http://insecure.example']]);
-		$this->assertFalse($badPlan['valid']);
+		$this->assertCount(1, $badPlan);
+		$this->assertSame('error', $badPlan[0]['operation']);
+		$this->assertFalse($badApply['ok']);
 		$this->assertFalse($badApply['applied']);
 		$this->assertNotEmpty($badApply['errors']);
 	}
@@ -219,20 +225,33 @@ final class IntegrationsTest extends TestCase {
 	}
 
 	public function testApiRegisterResourcesAppendsMcpDescriptorsReferencingSchema() : void {
-		$existing = [['name' => 'other/items', 'plugin' => 'other']];
+		$existing = [['plugin' => 'other', 'collection' => 'otherItems']];
 		$result   = mcp_api_register_resources($existing);
 
-		$this->assertCount(4, $result);
-		$this->assertSame('other/items', $result[0]['name']);
+		$this->assertCount(2, $result);
+		$this->assertSame('otherItems', $result[0]['collection']);
 
-		$mcpNames = array_column(array_slice($result, 1), 'name');
-		$this->assertSame(['mcp/abilities', 'mcp/audit', 'mcp/tokens'], $mcpNames);
+		$descriptor = $result[1];
+		$this->assertSame('mcp', $descriptor['plugin']);
+		$this->assertSame('mcpAbilities', $descriptor['collection']);
+		$this->assertMatchesRegularExpression('/^[a-z][A-Za-z0-9]{2,63}$/', $descriptor['collection']);
+		$this->assertSame('mcpAbility', $descriptor['singleton']);
+		$this->assertSame('mcp.php', $descriptor['realm_read']);
+		$this->assertSame('schema/mcp.schema.yaml', $descriptor['schema']);
+		$this->assertIsCallable($descriptor['handlers']['list']);
+		$this->assertIsCallable($descriptor['handlers']['get']);
 
-		foreach (array_slice($result, 1) as $resource) {
-			$this->assertSame('mcp', $resource['plugin']);
-			$this->assertSame('schema/mcp.schema.yaml', $resource['schema']);
-			$this->assertTrue($resource['readOnly']);
-		}
-		$this->assertContains('token_hash', $result[3]['secretFieldsExcluded']);
+		$listed = ($descriptor['handlers']['list'])(['user_id' => 1]);
+		$this->assertNotEmpty($listed);
+		$ids = array_column($listed, 'id');
+		$this->assertContains('cacti-get-system-info', $ids);
+
+		$found = ($descriptor['handlers']['get'])('cacti-get-system-info', ['user_id' => 1]);
+		$this->assertIsArray($found);
+		$this->assertSame('cacti-get-system-info', $found['id']);
+		$this->assertSame('mcpAbilities/cacti-get-system-info', $found['name']);
+
+		$this->assertNull(($descriptor['handlers']['get'])('does-not-exist', ['user_id' => 1]));
+		$this->assertNull(($descriptor['handlers']['get'])('', ['user_id' => 1]));
 	}
 }
