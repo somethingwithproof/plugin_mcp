@@ -22,6 +22,7 @@ const MCP_ERROR_MESSAGES = [
 	'UNSUPPORTED_MEDIA_TYPE' => 'The request content type is not supported.',
 	'REQUEST_TOO_LARGE'      => 'The request body exceeds the size limit.',
 	'CACTI_UNAVAILABLE'      => 'Cacti is not available.',
+	'LOG_UNAVAILABLE'        => 'The Cacti log file is not readable.',
 ];
 
 const MCP_PAGE_SIZE_DEFAULT = 50;

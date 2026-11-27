@@ -36,7 +36,17 @@ class AbilitiesError extends RuntimeException {
 }
 
 /** Realm IDs the built-in abilities check. lib/providers.php enforces them and the console shows them. Plugin abilities declare their own. */
-const MCP_BUILTIN_REALMS = ['cacti-get-system-info' => 15, 'cacti-list-devices' => 3, 'cacti-get-device' => 3];
+const MCP_BUILTIN_REALMS = [
+	'cacti-get-system-info'   => 15,
+	'cacti-list-devices'      => 3,
+	'cacti-get-device'        => 3,
+	'cacti-list-sites'        => 3,
+	'cacti-list-pollers'      => 15,
+	'cacti-list-trees'        => 7,
+	'cacti-list-graphs'       => 7,
+	'cacti-list-data-sources' => 3,
+	'cacti-get-clog'          => 19,
+];
 
 /** The class name of an exception for the log. An anonymous class name embeds a NUL and a file path, so use its parent. */
 function mcp_exception_class(Throwable $error) : string {

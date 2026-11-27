@@ -141,7 +141,14 @@ function phase_smoke() : void {
 		}
 		$names = array_column($tools, 'name');
 		sort($names);
-		$expected = ['cacti-get-device', 'cacti-get-system-info', 'cacti-list-devices'];
+		$expected = [
+			'cacti-get-device',
+			'cacti-get-system-info',
+			'cacti-list-data-sources',
+			'cacti-list-devices',
+			'cacti-list-pollers',
+			'cacti-list-sites',
+		];
 
 		return $names === $expected ? null : 'tool names were [' . implode(', ', $names) . ']';
 	});
@@ -302,7 +309,14 @@ function phase_main(string $ref) : void {
 	$apionly  = secret('token-apionly');
 	$norealm  = secret('token-norealm');
 	$revoked  = secret('token-revoked');
-	$builtin  = ['cacti-get-device', 'cacti-get-system-info', 'cacti-list-devices'];
+	$builtin  = [
+		'cacti-get-device',
+		'cacti-get-system-info',
+		'cacti-list-data-sources',
+		'cacti-list-devices',
+		'cacti-list-pollers',
+		'cacti-list-sites',
+	];
 
 	check('C1', 'server/discover', function () use ($user) {
 		$response = mcp_modern($user, 'server/discover');
@@ -401,7 +415,7 @@ function phase_main(string $ref) : void {
 		}
 		$abilities = decode($response)['abilities'] ?? null;
 
-		return is_array($abilities) && count($abilities) === 3 ? null : 'abilities does not hold 3 entries';
+		return is_array($abilities) && count($abilities) === 6 ? null : 'abilities does not hold 6 entries';
 	});
 
 	check('C4', 'GET /v1/abilities/cacti-get-device', function () use ($user) {
