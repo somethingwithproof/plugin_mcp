@@ -386,21 +386,15 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 		's.id',
 		"sites\0",
 		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-sites'], $user),
-		function (int $user, string $where, string $order, array $page) : array {
-			$sql = 'SELECT s.id, s.name, s.address1, s.address2, s.city, s.state, s.postal_code, s.country, '
-				. 's.timezone, s.latitude, s.longitude, s.zoom, s.alternate_id, s.notes '
-				. 'FROM sites AS s'
-				. ($where !== '' ? ' WHERE ' . $where : '')
-				. ' ORDER BY ' . $order
-				. ' LIMIT ' . ($page['size'] + 1) . ' OFFSET ' . $page['offset'];
-			$rows = db_fetch_assoc_prepared($sql, []);
-
-			if ($rows === false) {
-				throw new RuntimeException('Site query failed');
-			}
-
-			return array_values($rows);
-		},
+		fn (int $user, string $where, string $order, array $page) : array => mcp_query_page(
+			's.id, s.name, s.address1, s.address2, s.city, s.state, s.postal_code, s.country, '
+				. 's.timezone, s.latitude, s.longitude, s.zoom, s.alternate_id, s.notes',
+			'sites AS s',
+			$where,
+			$order,
+			$page,
+			'Site query failed'
+		),
 		'mcp_site_resource'
 	);
 
@@ -418,24 +412,18 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 		'p.id',
 		"pollers\0",
 		fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-list-pollers'], $user),
-		function (int $user, string $where, string $order, array $page) : array {
-			// Never select dbpass, dbuser, dbsslkey, dbsslcert, or dbsslca.
-			$sql = 'SELECT p.id, p.disabled, p.name, p.notes, p.status, p.timezone, p.hostname, '
+		// Never select dbpass, dbuser, dbsslkey, dbsslcert, or dbsslca.
+		fn (int $user, string $where, string $order, array $page) : array => mcp_query_page(
+			'p.id, p.disabled, p.name, p.notes, p.status, p.timezone, p.hostname, '
 				. 'p.total_time, p.max_time, p.min_time, p.avg_time, p.total_polls, p.processes, '
 				. 'p.threads, p.sync_interval, p.snmp, p.script, p.server, p.last_update, '
-				. 'p.last_status, p.last_sync, p.requires_sync '
-				. 'FROM poller AS p'
-				. ($where !== '' ? ' WHERE ' . $where : '')
-				. ' ORDER BY ' . $order
-				. ' LIMIT ' . ($page['size'] + 1) . ' OFFSET ' . $page['offset'];
-			$rows = db_fetch_assoc_prepared($sql, []);
-
-			if ($rows === false) {
-				throw new RuntimeException('Poller query failed');
-			}
-
-			return array_values($rows);
-		},
+				. 'p.last_status, p.last_sync, p.requires_sync',
+			'poller AS p',
+			$where,
+			$order,
+			$page,
+			'Poller query failed'
+		),
 		'mcp_poller_resource'
 	);
 
@@ -525,24 +513,23 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 			}
 
 			$placeholders = implode(', ', array_fill(0, count($deviceIds), '?'));
+			$scopedWhere  = 'dl.host_id IN (' . $placeholders . ')'
+				. ($where !== '' ? ' AND (' . $where . ')' : '');
 			// Query safe metadata only; never join data_input_data or expose secret input values.
-			$sql = 'SELECT dl.id, dl.host_id, dl.data_template_id, dl.snmp_query_id, dl.snmp_index, dl.orphan, '
-				. 'dtd.name_cache, dtd.active, dtd.rrd_step, dtd.data_source_profile_id, '
-				. 'dt.name AS template_name, h.description AS host_description '
-				. 'FROM data_local AS dl '
-				. 'INNER JOIN data_template_data AS dtd ON dtd.local_data_id = dl.id '
-				. 'LEFT JOIN data_template AS dt ON dt.id = dl.data_template_id '
-				. 'LEFT JOIN host AS h ON h.id = dl.host_id '
-				. 'WHERE dl.host_id IN (' . $placeholders . ')'
-				. ($where !== '' ? ' AND (' . $where . ')' : '')
-				. ' ORDER BY ' . $order
-				. ' LIMIT ' . ($page['size'] + 1) . ' OFFSET ' . $page['offset'];
-			$rows = db_fetch_assoc_prepared($sql, $deviceIds);
-
-			if ($rows === false) {
-				throw new RuntimeException('Data source query failed');
-			}
-			$rows = array_values($rows);
+			$rows = mcp_query_page(
+				'dl.id, dl.host_id, dl.data_template_id, dl.snmp_query_id, dl.snmp_index, dl.orphan, '
+					. 'dtd.name_cache, dtd.active, dtd.rrd_step, dtd.data_source_profile_id, '
+					. 'dt.name AS template_name, h.description AS host_description',
+				'data_local AS dl '
+					. 'INNER JOIN data_template_data AS dtd ON dtd.local_data_id = dl.id '
+					. 'LEFT JOIN data_template AS dt ON dt.id = dl.data_template_id '
+					. 'LEFT JOIN host AS h ON h.id = dl.host_id',
+				$scopedWhere,
+				$order,
+				$page,
+				'Data source query failed',
+				$deviceIds
+			);
 
 			if (function_exists('is_device_allowed')) {
 				$rows = array_values(array_filter(
@@ -658,6 +645,36 @@ function mcp_plugin_file(string $plugin, string $file) : string|false {
 }
 
 /**
+ * Run a paginated read-only SELECT query with optional WHERE clause and bound parameters.
+ *
+ * @param array{size: int, offset: int} $page
+ * @param list<mixed>                   $params
+ * @return list<array<string, mixed>>
+ */
+function mcp_query_page(
+	string $select,
+	string $from,
+	string $where,
+	string $order,
+	array $page,
+	string $error,
+	array $params = []
+) : array {
+	$sql = 'SELECT ' . $select
+		. ' FROM ' . $from
+		. ($where !== '' ? ' WHERE ' . $where : '')
+		. ' ORDER BY ' . $order
+		. ' LIMIT ' . ($page['size'] + 1) . ' OFFSET ' . $page['offset'];
+	$rows = db_fetch_assoc_prepared($sql, $params);
+
+	if ($rows === false) {
+		throw new RuntimeException($error);
+	}
+
+	return array_values($rows);
+}
+
+/**
  * Collect allowed device IDs for $user through Cacti's device permission helper.
  *
  * @return list<int>
@@ -666,9 +683,8 @@ function mcp_allowed_device_ids(int $user) : array {
 	$ids       = [];
 	$offset    = 0;
 	$batchSize = 1000;
-	$maxIds    = 10000;
 
-	while (count($ids) < $maxIds) {
+	while (true) {
 		$total = -1;
 		$rows  = get_allowed_devices('', 'h1.id ASC', $offset . ',' . $batchSize, $total, $user);
 
