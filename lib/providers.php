@@ -1040,24 +1040,15 @@ function mcp_redact_log_line(string $line) : string {
 	}
 
 	// Strip unsafe control and zero-width chars first so obfuscation cannot bypass secret redaction.
-	$line = mcp_capability_strip_unsafe_chars($line);
+	$line     = mcp_capability_strip_unsafe_chars($line);
+	$patterns = [];
 
 	if (stripos($line, 'cmcp_pat_') !== false) {
-		$replaced = preg_replace('/\bcmcp_pat_[a-f0-9]+\b/i', '[redacted]', $line);
-
-		if ($replaced === null) {
-			return '[redacted]';
-		}
-		$line = $replaced;
+		$patterns[] = ['/\bcmcp_pat_[a-f0-9]+\b/i', '[redacted]'];
 	}
 
 	if (stripos($line, 'bearer') !== false || stripos($line, 'basic') !== false) {
-		$replaced = preg_replace('/(\b(?:Bearer|Basic)[ \t]+)(?:\\\\[^\r\n]|[^\s;,"\'\\\\\r\n])+/i', '$1[redacted]', $line);
-
-		if ($replaced === null) {
-			return '[redacted]';
-		}
-		$line = $replaced;
+		$patterns[] = ['/(\b(?:Bearer|Basic)[ \t]+)(?:\\\\[^\r\n]|[^\s;,"\'\\\\\r\n])+/i', '$1[redacted]'];
 	}
 
 	$hasKey = preg_match($keyPresencePattern, $line);
@@ -1071,42 +1062,25 @@ function mcp_redact_log_line(string $line) : string {
 		$hasQuote = str_contains($line, '"') || str_contains($line, "'");
 
 		if ($hasSep && $hasQuote) {
-			$replaced = preg_replace($quotedPattern, '$1$2[redacted]$2', $line);
-
-			if ($replaced === null) {
-				return '[redacted]';
-			}
-			$line = $replaced;
+			$patterns[] = [$quotedPattern, '$1$2[redacted]$2'];
 		}
 
 		if ($hasQuote) {
-			$replaced = preg_replace($spaceQuotedPattern, '$1$2[redacted]$2', $line);
-
-			if ($replaced === null) {
-				return '[redacted]';
-			}
-			$line = $replaced;
+			$patterns[] = [$spaceQuotedPattern, '$1$2[redacted]$2'];
 		}
 
 		if ($hasSep) {
-			$replaced = preg_replace($sepUnquotedPattern, '$1[redacted]', $line);
-
-			if ($replaced === null) {
-				return '[redacted]';
-			}
-			$line = $replaced;
+			$patterns[] = [$sepUnquotedPattern, '$1[redacted]'];
 		}
-
-		$replaced = preg_replace($spaceUnquotedPattern, '$1[redacted]', $line);
-
-		if ($replaced === null) {
-			return '[redacted]';
-		}
-		$line = $replaced;
+		$patterns[] = [$spaceUnquotedPattern, '$1[redacted]'];
 	}
 
 	if (str_contains($line, '://')) {
-		$replaced = preg_replace('/(\b[a-z][a-z0-9+.\-]*:\/\/[^:\/@?#\s]+:)[^\/\s?#]+(@)/i', '$1[redacted]$2', $line);
+		$patterns[] = ['/(\b[a-z][a-z0-9+.\-]*:\/\/[^:\/@?#\s]+:)[^\/\s?#]+(@)/i', '$1[redacted]$2'];
+	}
+
+	foreach ($patterns as [$pattern, $replacement]) {
+		$replaced = preg_replace($pattern, $replacement, $line);
 
 		if ($replaced === null) {
 			return '[redacted]';

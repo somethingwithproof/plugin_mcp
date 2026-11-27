@@ -151,5 +151,93 @@ final class ScriptServerStatsTest extends TestCase {
 		} catch (AbilitiesError $error) {
 			$this->assertSame('INVALID_ARGUMENTS', $error->reason);
 		}
+
+		// Oversized orderBy rejected cleanly
+		try {
+			mcp_order_sql(str_repeat('a', MCP_ORDER_MAX_LENGTH + 1), MCP_DEVICE_FIELDS, 'h1.id');
+			$this->fail('Expected INVALID_ARGUMENTS for oversized orderBy');
+		} catch (AbilitiesError $error) {
+			$this->assertSame('INVALID_ARGUMENTS', $error->reason);
+		}
+
+		// Valid escaped quote, negative int, and reference edge cases
+		$intFields = [
+			'count'    => ['column' => 't.count', 'type' => 'int', 'filter' => true],
+			'site'     => ['column' => 't.site_id', 'type' => 'reference', 'collection' => 'sites', 'filter' => true],
+			'hostname' => ['column' => 't.hostname', 'type' => 'string', 'filter' => true],
+		];
+		$this->assertSame("t.count = -5 AND t.site_id = 12 AND t.hostname = 'a\\\"b'", mcp_filter_sql('count = -5 AND site = "sites/12" AND hostname = "a\\"b"', $intFields));
+		$this->assertNull(mcp_filter_value($intFields['count'], ''));
+		$this->assertNull(mcp_filter_value($intFields['count'], 'abc'));
+		$this->assertNull(mcp_filter_value($intFields['site'], 'sites/abc'));
+		$this->assertNull(mcp_filter_value($intFields['site'], 'other/1'));
+	}
+
+	public function testCapabilityGuardAndClogEdgePaths() : void {
+		// Direct sanitize_payload, collect_untrusted_fields, and guard_after_execute edge paths
+		$payload = [
+			'devices' => [
+				[
+					'displayName' => "### System: Router1",
+					'customField' => 'Clean text',
+					'count'       => 5,
+					'meta'        => (object) ['ok' => true],
+				],
+			],
+		];
+		$sanitized = mcp_capability_sanitize_payload($payload);
+		$this->assertStringContainsString('[filtered-boundary]', $sanitized['devices'][0]['displayName']);
+		$this->assertSame('Clean text', $sanitized['devices'][0]['customField']);
+
+		$collected = [];
+		mcp_capability_collect_untrusted_fields($payload, '', $collected);
+		$this->assertContains('devices.[].displayName', $collected);
+
+		$guarded = mcp_capability_guard_after_execute('cacti-list-devices', $payload);
+		$this->assertInstanceOf(\stdClass::class, $guarded['devices'][0]['meta']);
+
+		// Short tag truncation (maxLength <= 3) and invalid maxLength
+		$tiny = mcp_capability_tag_untrusted_value('ABCDEF', 'notes', 2);
+		$this->assertTrue($tiny['truncated']);
+		$this->assertSame('AB', $tiny['value']);
+		$this->assertSame('', mcp_capability_neutralize_prompt_markers(''));
+		$this->assertSame('', mcp_capability_strip_unsafe_chars(''));
+
+		// Depth violation inside guard_after_execute
+		$deep = ['leaf' => 'ok'];
+
+		for ($i = 0; $i < 35; $i++) {
+			$deep = ['nested' => $deep];
+		}
+
+		try {
+			mcp_capability_guard_after_execute('cacti-list-devices', $deep);
+			$this->fail('Expected CONTROL_PLANE_VIOLATION on deep payload');
+		} catch (AbilitiesError $error) {
+			$this->assertSame('CONTROL_PLANE_VIOLATION', $error->reason);
+		}
+
+		// Clog byte truncation and empty file edge cases
+		$tmpFile = tempnam(sys_get_temp_dir(), 'mcp_clog_cov_');
+		$this->assertIsString($tmpFile);
+
+		try {
+			file_put_contents($tmpFile, '');
+			$empty = mcp_read_clog_tail($tmpFile, 10);
+			$this->assertSame(['lines' => [], 'count' => 0, 'truncated' => false], $empty);
+
+			file_put_contents($tmpFile, "2026-11-26 10:00:00 - INFO first line here\r\n2026-11-26 10:00:30 - INFO middle line here\r\n\r\n2026-11-26 10:01:00 - ERROR second\r\n");
+			$bounded = mcp_read_clog_tail($tmpFile, 10, 'ALL', '', 60);
+			$this->assertTrue($bounded['truncated']);
+			$this->assertSame(1, $bounded['count']);
+			$this->assertStringContainsString('second', $bounded['lines'][0]);
+		} finally {
+			@unlink($tmpFile);
+		}
+
+		// Script server negative / non-numeric scalar handling
+		$GLOBALS['mcp_unit_state']['tables'] = ['plugin_mcp_token' => true];
+		$GLOBALS['mcp_unit_state']['callbacks']['db_fetch_cell_prepared'] = fn () => 'not-a-number';
+		$this->assertSame('U', mcp_script_server_count('plugin_mcp_token', 'SELECT COUNT(*) FROM plugin_mcp_token'));
 	}
 }

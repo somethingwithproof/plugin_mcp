@@ -217,7 +217,10 @@ jobs:
 
       - name: Smoke test token CLI, script-server metrics, and integration hooks
         run: |
-          mariadb -h127.0.0.1 -ucactiuser cacti -e "REPLACE INTO settings (name, value) VALUES ('mcp_public_url', 'http://localhost/cacti');"
+          mariadb -h127.0.0.1 -ucactiuser cacti -e "REPLACE INTO settings (name, value) VALUES ('auth_method', '1'), ('mcp_public_url', 'http://localhost/cacti');"
+          API_REALM_ID="$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT id + 100 FROM plugin_realms WHERE plugin='mcp' AND file LIKE '%api.php%';")"
+          ADMIN_ID="$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT id FROM user_auth WHERE username='admin';")"
+          mariadb -h127.0.0.1 -ucactiuser cacti -e "REPLACE INTO user_auth_realm (realm_id, user_id) VALUES (${API_REALM_ID}, ${ADMIN_ID});"
           TOKEN_VALUE="cmcp_pat_$(openssl rand -hex 32)"
           TOKEN_OUT="$(CACTI_MCP_TOKEN="$TOKEN_VALUE" php plugins/mcp/tokens.php --create=admin --days=1)"
           unset TOKEN_VALUE
