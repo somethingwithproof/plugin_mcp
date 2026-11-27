@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: 2026 Thomas Vincent
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+schemaVersion: "1.0"
+plugin: mcp
+title: Cacti MCP Plugin Schema
+description: >
+  Declarative configuration and runtime state boundary for plugin_mcp.
+  Configuration keys under config are declarative and eligible for CasC
+  reconciliation. Tables under state are runtime operational data and
+  credentials and must never be reconciled or exported as secrets by CasC.
+
+config:
+  reconciledByCasc: true
+  properties:
+    mcp_public_url:
+      type: string
+      format: uri
+      nullable: true
+      default: ""
+      maxLength: 255
+      description: >
+        Public Cacti base URL used by MCP clients (for example
+        https://cacti.example.com/cacti). HTTPS is required except for
+        loopback hosts.
+    ability_enablement_policy:
+      type: object
+      description: >
+        Declarative policy controlling default ability exposure by namespace
+        (built-in cacti abilities default to exposed; third-party plugin
+        abilities default to hidden unless explicitly enabled).
+      properties:
+        builtin_default_exposed:
+          type: boolean
+          default: true
+        plugin_default_exposed:
+          type: boolean
+          default: false
+      additionalProperties: false
+  additionalProperties: false
+
+state:
+  reconciledByCasc: false
+  neverExportSecrets: true
+  tables:
+    plugin_mcp_token:
+      description: >
+        Personal access token runtime table storing SHA-256 token hashes,
+        owners, scopes, expiration timestamps, and revocation flags.
+      secretColumns:
+        - token_hash
+      reconciledByCasc: false
+    plugin_mcp_audit:
+      description: >
+        Append-only audit log of ability invocations, denials, rejections,
+        and token lifecycle events.
+      reconciledByCasc: false
+    plugin_mcp_ability:
+      description: >
+        Runtime per-ability exposure override rows managed through the Cacti
+        administration console.
+      reconciledByCasc: false
+
+resources:
+  - name: mcp/abilities
+    readOnly: true
+    backingTable: plugin_mcp_ability
+  - name: mcp/audit
+    readOnly: true
+    backingTable: plugin_mcp_audit
+  - name: mcp/tokens
+    readOnly: true
+    backingTable: plugin_mcp_token
+    excludedFields:
+      - token_hash

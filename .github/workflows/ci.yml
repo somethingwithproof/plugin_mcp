@@ -64,19 +64,60 @@ jobs:
       fail-fast: false
       matrix:
         php: ['8.2', '8.3', '8.4', '8.5']
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: ${{ matrix.php }}
-          coverage: none
+          coverage: ${{ matrix.php == '8.4' && 'pcov' || 'none' }}
       - run: composer install --prefer-dist --no-progress
       - name: Run PHPStan
         run: composer phpstan
       - name: Run PHPUnit tests
+        if: matrix.php != '8.4'
         run: composer test
+      - name: Run PHPUnit tests with coverage
+        if: matrix.php == '8.4'
+        run: |
+          mkdir -p coverage
+          vendor/bin/phpunit --configuration=phpunit.xml --coverage-clover=coverage/clover.xml
+      - name: Enforce 85% line coverage threshold
+        if: matrix.php == '8.4'
+        run: |
+          php -r '
+            $xml = simplexml_load_file("coverage/clover.xml");
+            if ($xml === false || !isset($xml->project->metrics)) {
+              fwrite(STDERR, "Unable to parse coverage/clover.xml\n");
+              exit(1);
+            }
+            $m = $xml->project->metrics;
+            $statements = (int) $m["statements"];
+            $covered = (int) $m["coveredstatements"];
+            $pct = $statements > 0 ? ($covered / $statements) * 100.0 : 0.0;
+            printf("Measured line coverage: %.2f%% (%d/%d statements)\n", $pct, $covered, $statements);
+            if ($pct < 85.0) {
+              fwrite(STDERR, sprintf("Coverage %.2f%% is below required 85.00%% threshold\n", $pct));
+              exit(1);
+            }
+          '
+      - name: Upload coverage report
+        if: matrix.php == '8.4'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: phpunit-coverage-clover
+          path: coverage/clover.xml
+          if-no-files-found: error
+      - name: SonarCloud Scan
+        if: matrix.php == '8.4' && env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   package:
     name: Build installable plugin archive
@@ -95,6 +136,7 @@ jobs:
           tar -xzf dist/mcp.tar.gz -C /tmp/mcp-package
           test -f /tmp/mcp-package/mcp/INFO
           test -f /tmp/mcp-package/mcp/setup.php
+          test -f /tmp/mcp-package/mcp/schema/mcp.schema.yaml
           test -f /tmp/mcp-package/mcp/images/mcp_logo.png
           test ! -d /tmp/mcp-package/mcp/tests
           test ! -d /tmp/mcp-package/mcp/.github

@@ -2,6 +2,9 @@
 /* SPDX-FileCopyrightText: 2026 Thomas Vincent
  * SPDX-License-Identifier: GPL-2.0-or-later */
 
+/**
+ * Domain error carrying a google.rpc.Code status, ErrorInfo reason, and HTTP status override.
+ */
 class AbilitiesError extends RuntimeException {
 	private const HTTP_CODES = [
 		'INVALID_ARGUMENT'    => 400,
@@ -19,6 +22,8 @@ class AbilitiesError extends RuntimeException {
 	];
 
 	/**
+	 * Construct an AbilitiesError.
+	 *
 	 * @param string $status     A google.rpc.Code name.
 	 * @param string $reason     UPPER_SNAKE_CASE ErrorInfo reason.
 	 * @param string $message    Developer facing text; empty selects the default for the reason.
@@ -30,6 +35,11 @@ class AbilitiesError extends RuntimeException {
 		parent::__construct($message);
 	}
 
+	/**
+	 * Resolve the HTTP status code corresponding to this error.
+	 *
+	 * @return int HTTP status code.
+	 */
 	public function httpStatus() : int {
 		return $this->httpCode ?? self::HTTP_CODES[$this->status] ?? 500;
 	}
@@ -48,7 +58,12 @@ const MCP_BUILTIN_REALMS = [
 	'cacti-get-clog'          => 19,
 ];
 
-/** The class name of an exception for the log. An anonymous class name embeds a NUL and a file path, so use its parent. */
+/**
+ * The class name of an exception for the log. An anonymous class name embeds a NUL and a file path, so use its parent.
+ *
+ * @param Throwable $error Exception or error instance.
+ * @return string Safe exception class name for logging.
+ */
 function mcp_exception_class(Throwable $error) : string {
 	$class = $error::class;
 
@@ -62,6 +77,11 @@ function mcp_exception_class(Throwable $error) : string {
 /**
  * Log a failure the caller only sees as a generic error. Only the ability id, a fixed reason, and the
  * exception class are written: never the message, arguments, or token. Skipped where Cacti is not loaded.
+ *
+ * @param string     $ability Ability identifier or empty string.
+ * @param string     $reason  Fixed reason token.
+ * @param ?Throwable $error   Optional exception whose class name is recorded.
+ * @return void
  */
 function mcp_log_failure(string $ability, string $reason, ?Throwable $error = null) : void {
 	if (!function_exists('cacti_log')) {
@@ -72,7 +92,12 @@ function mcp_log_failure(string $ability, string $reason, ?Throwable $error = nu
 	cacti_log('MCP: ability ' . $ability . ' failed: ' . $reason . ($error !== null ? ' (' . mcp_exception_class($error) . ')' : ''), false, 'MCP');
 }
 
-/** A deliberately small schema dialect. Unsupported constraints fail closed. */
+/**
+ * Validate a schema in the supported JSON Schema subset. Unsupported constraints fail closed.
+ *
+ * @param array<string, mixed> $schema Ability input or output JSON schema.
+ * @return void
+ */
 function abilities_check_schema(array $schema) : void {
 	$types = [
 		'object'  => ['type', 'description', 'properties', 'required', 'additionalProperties'],
@@ -129,8 +154,15 @@ function abilities_check_schema(array $schema) : void {
 }
 
 /**
+ * Validate a decoded JSON value against a checked ability schema.
+ *
  * $capStrings applies the default 4096-character limit to strings without a declared maxLength.
  * It is on for arguments; results are bounded by their declared maxLength and the result byte limit.
+ *
+ * @param mixed                $value      Decoded JSON value to validate.
+ * @param array<string, mixed> $schema     Schema specification.
+ * @param bool                 $capStrings Whether to enforce the 4096-character default string cap.
+ * @return void
  */
 function abilities_validate(mixed $value, array $schema, bool $capStrings = true) : void {
 	$type = $schema['type'];
@@ -199,6 +231,11 @@ function abilities_validate(mixed $value, array $schema, bool $capStrings = true
  * Make every empty PHP array that the schema declares an object an actual empty object, at any depth,
  * so it encodes as {} rather than []. A top-level result stays an array; the callers encode it as an object.
  * Non-empty lists are left alone and fail validation.
+ *
+ * @param mixed                $value  Result value to normalize.
+ * @param array<string, mixed> $schema Declared output schema.
+ * @param bool                 $top    True when normalizing the top-level result array.
+ * @return mixed Normalized value.
  */
 function abilities_normalize_output(mixed $value, array $schema, bool $top = true) : mixed {
 	$type = is_array($schema['type']) ? $schema['type'][0] : $schema['type'];
@@ -229,6 +266,9 @@ function abilities_normalize_output(mixed $value, array $schema, bool $top = tru
 	return $value;
 }
 
+/**
+ * In-memory registry of read-only abilities enforcing schema validation, exposure, permissions, and auditing.
+ */
 class AbilitiesRegistry {
 	public const ID_PATTERN        = '/^(?=.{1,64}$)[a-z][a-z0-9]*(-[a-z0-9]+){1,7}$/D';
 	private const CATEGORY_PATTERN = '/^[a-z][a-z0-9-]{0,31}$/D';
@@ -241,16 +281,33 @@ class AbilitiesRegistry {
 	/** @var ?callable(string, string): bool */
 	private $isExposed = null;
 
-	/** Whether $id is a well-formed ability identifier. */
+	/**
+	 * Whether $id is a well-formed ability identifier.
+	 *
+	 * @param string $id Candidate ability identifier.
+	 * @return bool True when $id matches ID_PATTERN.
+	 */
 	public static function isValidId(string $id) : bool {
 		return preg_match(self::ID_PATTERN, $id) === 1;
 	}
 
-	/** Set the exposure policy, callable(string $id, string $namespace): bool. Without one, every ability is exposed. */
+	/**
+	 * Set the exposure policy, callable(string $id, string $namespace): bool. Without one, every ability is exposed.
+	 *
+	 * @param callable(string, string): bool $isExposed Policy callback.
+	 * @return void
+	 */
 	public function setExposure(callable $isExposed) : void {
 		$this->isExposed = $isExposed;
 	}
 
+	/**
+	 * Register an ability category identifier and display label.
+	 *
+	 * @param string $id    Lowercase category slug.
+	 * @param string $label Human-readable category label.
+	 * @return void
+	 */
 	public function registerCategory(string $id, string $label) : void {
 		if (!preg_match(self::CATEGORY_PATTERN, $id) || $label === '' || isset($this->categories[$id])) {
 			throw new LogicException('Invalid or duplicate ability category');
@@ -258,6 +315,14 @@ class AbilitiesRegistry {
 		$this->categories[$id] = $label;
 	}
 
+	/**
+	 * Register one read-only ability definition under the given namespace.
+	 *
+	 * @param string               $id         Ability identifier.
+	 * @param array<string, mixed> $definition Ability definition array.
+	 * @param string               $namespace  Owning plugin namespace.
+	 * @return void
+	 */
 	public function register(string $id, array $definition, string $namespace = 'cacti') : void {
 		if (!self::isValidId($id) || isset($this->entries[$id]) || count($this->entries) >= 256) {
 			throw new LogicException('Invalid or duplicate ability');
@@ -294,17 +359,32 @@ class AbilitiesRegistry {
 		$this->entries[$id] = ['id' => $id, 'namespace' => $namespace] + $definition;
 	}
 
-	/** Take over the state of a clone made from this registry, once its plugin registered cleanly. */
+	/**
+	 * Take over the state of a clone made from this registry, once its plugin registered cleanly.
+	 *
+	 * @param self $scratch Cloned registry with validated plugin registrations.
+	 * @return void
+	 */
 	public function adopt(self $scratch) : void {
 		$this->entries    = $scratch->entries;
 		$this->categories = $scratch->categories;
 	}
 
-	/** Every registered ability with its namespace, ignoring principal and exposure. For the admin page only. */
+	/**
+	 * Every registered ability with its namespace, ignoring principal and exposure. For the admin page only.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
 	public function all() : array {
 		return array_values(array_map(fn (array $entry) => $this->descriptor($entry) + ['namespace' => $entry['namespace']], $this->entries));
 	}
 
+	/**
+	 * Return all abilities visible and permitted for the given principal.
+	 *
+	 * @param array<string, mixed> $principal Authenticated principal.
+	 * @return list<array<string, mixed>>
+	 */
 	public function discover(array $principal) : array {
 		$items = [];
 
@@ -317,13 +397,28 @@ class AbilitiesRegistry {
 		return $items;
 	}
 
+	/**
+	 * Return one ability descriptor when visible and permitted for the principal, or null otherwise.
+	 *
+	 * @param array<string, mixed> $principal Authenticated principal.
+	 * @param string               $id        Ability identifier.
+	 * @return ?array<string, mixed>
+	 */
 	public function get(array $principal, string $id) : ?array {
 		$entry = $this->entries[$id] ?? null;
 
 		return $entry !== null && $this->allowed($entry, $principal) ? $this->descriptor($entry) : null;
 	}
 
-	/** @return array{requestId: string, result: array} */
+	/**
+	 * Execute a permitted ability after input validation and audit logging.
+	 *
+	 * @param array<string, mixed> $principal Authenticated principal.
+	 * @param string               $id        Ability identifier.
+	 * @param stdClass             $args      Decoded caller arguments.
+	 * @param callable             $audit     Audit logger callback.
+	 * @return array{requestId: string, result: array}
+	 */
 	public function execute(array $principal, string $id, stdClass $args, callable $audit) : array {
 		$entry     = $this->entries[$id] ?? null;
 		$requestId = bin2hex(random_bytes(16));
@@ -359,7 +454,15 @@ class AbilitiesRegistry {
 		return ['requestId' => $requestId, 'result' => $result];
 	}
 
-	/** Record a refused attempt. Nothing ran, so an audit outage must not change the error the caller sees. */
+	/**
+	 * Record a refused attempt. Nothing ran, so an audit outage must not change the error the caller sees.
+	 *
+	 * @param callable $audit     Audit logger callback.
+	 * @param string   $requestId Generated request ID.
+	 * @param string   $name      Validated ability name or '(invalid)'.
+	 * @param string   $outcome   Refusal outcome ('denied' or 'rejected').
+	 * @return void
+	 */
 	private function auditRefusal(callable $audit, string $requestId, string $name, string $outcome) : void {
 		try {
 			$audit($requestId, $name, $outcome);
@@ -369,7 +472,13 @@ class AbilitiesRegistry {
 		}
 	}
 
-	/** The result must survive a JSON round trip and match the declared output schema exactly. Returns it with empty objects normalized. */
+	/**
+	 * The result must survive a JSON round trip and match the declared output schema exactly. Returns it with empty objects normalized.
+	 *
+	 * @param mixed                $result Raw ability return value.
+	 * @param array<string, mixed> $schema Declared output schema.
+	 * @return array<string, mixed> Validated result array.
+	 */
 	private function checkResult(mixed $result, array $schema) : array {
 		try {
 			// A non-empty list would be cast to an object with numeric keys; reject it instead.
@@ -390,6 +499,12 @@ class AbilitiesRegistry {
 		return $result;
 	}
 
+	/**
+	 * Verify annotations match the fixed read-only, non-destructive, idempotent set.
+	 *
+	 * @param array<string, mixed> $annotations Candidate annotations array.
+	 * @return bool True when annotations match exactly.
+	 */
 	private function sameAnnotations(array $annotations) : bool {
 		foreach (self::ANNOTATIONS as $key => $value) {
 			if (!array_key_exists($key, $annotations) || $annotations[$key] !== $value) {
@@ -400,6 +515,12 @@ class AbilitiesRegistry {
 		return count($annotations) === count(self::ANNOTATIONS);
 	}
 
+	/**
+	 * Build the public descriptor array for a registered entry.
+	 *
+	 * @param array<string, mixed> $entry Internal registry entry.
+	 * @return array<string, mixed> Public descriptor array.
+	 */
 	private function descriptor(array $entry) : array {
 		return [
 			'id'           => $entry['id'],
@@ -412,6 +533,13 @@ class AbilitiesRegistry {
 		];
 	}
 
+	/**
+	 * Check whether the principal holds scope, exposure, and permission for an ability.
+	 *
+	 * @param array<string, mixed> $entry     Internal registry entry.
+	 * @param array<string, mixed> $principal Authenticated principal.
+	 * @return bool True when allowed.
+	 */
 	private function allowed(array $entry, array $principal) : bool {
 		// Exposure narrows access; the realm check below still applies to exposed abilities.
 		return in_array('abilities:read', $principal['scopes'], true)
@@ -420,11 +548,26 @@ class AbilitiesRegistry {
 	}
 }
 
-/** Hands plugins a registry view that only accepts abilities in their own namespace. */
+/**
+ * Hands plugins a registry view that only accepts abilities in their own namespace.
+ */
 class AbilitiesRegistrar {
+	/**
+	 * Create a namespace-scoped registrar wrapper.
+	 *
+	 * @param AbilitiesRegistry $registry  Target registry instance.
+	 * @param string            $namespace Owning plugin namespace prefix.
+	 */
 	public function __construct(private AbilitiesRegistry $registry, private string $namespace) {
 	}
 
+	/**
+	 * Register an ability whose identifier starts with this plugin's namespace.
+	 *
+	 * @param string               $id         Ability identifier.
+	 * @param array<string, mixed> $definition Ability definition array.
+	 * @return void
+	 */
 	public function register(string $id, array $definition) : void {
 		if (!str_starts_with($id, $this->namespace . '-')) {
 			throw new LogicException('Ability IDs must start with the plugin namespace');
@@ -432,6 +575,13 @@ class AbilitiesRegistrar {
 		$this->registry->register($id, $definition, $this->namespace);
 	}
 
+	/**
+	 * Register a category on the underlying ability registry.
+	 *
+	 * @param string $id    Lowercase category slug.
+	 * @param string $label Human-readable category label.
+	 * @return void
+	 */
 	public function registerCategory(string $id, string $label) : void {
 		$this->registry->registerCategory($id, $label);
 	}

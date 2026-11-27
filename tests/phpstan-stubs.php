@@ -17,6 +17,9 @@ function read_config_option(string $config_name, bool $force = false) : mixed {
 	return null;
 }
 
+function set_config_option(string $config_name, mixed $value) : void {
+}
+
 function is_realm_allowed(int $realm, int|bool $check_user = false) : bool {
 	return false;
 }

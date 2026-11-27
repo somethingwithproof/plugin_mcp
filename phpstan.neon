@@ -9,6 +9,8 @@ parameters:
 		- lib/aip.php
 		- lib/api_http.php
 		- lib/bootstrap.php
+		- lib/capability_guard.php
+		- lib/integrations.php
 		- lib/mcp_server.php
 		- lib/origin.php
 		- lib/providers.php
@@ -25,16 +27,7 @@ parameters:
 			identifier: missingType.iterableValue
 			paths:
 				- lib/admin.php
-				- lib/aip.php
 				- lib/api_http.php
-				- lib/bootstrap.php
 				- lib/mcp_server.php
-				- lib/origin.php
 				- lib/registry.php
 				- lib/storage.php
-		-
-			identifier: missingType.parameter
-			path: setup.php
-		-
-			identifier: missingType.return
-			path: setup.php

@@ -5,6 +5,7 @@
 require_once __DIR__ . '/registry.php';
 require_once __DIR__ . '/storage.php';
 require_once __DIR__ . '/aip.php';
+require_once __DIR__ . '/capability_guard.php';
 require_once __DIR__ . '/../setup.php';
 
 /* Ported from the core REST API resources.php devices definition (HOST_* constants). */
@@ -87,6 +88,11 @@ const MCP_DATA_SOURCE_FIELDS = [
 	'name'         => ['column' => 'dl.id', 'type' => 'int', 'order' => true],
 ];
 
+/**
+ * Build the ability registry populated with built-in Cacti abilities and plugin hooks.
+ *
+ * @return AbilitiesRegistry Configured registry instance.
+ */
 function mcp_registry() : AbilitiesRegistry {
 	$registry = new AbilitiesRegistry();
 	$registry->setExposure(fn (string $id, string $namespace) => mcp_is_exposed($id, $namespace, mcp_exposure_map()));
@@ -102,8 +108,8 @@ function mcp_registry() : AbilitiesRegistry {
 /**
  * Shared closed object schema builder for resource schemas.
  *
- * @param array<string, array<string, mixed>> $properties
- * @return array<string, mixed>
+ * @param array<string, array<string, mixed>> $properties Map of property name to JSON schema.
+ * @return array<string, mixed> Closed object JSON schema.
  */
 function mcp_object_schema(array $properties) : array {
 	return [
@@ -117,12 +123,21 @@ function mcp_object_schema(array $properties) : array {
 /**
  * Shared input/output schema and paginated execution wrapper for AIP list abilities.
  *
- * @param array<string, mixed>                                          $itemSchema
- * @param array<string, array<string, mixed>>                           $filterFields
- * @param array<string, array<string, mixed>>                           $orderFields
- * @param callable(int): bool                                           $permission
- * @param callable(int, string, string, array{size: int, offset: int}): list<array<string, mixed>> $fetch
- * @param callable(array<string, mixed>): array<string, mixed>          $mapper
+ * @param AbilitiesRegistry                                                                       $registry          Target registry.
+ * @param string                                                                                  $id                Ability identifier.
+ * @param string                                                                                  $label             Human-readable ability title.
+ * @param string                                                                                  $description       Ability description.
+ * @param string                                                                                  $category          Registered ability category ID.
+ * @param string                                                                                  $listKey           Response key holding resource rows.
+ * @param array<string, mixed>                                                                    $itemSchema        JSON schema for each item in the list.
+ * @param array<string, array<string, mixed>>                                                     $filterFields      Allowed AIP-160 filter fields.
+ * @param array<string, array<string, mixed>>                                                     $orderFields       Allowed AIP-132 orderBy fields.
+ * @param string                                                                                  $tieBreakerColumn  SQL column appended for stable offset paging.
+ * @param string                                                                                  $fingerprintPrefix Prefix binding page tokens to this ability.
+ * @param callable(int): bool                                                                     $permission        Permission callback checking user access.
+ * @param callable(int, string, string, array{size: int, offset: int}): list<array<string, mixed>> $fetch            Row fetcher callback.
+ * @param callable(array<string, mixed>): array<string, mixed>                                    $mapper            Row-to-resource mapper callback.
+ * @return void
  */
 function mcp_register_list_ability(
 	AbilitiesRegistry $registry,
@@ -140,6 +155,9 @@ function mcp_register_list_ability(
 	callable $fetch,
 	callable $mapper
 ) : void {
+	$annotations = ['readOnly' => true, 'destructive' => false, 'idempotent' => true];
+	mcp_capability_validate_annotations($annotations, $id);
+
 	$registry->register($id, [
 		'label'        => $label,
 		'description'  => $description,
@@ -158,9 +176,10 @@ function mcp_register_list_ability(
 			$listKey        => ['type' => 'array', 'items' => $itemSchema, 'maxItems' => MCP_PAGE_SIZE_MAX],
 			'nextPageToken' => ['type' => ['string', 'null']],
 		]),
-		'annotations' => ['readOnly' => true, 'destructive' => false, 'idempotent' => true],
+		'annotations' => $annotations,
 		'permission'  => $permission,
 		'execute'     => function (int $user, stdClass $args) use (
+			$id,
 			$listKey,
 			$filterFields,
 			$orderFields,
@@ -169,6 +188,8 @@ function mcp_register_list_ability(
 			$fetch,
 			$mapper
 		) {
+			mcp_capability_assert_no_control_escalation($args);
+
 			$filter      = (string) ($args->filter ?? '');
 			$orderBy     = trim((string) ($args->orderBy ?? ''));
 			$fingerprint = sha1($fingerprintPrefix . $filter . "\0" . $orderBy);
@@ -181,14 +202,20 @@ function mcp_register_list_ability(
 			$rows = $fetch($user, $where, $order, $page);
 			$more = count($rows) > $page['size'];
 
-			return [
+			return mcp_capability_guard_after_execute($id, [
 				$listKey        => array_map($mapper, array_slice($rows, 0, $page['size'])),
 				'nextPageToken' => $more ? mcp_page_token($page['offset'] + $page['size'], $fingerprint) : null,
-			];
+			]);
 		},
 	]);
 }
 
+/**
+ * Register all built-in read-only Cacti abilities on the given registry.
+ *
+ * @param AbilitiesRegistry $registry Target registry.
+ * @return void
+ */
 function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 	$annotations = ['readOnly' => true, 'destructive' => false, 'idempotent' => true];
 	$nullable    = fn (string $type) => ['type' => [$type, 'null']];
@@ -361,6 +388,8 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 		'annotations'   => $annotations,
 		'permission'    => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-get-device'], $user),
 		'execute'       => function (int $user, stdClass $args) {
+			mcp_capability_assert_no_control_escalation($args);
+
 			$total = -1;
 			$id    = (int) substr((string) $args->name, strlen('devices/'));
 			$rows  = get_allowed_devices('', 'h1.id ASC', '1', $total, $user, $id);
@@ -369,7 +398,7 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 				throw new AbilitiesError('NOT_FOUND', 'DEVICE_NOT_FOUND');
 			}
 
-			return ['device' => mcp_device_resource(reset($rows))];
+			return mcp_capability_guard_after_execute('cacti-get-device', ['device' => mcp_device_resource(reset($rows))]);
 		},
 	]);
 
@@ -565,11 +594,17 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
 		'permission'  => fn (int $user) => is_realm_allowed(MCP_BUILTIN_REALMS['cacti-get-clog'], $user)
 			|| is_realm_allowed(18, $user),
 		'execute' => function (int $user, stdClass $args) {
+			mcp_capability_assert_no_control_escalation($args);
+
 			$limit    = isset($args->lines) ? (int) $args->lines : MCP_CLOG_DEFAULT_LINES;
 			$severity = isset($args->severity) ? (string) $args->severity : 'ALL';
 			$search   = isset($args->search) ? (string) $args->search : '';
 
-			return mcp_read_clog_tail(mcp_clog_path(), $limit, $severity, $search);
+			return mcp_capability_guard_after_execute(
+				'cacti-get-clog',
+				mcp_read_clog_tail(mcp_clog_path(), $limit, $severity, $search),
+				MCP_CLOG_MAX_LINE_LENGTH
+			);
 		},
 	]);
 }
@@ -579,6 +614,9 @@ function mcp_register_builtins(AbilitiesRegistry $registry) : void {
  *
  * Each plugin registers into a scratch copy that is adopted only when the hook
  * function returns, so a failing plugin leaves nothing behind.
+ *
+ * @param AbilitiesRegistry $registry Target ability registry.
+ * @return void
  */
 function mcp_dispatch_ability_hooks(AbilitiesRegistry $registry) : void {
 	global $plugins_integrated;
@@ -631,7 +669,13 @@ function mcp_dispatch_ability_hooks(AbilitiesRegistry $registry) : void {
 	}
 }
 
-/** Resolve a hook file inside the plugin directory, as api_plugin_hook_function() does. */
+/**
+ * Resolve a hook file inside the plugin directory, as api_plugin_hook_function() does.
+ *
+ * @param string $plugin Plugin directory slug.
+ * @param string $file   Relative file path inside the plugin directory.
+ * @return string|false Resolved filesystem path, or false when unavailable.
+ */
 function mcp_plugin_file(string $plugin, string $file) : string|false {
 	global $config;
 
@@ -647,8 +691,13 @@ function mcp_plugin_file(string $plugin, string $file) : string|false {
 /**
  * Run a paginated read-only SELECT query with optional WHERE clause and bound parameters.
  *
- * @param array{size: int, offset: int} $page
- * @param list<mixed>                   $params
+ * @param string                        $select SQL SELECT projection list.
+ * @param string                        $from   SQL FROM clause and joins.
+ * @param string                        $where  SQL WHERE predicate or empty string.
+ * @param string                        $order  SQL ORDER BY clause.
+ * @param array{size: int, offset: int} $page   Pagination window.
+ * @param string                        $error  Error message thrown on DB failure.
+ * @param list<mixed>                   $params Bound SQL parameters.
  * @return list<array<string, mixed>>
  */
 function mcp_query_page(
@@ -677,7 +726,8 @@ function mcp_query_page(
 /**
  * Collect allowed device IDs for $user through Cacti's device permission helper.
  *
- * @return list<int>
+ * @param int $user Cacti user ID.
+ * @return list<int> Permitted device IDs.
  */
 function mcp_allowed_device_ids(int $user) : array {
 	$ids       = [];
@@ -724,13 +774,21 @@ function mcp_device_filter_fields() : array {
 /**
  * A resource name such as sites/3, or null when the reference is unset or the column is missing.
  *
- * @param array<string, mixed> $row
+ * @param array<string, mixed> $row        Database row.
+ * @param string               $column     Foreign key column name.
+ * @param string               $collection Target AIP collection name.
+ * @return ?string Formatted resource name or null.
  */
 function mcp_reference(array $row, string $column, string $collection) : ?string {
 	return (int) ($row[$column] ?? 0) > 0 ? $collection . '/' . (int) $row[$column] : null;
 }
 
-/** RFC 3339 UTC time, or null when unset; ported from core rest_time(). */
+/**
+ * Format a timestamp as RFC 3339 UTC time, or null when unset; ported from core rest_time().
+ *
+ * @param mixed $value Database timestamp string or integer.
+ * @return ?string RFC 3339 UTC string or null.
+ */
 function mcp_time(mixed $value) : ?string {
 	if (empty($value) || str_starts_with((string) $value, '0000-00-00')) {
 		return null;
@@ -742,24 +800,27 @@ function mcp_time(mixed $value) : ?string {
 
 /**
  * The core Device read fields, without credentials. A column missing on this Cacti version gives null.
+ * Untrusted Cacti telemetry strings are sanitized through the capability guard.
  *
- * @param array<string, mixed> $row
- * @return array<string, mixed>
+ * @param array<string, mixed> $row Host database row.
+ * @return array<string, mixed> Sanitized Device resource payload.
  */
 function mcp_device_resource(array $row) : array {
 	$int = fn (string $column) => isset($row[$column]) ? (int) $row[$column] : null;
-	$str = fn (string $column) => isset($row[$column]) ? (string) $row[$column] : null;
+	$str = fn (string $column, string $field) => isset($row[$column])
+		? mcp_capability_sanitize_untrusted_string((string) $row[$column], $field)
+		: null;
 
 	return [
 		'name'               => 'devices/' . (int) $row['id'],
-		'displayName'        => (string) $row['description'],
-		'hostname'           => (string) $row['hostname'],
+		'displayName'        => mcp_capability_sanitize_untrusted_string((string) $row['description'], 'displayName'),
+		'hostname'           => mcp_capability_sanitize_untrusted_string((string) $row['hostname'], 'hostname'),
 		'deviceTemplate'     => mcp_reference($row, 'host_template_id', 'deviceTemplates'),
 		'site'               => mcp_reference($row, 'site_id', 'sites'),
 		'poller'             => mcp_reference($row, 'poller_id', 'pollers'),
-		'externalId'         => $str('external_id'),
-		'location'           => $str('location'),
-		'notes'              => $str('notes'),
+		'externalId'         => $str('external_id', 'externalId'),
+		'location'           => $str('location', 'location'),
+		'notes'              => $str('notes', 'notes'),
 		'disabled'           => ($row['disabled'] ?? '') === 'on',
 		'snmpVersion'        => $int('snmp_version'),
 		'snmpPort'           => $int('snmp_port'),
@@ -777,7 +838,7 @@ function mcp_device_resource(array $row) : array {
 			? (MCP_DEVICE_STATES[(int) $row['status']] ?? MCP_DEVICE_STATES[0])
 			: null,
 		'availability'       => isset($row['availability']) ? (float) $row['availability'] : null,
-		'lastError'          => $str('status_last_error'),
+		'lastError'          => $str('status_last_error', 'lastError'),
 		'failTime'           => mcp_time($row['status_fail_date'] ?? null),
 		'recoveryTime'       => mcp_time($row['status_rec_date'] ?? null),
 		'createTime'         => mcp_time($row['created'] ?? null),
@@ -785,51 +846,57 @@ function mcp_device_resource(array $row) : array {
 }
 
 /**
- * @param array<string, mixed> $row
- * @return array<string, mixed>
+ * Project a Cacti site row into a sanitized Site resource.
+ *
+ * @param array<string, mixed> $row Site database row.
+ * @return array<string, mixed> Sanitized Site resource payload.
  */
 function mcp_site_resource(array $row) : array {
-	$str   = fn (string $column) => isset($row[$column]) ? (string) $row[$column] : null;
+	$str   = fn (string $column, string $field) => isset($row[$column])
+		? mcp_capability_sanitize_untrusted_string((string) $row[$column], $field)
+		: null;
 	$int   = fn (string $column) => isset($row[$column]) ? (int) $row[$column] : null;
 	$float = fn (string $column) => isset($row[$column]) ? (float) $row[$column] : null;
 
 	return [
 		'name'        => 'sites/' . (int) ($row['id'] ?? 0),
-		'displayName' => (string) ($row['name'] ?? ''),
-		'address1'    => $str('address1'),
-		'address2'    => $str('address2'),
-		'city'        => $str('city'),
-		'state'       => $str('state'),
-		'postalCode'  => $str('postal_code'),
-		'country'     => $str('country'),
-		'timezone'    => $str('timezone'),
+		'displayName' => mcp_capability_sanitize_untrusted_string((string) ($row['name'] ?? ''), 'displayName'),
+		'address1'    => $str('address1', 'address1'),
+		'address2'    => $str('address2', 'address2'),
+		'city'        => $str('city', 'city'),
+		'state'       => $str('state', 'state'),
+		'postalCode'  => $str('postal_code', 'postalCode'),
+		'country'     => $str('country', 'country'),
+		'timezone'    => $str('timezone', 'timezone'),
 		'latitude'    => $float('latitude'),
 		'longitude'   => $float('longitude'),
 		'zoom'        => $int('zoom'),
-		'alternateId' => $str('alternate_id'),
-		'notes'       => $str('notes'),
+		'alternateId' => $str('alternate_id', 'alternateId'),
+		'notes'       => $str('notes', 'notes'),
 	];
 }
 
 /**
  * Safe poller fields only; database credentials and TLS keys are never projected.
  *
- * @param array<string, mixed> $row
- * @return array<string, mixed>
+ * @param array<string, mixed> $row Poller database row.
+ * @return array<string, mixed> Sanitized Poller resource payload.
  */
 function mcp_poller_resource(array $row) : array {
-	$str   = fn (string $column) => isset($row[$column]) ? (string) $row[$column] : null;
+	$str   = fn (string $column, string $field) => isset($row[$column])
+		? mcp_capability_sanitize_untrusted_string((string) $row[$column], $field)
+		: null;
 	$int   = fn (string $column) => isset($row[$column]) ? (int) $row[$column] : null;
 	$float = fn (string $column) => isset($row[$column]) ? (float) $row[$column] : null;
 
 	return [
 		'name'           => 'pollers/' . (int) ($row['id'] ?? 0),
-		'displayName'    => (string) ($row['name'] ?? ''),
-		'hostname'       => (string) ($row['hostname'] ?? ''),
+		'displayName'    => mcp_capability_sanitize_untrusted_string((string) ($row['name'] ?? ''), 'displayName'),
+		'hostname'       => mcp_capability_sanitize_untrusted_string((string) ($row['hostname'] ?? ''), 'hostname'),
 		'disabled'       => ($row['disabled'] ?? '') === 'on',
 		'state'          => isset($row['status']) ? (MCP_POLLER_STATES[(int) $row['status']] ?? 'UNKNOWN') : null,
-		'timezone'       => $str('timezone'),
-		'notes'          => $str('notes'),
+		'timezone'       => $str('timezone', 'timezone'),
+		'notes'          => $str('notes', 'notes'),
 		'processes'      => $int('processes'),
 		'threads'        => $int('threads'),
 		'totalPolls'     => $int('total_polls'),
@@ -849,15 +916,17 @@ function mcp_poller_resource(array $row) : array {
 }
 
 /**
- * @param array<string, mixed> $row
- * @return array<string, mixed>
+ * Project a Cacti graph tree row into a sanitized Tree resource.
+ *
+ * @param array<string, mixed> $row Graph tree database row.
+ * @return array<string, mixed> Sanitized Tree resource payload.
  */
 function mcp_tree_resource(array $row) : array {
 	$int = fn (string $column) => isset($row[$column]) ? (int) $row[$column] : null;
 
 	return [
 		'name'             => 'trees/' . (int) ($row['id'] ?? 0),
-		'displayName'      => (string) ($row['name'] ?? ''),
+		'displayName'      => mcp_capability_sanitize_untrusted_string((string) ($row['name'] ?? ''), 'displayName'),
 		'enabled'          => isset($row['enabled']) ? $row['enabled'] === 'on' : true,
 		'locked'           => isset($row['locked']) ? (int) $row['locked'] === 1 : null,
 		'sortType'         => $int('sort_type'),
@@ -867,54 +936,64 @@ function mcp_tree_resource(array $row) : array {
 }
 
 /**
- * @param array<string, mixed> $row
- * @return array<string, mixed>
+ * Project a Cacti graph row into a sanitized Graph resource.
+ *
+ * @param array<string, mixed> $row Graph database row.
+ * @return array<string, mixed> Sanitized Graph resource payload.
  */
 function mcp_graph_resource(array $row) : array {
-	$str = fn (string $column) => isset($row[$column]) ? (string) $row[$column] : null;
+	$str = fn (string $column, string $field) => isset($row[$column])
+		? mcp_capability_sanitize_untrusted_string((string) $row[$column], $field)
+		: null;
 	$int = fn (string $column) => isset($row[$column]) ? (int) $row[$column] : null;
 
 	return [
 		'name'              => 'graphs/' . (int) ($row['local_graph_id'] ?? $row['id'] ?? 0),
-		'title'             => (string) ($row['title_cache'] ?? ''),
+		'title'             => mcp_capability_sanitize_untrusted_string((string) ($row['title_cache'] ?? ''), 'title'),
 		'device'            => mcp_reference($row, 'host_id', 'devices'),
-		'deviceDisplayName' => $str('description'),
+		'deviceDisplayName' => $str('description', 'deviceDisplayName'),
 		'graphTemplate'     => mcp_reference($row, 'graph_template_id', 'graphTemplates'),
-		'templateName'      => $str('template_name'),
+		'templateName'      => $str('template_name', 'templateName'),
 		'width'             => $int('width'),
 		'height'            => $int('height'),
 		'snmpQuery'         => mcp_reference($row, 'snmp_query_id', 'dataQueries'),
-		'snmpIndex'         => $str('snmp_index'),
+		'snmpIndex'         => $str('snmp_index', 'snmpIndex'),
 	];
 }
 
 /**
  * Safe data source metadata; secret data_input_data values are never queried or returned.
  *
- * @param array<string, mixed> $row
- * @return array<string, mixed>
+ * @param array<string, mixed> $row Data source database row.
+ * @return array<string, mixed> Sanitized DataSource resource payload.
  */
 function mcp_data_source_resource(array $row) : array {
-	$str = fn (string $column) => isset($row[$column]) ? (string) $row[$column] : null;
+	$str = fn (string $column, string $field) => isset($row[$column])
+		? mcp_capability_sanitize_untrusted_string((string) $row[$column], $field)
+		: null;
 	$int = fn (string $column) => isset($row[$column]) ? (int) $row[$column] : null;
 
 	return [
 		'name'              => 'dataSources/' . (int) ($row['id'] ?? 0),
-		'displayName'       => (string) ($row['name_cache'] ?? ''),
+		'displayName'       => mcp_capability_sanitize_untrusted_string((string) ($row['name_cache'] ?? ''), 'displayName'),
 		'device'            => mcp_reference($row, 'host_id', 'devices'),
-		'deviceDisplayName' => $str('host_description'),
+		'deviceDisplayName' => $str('host_description', 'deviceDisplayName'),
 		'dataTemplate'      => mcp_reference($row, 'data_template_id', 'dataTemplates'),
-		'templateName'      => $str('template_name'),
+		'templateName'      => $str('template_name', 'templateName'),
 		'dataSourceProfile' => mcp_reference($row, 'data_source_profile_id', 'dataSourceProfiles'),
 		'active'            => ($row['active'] ?? '') === 'on',
 		'rrdStep'           => $int('rrd_step'),
 		'snmpQuery'         => mcp_reference($row, 'snmp_query_id', 'dataQueries'),
-		'snmpIndex'         => $str('snmp_index'),
+		'snmpIndex'         => $str('snmp_index', 'snmpIndex'),
 		'orphan'            => isset($row['orphan']) ? (int) $row['orphan'] === 1 : null,
 	];
 }
 
-/** Resolve the Cacti log file path without exposing it in API responses. */
+/**
+ * Resolve the Cacti log file path without exposing it in API responses.
+ *
+ * @return string Filesystem path to cacti.log or empty string when unresolvable.
+ */
 function mcp_clog_path() : string {
 	global $config;
 
@@ -935,9 +1014,16 @@ function mcp_clog_path() : string {
 
 /**
  * Redact bearer tokens, personal access tokens, passwords, secrets, SNMP
- * communities, API keys, and URL userinfo from a log line. Fails closed.
+ * communities, API keys, and URL userinfo from a log line, and sanitize
+ * control, bidi, and prompt-injection markers. Fails closed.
+ *
+ * @param string $line Raw Cacti log line.
+ * @return string Redacted and sanitized log line.
  */
 function mcp_redact_log_line(string $line) : string {
+	// Strip unsafe control and zero-width chars first so obfuscation cannot bypass secret redaction.
+	$line = mcp_capability_strip_unsafe_chars($line);
+
 	$keys     = 'authorization|password|passwd|passphrase|pass|secret|token|community|'
 		. 'api[_-]?key|auth[_-]?key|priv(?:ate)?[_-]?key|dbpass|dbsslkey';
 	$quoted   = '/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(["\'])'
@@ -963,6 +1049,8 @@ function mcp_redact_log_line(string $line) : string {
 		$line = $replaced;
 	}
 
+	$line = mcp_capability_neutralize_prompt_markers($line);
+
 	if (strlen($line) > MCP_CLOG_MAX_LINE_LENGTH) {
 		$line = substr($line, 0, MCP_CLOG_MAX_LINE_LENGTH) . '...';
 	}
@@ -973,6 +1061,11 @@ function mcp_redact_log_line(string $line) : string {
 /**
  * Read a bounded tail of the Cacti log, filter by severity/search, and redact secrets.
  *
+ * @param string $path     Filesystem path to the Cacti log file.
+ * @param int    $limit    Maximum number of matching lines to return.
+ * @param string $severity Severity filter token or 'ALL'.
+ * @param string $search   Case-insensitive plain substring filter.
+ * @param int    $maxBytes Maximum trailing byte window read from disk.
  * @return array{lines: list<string>, count: int, truncated: bool}
  */
 function mcp_read_clog_tail(

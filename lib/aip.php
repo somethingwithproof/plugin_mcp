@@ -23,12 +23,19 @@ const MCP_ERROR_MESSAGES = [
 	'REQUEST_TOO_LARGE'      => 'The request body exceeds the size limit.',
 	'CACTI_UNAVAILABLE'      => 'Cacti is not available.',
 	'LOG_UNAVAILABLE'        => 'The Cacti log file is not readable.',
+	'CAPABILITY_DENIED'      => 'The capability boundary denied this request.',
+	'CONTROL_PLANE_VIOLATION'=> 'Untrusted data attempted to access or mutate control-plane fields.',
 ];
 
 const MCP_PAGE_SIZE_DEFAULT = 50;
 const MCP_PAGE_SIZE_MAX     = 100;
 
-/** Build the AIP-193 error body. @return array<string, mixed> */
+/**
+ * Build the AIP-193 error body.
+ *
+ * @param AbilitiesError $e Error instance to serialize.
+ * @return array<string, mixed> AIP-193 error envelope.
+ */
 function mcp_error_body(AbilitiesError $e) : array {
 	$code    = $e->httpStatus();
 	$details = [[
@@ -55,7 +62,12 @@ function mcp_error_body(AbilitiesError $e) : array {
 	]];
 }
 
-/** Make empty "properties" lists encode as JSON objects. */
+/**
+ * Make empty "properties" lists encode as JSON objects.
+ *
+ * @param array<string, mixed> $schema Ability JSON schema definition.
+ * @return array<string, mixed> Normalized JSON schema ready for json_encode().
+ */
 function mcp_schema_json(array $schema) : array {
 	if (isset($schema['properties']) && is_array($schema['properties'])) {
 		$properties = array_map('mcp_schema_json', $schema['properties']);
@@ -72,6 +84,10 @@ function mcp_schema_json(array $schema) : array {
 /**
  * Read pageSize and pageToken. The token binds the offset to the query fingerprint.
  *
+ * @param stdClass $args        Caller arguments object.
+ * @param string   $fingerprint Query fingerprint binding pageToken to filter/order.
+ * @param int      $default     Default page size when omitted or zero.
+ * @param int      $max         Maximum allowed page size.
  * @return array{size: int, offset: int}
  */
 function mcp_page(stdClass $args, string $fingerprint, int $default = MCP_PAGE_SIZE_DEFAULT, int $max = MCP_PAGE_SIZE_MAX) : array {
@@ -104,11 +120,23 @@ function mcp_page(stdClass $args, string $fingerprint, int $default = MCP_PAGE_S
 	return ['size' => $size, 'offset' => $offset];
 }
 
-/** Issue the pageToken for the page that starts at $offset. */
+/**
+ * Issue the pageToken for the page that starts at $offset.
+ *
+ * @param int    $offset      Zero-based row offset for the next page.
+ * @param string $fingerprint Query fingerprint bound into the token.
+ * @return string URL-safe base64 page token.
+ */
 function mcp_page_token(int $offset, string $fingerprint) : string {
 	return rtrim(strtr(base64_encode((string) json_encode(['o' => $offset, 'f' => $fingerprint])), '+/', '-_'), '=');
 }
 
+/**
+ * Build an INVALID_FILTER error for the filter field.
+ *
+ * @param string $description Field violation explanation.
+ * @return AbilitiesError Error ready to throw.
+ */
 function mcp_filter_error(string $description) : AbilitiesError {
 	return new AbilitiesError('INVALID_ARGUMENT', 'INVALID_FILTER', '', [['field' => 'filter', 'description' => $description]]);
 }
@@ -119,7 +147,9 @@ function mcp_filter_error(string $description) : AbilitiesError {
  * Comparisons (= != < <= > >=) joined by AND; values are a double quoted
  * string, a number, true, or false. Only fields marked 'filter' are allowed.
  *
- * @param array<string, array<string, mixed>> $fields
+ * @param string                              $filter AIP-160 filter expression.
+ * @param array<string, array<string, mixed>> $fields Allowed field specifications.
+ * @return string SQL WHERE fragment or empty string when $filter is blank.
  */
 function mcp_filter_sql(string $filter, array $fields) : string {
 	$filter = trim($filter);
@@ -187,7 +217,13 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 	return implode(' AND ', $clauses);
 }
 
-/** Convert a filter literal to the stored representation of a field; null when it does not fit. */
+/**
+ * Convert a filter literal to the stored representation of a field; null when it does not fit.
+ *
+ * @param array<string, mixed> $spec  Field specification from the resource field map.
+ * @param mixed                $value Parsed literal value.
+ * @return int|string|null Stored database representation, or null if incompatible.
+ */
 function mcp_filter_value(array $spec, mixed $value) : int|string|null {
 	switch ($spec['type']) {
 		case 'bool':
@@ -212,8 +248,10 @@ function mcp_filter_value(array $spec, mixed $value) : int|string|null {
 /**
  * Translate an AIP-132 orderBy into SQL using fields marked 'order'.
  *
- * @param array<string, array<string, mixed>> $fields
+ * @param string                              $orderBy AIP-132 orderBy clause.
+ * @param array<string, array<string, mixed>> $fields  Allowed field specifications.
  * @param string                              $default SQL used when orderBy is empty.
+ * @return string SQL ORDER BY fragment.
  */
 function mcp_order_sql(string $orderBy, array $fields, string $default) : string {
 	$orderBy = trim($orderBy);

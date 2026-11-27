@@ -8,7 +8,13 @@
 require_once __DIR__ . '/registry.php';
 require_once __DIR__ . '/aip.php';
 
-/** The AIP-193 response for an error, with the headers the status calls for. @return array{status: int, headers: array<string, string>, body: array} */
+/**
+ * The AIP-193 response for an error, with the headers the status calls for.
+ *
+ * @param Throwable $error   Thrown error or exception.
+ * @param string    $ability Ability ID associated with the request, if any.
+ * @return array{status: int, headers: array<string, string>, body: array}
+ */
 function mcp_api_error(Throwable $error, string $ability = '') : array {
 	if (!$error instanceof AbilitiesError) {
 		mcp_log_failure($ability, 'INTERNAL_ERROR', $error);
@@ -21,7 +27,12 @@ function mcp_api_error(Throwable $error, string $ability = '') : array {
 	return ['status' => $error->httpStatus(), 'headers' => $headers, 'body' => mcp_error_body($error)];
 }
 
-/** The Ability resource for a registry descriptor. */
+/**
+ * Build the Ability resource payload for a registry descriptor.
+ *
+ * @param array<string, mixed> $descriptor Registry ability descriptor.
+ * @return array<string, mixed> Ability REST resource array.
+ */
 function mcp_api_ability(array $descriptor) : array {
 	return [
 		'name'         => 'abilities/' . $descriptor['id'],
@@ -34,11 +45,24 @@ function mcp_api_ability(array $descriptor) : array {
 	];
 }
 
+/**
+ * Construct an INVALID_ARGUMENTS error for a specific request field.
+ *
+ * @param string $field       Offending field name.
+ * @param string $description Human-readable validation violation.
+ * @return AbilitiesError Error instance.
+ */
 function mcp_api_invalid(string $field, string $description) : AbilitiesError {
 	return new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS', '', [['field' => $field, 'description' => $description]]);
 }
 
-/** Read a query parameter that must be a string. */
+/**
+ * Read a query parameter that must be a string.
+ *
+ * @param array<string, mixed> $query Query string parameters.
+ * @param string               $name  Parameter name.
+ * @return ?string Parameter value, or null if absent.
+ */
 function mcp_api_query_string(array $query, string $name) : ?string {
 	if (!isset($query[$name])) {
 		return null;
@@ -51,7 +75,14 @@ function mcp_api_query_string(array $query, string $name) : ?string {
 	return $query[$name];
 }
 
-/** List: pageSize, pageToken, and filter of the form category = "...". */
+/**
+ * List abilities with pageSize, pageToken, and filter of the form category = "...".
+ *
+ * @param array<string, mixed> $query     Query parameters.
+ * @param AbilitiesRegistry    $registry  Ability registry instance.
+ * @param array                $principal Authenticated request principal.
+ * @return array<string, mixed> Paginated list response.
+ */
 function mcp_api_list(array $query, AbilitiesRegistry $registry, array $principal) : array {
 	$filter   = mcp_api_query_string($query, 'filter') ?? '';
 	$category = null;
@@ -85,7 +116,16 @@ function mcp_api_list(array $query, AbilitiesRegistry $registry, array $principa
 		'nextPageToken'    => $next < count($items) ? mcp_page_token($next, $print) : null];
 }
 
-/** Execute: the body is exactly {"arguments": {...}}. */
+/**
+ * Execute an ability; the JSON request body must be exactly {"arguments": {...}}.
+ *
+ * @param string            $id        Ability identifier.
+ * @param string            $body      Raw JSON request body.
+ * @param AbilitiesRegistry $registry  Ability registry instance.
+ * @param array             $principal Authenticated request principal.
+ * @param callable          $audit     Audit callback.
+ * @return array<string, mixed> Execution response with requestId and result.
+ */
 function mcp_api_execute(string $id, string $body, AbilitiesRegistry $registry, array $principal, callable $audit) : array {
 	try {
 		$request = json_decode($body, false, 32, JSON_THROW_ON_ERROR);
@@ -114,7 +154,13 @@ function mcp_api_execute(string $id, string $body, AbilitiesRegistry $registry, 
 /**
  * Route one request. Never throws: failures come back as AIP-193 responses.
  *
- * @param array<string, mixed> $query
+ * @param string               $method    HTTP method.
+ * @param string               $pathInfo  Request PATH_INFO route.
+ * @param array<string, mixed> $query     Query parameters.
+ * @param string               $body      Raw HTTP request body.
+ * @param AbilitiesRegistry    $registry  Ability registry instance.
+ * @param array                $principal Authenticated request principal.
+ * @param callable             $audit     Audit callback.
  * @return array{status: int, headers: array<string, string>, body: array}
  */
 function mcp_api_handle(string $method, string $pathInfo, array $query, string $body,

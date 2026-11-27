@@ -7,6 +7,11 @@ require_once __DIR__ . '/registry.php';
 /** Files the MCP and Abilities API realm covers; one realm row holds the whole list. */
 const MCP_REALM_FILES = 'api.php,mcp.php,mcp_tokens.php';
 
+/**
+ * Create or upgrade the MCP plugin database tables idempotently.
+ *
+ * @return void
+ */
 function mcp_install_schema() : void {
 	// Cacti's table registration also schedules tables for removal on uninstall.
 	// These tables intentionally survive uninstall for token and audit retention.
@@ -59,6 +64,12 @@ function mcp_install_schema() : void {
 	}
 }
 
+/**
+ * Determine whether $userId holds the MCP and Abilities API realm while core auth is active.
+ *
+ * @param int $userId Cacti user ID.
+ * @return bool True when the user holds the plugin API realm.
+ */
 function mcp_has_realm(int $userId) : bool {
 	// Cacti's realm helper allows everything when core authentication is off.
 	if ((int) read_config_option('auth_method', true) === 0) {
@@ -71,6 +82,12 @@ function mcp_has_realm(int $userId) : bool {
 	return $id !== false && (int) $id > 0 && is_realm_allowed((int) $id + 100, $userId);
 }
 
+/**
+ * Validate personal access token syntax and return its SHA-256 hex digest.
+ *
+ * @param string $token Raw bearer token string.
+ * @return ?string Lowercase 64-char SHA-256 hash, or null when malformed.
+ */
 function mcp_token_hash(string $token) : ?string {
 	return preg_match('/^cmcp_pat_[a-f0-9]{64}$/D', $token) === 1 ? hash('sha256', $token) : null;
 }
@@ -81,6 +98,9 @@ function mcp_token_hash(string $token) : ?string {
  * the same way. get_guest_account() reads the cached option, so $fresh is for session-bearing console
  * paths, where a stale cache would still treat an account made the guest after sign-in as ordinary.
  * When a guest is configured but cannot be looked up, it throws RuntimeException so callers fail closed.
+ *
+ * @param bool $fresh Force a fresh config read bypassing session cache.
+ * @return int Guest account user ID or 0 when unconfigured.
  */
 function mcp_guest_user_id(bool $fresh = false) : int {
 	$setting = read_config_option('guest_user', $fresh);
@@ -98,6 +118,12 @@ function mcp_guest_user_id(bool $fresh = false) : int {
 	return $rows === [] ? 0 : (int) $rows[0]['id'];
 }
 
+/**
+ * Authenticate an HTTP Authorization Bearer header against stored personal tokens.
+ *
+ * @param string $header Raw Authorization header value.
+ * @return array<string, mixed> Authenticated principal array.
+ */
 function mcp_authenticate(string $header) : array {
 	if (!preg_match('/^Bearer (cmcp_pat_[a-f0-9]{64})$/D', $header, $matches)) {
 		throw new AbilitiesError('UNAUTHENTICATED', 'INVALID_TOKEN');
@@ -142,12 +168,23 @@ function mcp_authenticate(string $header) : array {
 	return mcp_user_principal($userId, (int) $row['id']);
 }
 
-/** The principal a personal token of this user carries. The self-service page passes token 0 to preview it. */
+/**
+ * The principal a personal token of this user carries. The self-service page passes token 0 to preview it.
+ *
+ * @param int $userId  Cacti user ID.
+ * @param int $tokenId Token row ID, or 0 for preview.
+ * @return array{token_id: int, token_kind: string, user_id: int, scopes: list<string>}
+ */
 function mcp_user_principal(int $userId, int $tokenId) : array {
 	return ['token_id' => $tokenId, 'token_kind' => 'pat', 'user_id' => $userId, 'scopes' => ['abilities:read']];
 }
 
-/** Record use of a token at most once a minute. Bookkeeping only: a failure never fails authentication. */
+/**
+ * Record use of a token at most once a minute. Bookkeeping only: a failure never fails authentication.
+ *
+ * @param int $id Token row ID.
+ * @return void
+ */
 function mcp_touch_token(int $id) : void {
 	$now = time();
 
@@ -159,6 +196,15 @@ function mcp_touch_token(int $id) : void {
 	}
 }
 
+/**
+ * Record an ability audit lifecycle row (started, succeeded, failed, denied, or rejected).
+ *
+ * @param array<string, mixed> $principal Authenticated principal.
+ * @param string               $id        32-character hex request ID.
+ * @param string               $name      Ability identifier or '(invalid)'.
+ * @param string               $outcome   Audit outcome value.
+ * @return void
+ */
 function mcp_audit(array $principal, string $id, string $name, string $outcome) : void {
 	if ($outcome === 'started') {
 		$ok = db_execute_prepared('INSERT INTO plugin_mcp_audit
@@ -185,6 +231,7 @@ function mcp_audit(array $principal, string $id, string $name, string $outcome) 
 /**
  * Stored exposure flags by ability ID, read once per request.
  *
+ * @param bool $refresh Force a fresh database query when true.
  * @return array<string, bool>
  */
 function mcp_exposure_map(bool $refresh = false) : array {
@@ -208,7 +255,14 @@ function mcp_exposure_map(bool $refresh = false) : array {
 	return $map;
 }
 
-/** A stored flag wins; otherwise built-in (cacti) abilities are exposed and plugin abilities are hidden. */
+/**
+ * A stored flag wins; otherwise built-in (cacti) abilities are exposed and plugin abilities are hidden.
+ *
+ * @param string              $id        Ability identifier.
+ * @param string              $namespace Owning plugin namespace.
+ * @param array<string, bool> $map       Exposure map returned by mcp_exposure_map().
+ * @return bool True when the ability is exposed to clients.
+ */
 function mcp_is_exposed(string $id, string $namespace, array $map) : bool {
 	if (($map['*'] ?? true) === false) {
 		return false;
@@ -217,7 +271,13 @@ function mcp_is_exposed(string $id, string $namespace, array $map) : bool {
 	return $map[$id] ?? $namespace === 'cacti';
 }
 
-/** Expose or hide abilities. Every ID is validated before anything is written. */
+/**
+ * Expose or hide abilities. Every ID is validated before anything is written.
+ *
+ * @param array<int, mixed> $ids     Ability identifiers to update.
+ * @param bool              $exposed Desired exposure flag.
+ * @return void
+ */
 function mcp_set_exposure(array $ids, bool $exposed) : void {
 	foreach ($ids as $id) {
 		if (!is_string($id) || !AbilitiesRegistry::isValidId($id)) {
@@ -254,7 +314,9 @@ const MCP_AUDIT_OUTCOMES = ['started', 'succeeded', 'failed', 'denied', 'rejecte
 /**
  * One page of personal tokens, newest first. Never returns the hash.
  *
- * @param array{user_id?: int} $filter
+ * @param array{user_id?: int} $filter Optional filter map.
+ * @param int                  $page   1-based page number.
+ * @param int                  $rows   Number of rows per page.
  * @return array{rows: array, total: int}
  */
 function mcp_token_list(array $filter, int $page, int $rows) : array {
@@ -281,6 +343,11 @@ function mcp_token_list(array $filter, int $page, int $rows) : array {
  * Create a personal token for a user. The value is returned once; only its hash is stored.
  * $token is for the CLI, which takes the value from its environment instead of generating one.
  *
+ * @param int     $userId    Target token owner user ID.
+ * @param int     $days      Token lifetime in days (1 to 365).
+ * @param ?int    $createdBy Optional creator user ID (defaults to $userId).
+ * @param ?string $token     Optional caller-supplied token value (CLI path).
+ * @return string Newly created personal access token string.
  * @throws InvalidArgumentException for a bad user ID or lifetime
  * @throws RuntimeException when the row cannot be stored
  */
@@ -309,6 +376,8 @@ function mcp_token_create(int $userId, int $days, ?int $createdBy = null, ?strin
 /**
  * Refuse an owner who could not use a token: unknown, disabled, the guest account, or without the realm.
  *
+ * @param int $userId Cacti user ID to verify.
+ * @return void
  * @throws InvalidArgumentException when the user is not eligible
  */
 function mcp_token_assert_eligible(int $userId) : void {
@@ -331,7 +400,9 @@ function mcp_token_assert_eligible(int $userId) : void {
  * Whether a user may hold a personal token: enabled, not the guest account, and holding the
  * MCP and Abilities API realm. A guest token would let anyone who knows the shared account read Cacti.
  *
- * @param array{id?: mixed, enabled?: mixed} $user a user_auth row
+ * @param array{id?: mixed, enabled?: mixed} $user        A user_auth row.
+ * @param int                                $guestUserId Configured guest user ID, or 0 when none.
+ * @return bool True when the user is eligible to hold a personal token.
  */
 function mcp_token_eligible(array $user, int $guestUserId) : bool {
 	$id = (int) ($user['id'] ?? 0);
@@ -346,6 +417,11 @@ function mcp_token_eligible(array $user, int $guestUserId) : bool {
  * Create a token and audit its creation by $actor as one unit: a token whose audit row cannot be
  * written is revoked and not handed out. The value is returned once.
  *
+ * @param int     $userId Target token owner user ID.
+ * @param int     $days   Token lifetime in days (1 to 365).
+ * @param int     $actor  Acting user ID attributed in the audit row.
+ * @param ?string $token  Optional caller-supplied token value.
+ * @return string Newly created personal access token string.
  * @throws InvalidArgumentException for an ineligible owner or a bad lifetime
  * @throws RuntimeException when the token or its audit row cannot be stored
  */
@@ -368,7 +444,12 @@ function mcp_token_create_audited(int $userId, int $days, int $actor, ?string $t
 	return $token;
 }
 
-/** ID of the token with this value, for the audit row written when an admin creates it. */
+/**
+ * ID of the token with this value, for the audit row written when an admin creates it.
+ *
+ * @param string $token Personal access token string.
+ * @return int Token row ID or 0 when malformed or not found.
+ */
 function mcp_token_id(string $token) : int {
 	$hash = mcp_token_hash($token);
 
@@ -379,6 +460,10 @@ function mcp_token_id(string $token) : int {
  * Audit a console token action: one complete row, attributed to the acting admin. The token
  * value never appears. $action is token-create or token-revoke, recorded as the ability name.
  *
+ * @param int    $actor   Acting user ID.
+ * @param int    $tokenId Target token row ID.
+ * @param string $action  Action slug ('token-create' or 'token-revoke').
+ * @return void
  * @throws RuntimeException when the row cannot be written
  */
 function mcp_audit_admin(int $actor, int $tokenId, string $action) : void {
@@ -397,8 +482,9 @@ function mcp_audit_admin(int $actor, int $tokenId, string $action) : void {
 /**
  * Revoke tokens. With $ownerId only that user's tokens change, so a forged ID cannot touch anyone else's.
  *
- * @param list<int> $ids
- * @return int tokens changed; already revoked tokens do not count
+ * @param list<int> $ids     Token row IDs to revoke.
+ * @param ?int      $ownerId Optional owning user ID scope.
+ * @return int Tokens changed; already revoked tokens do not count.
  * @throws InvalidArgumentException for a malformed ID
  * @throws RuntimeException when the update fails
  */
@@ -423,8 +509,15 @@ function mcp_token_revoke(array $ids, ?int $ownerId = null) : int {
 	return (int) db_affected_rows();
 }
 
-/** The tokens were revoked but at least one audit row could not be written. */
+/**
+ * The tokens were revoked but at least one audit row could not be written.
+ */
 class McpRevokeAuditError extends RuntimeException {
+	/**
+	 * Construct the audit failure error carrying the revoked token count.
+	 *
+	 * @param int $revoked Number of tokens that were revoked before auditing failed.
+	 */
 	public function __construct(public int $revoked) {
 		parent::__construct('MCP audit write failed after revocation');
 	}
@@ -434,8 +527,10 @@ class McpRevokeAuditError extends RuntimeException {
  * Revoke the active tokens among $ids and audit each one actually revoked, attributed to $actor.
  * Unknown and already revoked IDs are skipped without a trace. With $ownerId only that user's tokens change.
  *
- * @param list<int> $ids
- * @return int tokens revoked
+ * @param int       $actor   Acting user ID.
+ * @param list<int> $ids     Candidate token row IDs.
+ * @param ?int      $ownerId Optional owning user ID scope.
+ * @return int Tokens revoked.
  * @throws McpRevokeAuditError when the tokens were revoked but an audit row could not be written
  * @throws InvalidArgumentException for a malformed ID
  * @throws RuntimeException when the lookup or update fails
@@ -459,7 +554,12 @@ function mcp_token_revoke_audited(int $actor, array $ids, ?int $ownerId = null) 
 	return $changed;
 }
 
-/** @param list<int> $ids */
+/**
+ * Validate that every entry in $ids is a positive integer token ID.
+ *
+ * @param list<int> $ids Token IDs to check.
+ * @return void
+ */
 function mcp_token_check_ids(array $ids) : void {
 	foreach ($ids as $id) {
 		if (!is_int($id) || $id < 1) {
@@ -471,8 +571,9 @@ function mcp_token_check_ids(array $ids) : void {
 /**
  * The given tokens that are active and, when $ownerId is set, owned by that user.
  *
- * @param list<int> $ids
- * @return list<int>
+ * @param list<int> $ids     Candidate token row IDs.
+ * @param ?int      $ownerId Optional owning user ID scope.
+ * @return list<int> Active revocable token IDs.
  */
 function mcp_token_revocable(array $ids, ?int $ownerId = null) : array {
 	mcp_token_check_ids($ids);
@@ -499,7 +600,9 @@ function mcp_token_revocable(array $ids, ?int $ownerId = null) : array {
 /**
  * One page of audit rows, newest first.
  *
- * @param array{user_id?: int, ability?: string, outcome?: string} $filter empty or -1 values mean no condition
+ * @param array{user_id?: int, ability?: string, outcome?: string} $filter Empty or -1 values mean no condition.
+ * @param int                                                      $page   1-based page number.
+ * @param int                                                      $rows   Number of rows per page.
  * @return array{rows: array, total: int}
  */
 function mcp_audit_list(array $filter, int $page, int $rows) : array {
@@ -544,6 +647,11 @@ function mcp_audit_list(array $filter, int $page, int $rows) : array {
  * Count and fetch one page. LIMIT and OFFSET are cast to integers and written into the
  * statement, as Cacti core does, because a bound LIMIT value reaches MySQL as a string.
  *
+ * @param string            $countSql SQL COUNT(*) query.
+ * @param string            $listSql  SQL list query without LIMIT/OFFSET.
+ * @param array<int, mixed> $params   Bound query parameters.
+ * @param int               $page     1-based page number.
+ * @param int               $rows     Number of rows per page.
  * @return array{rows: array, total: int}
  * @throws RuntimeException when the database read fails
  */

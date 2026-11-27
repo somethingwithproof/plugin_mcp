@@ -6,6 +6,7 @@
  * Split an absolute http(s) URL into scheme, host, effective port and path.
  * Returns null for anything that is not a plain origin-plus-path URL.
  *
+ * @param string $url Raw URL string to parse.
  * @return array{scheme: string, host: string, port: int, path: string}|null
  */
 function mcp_parse_url(string $url) : ?array {
@@ -50,6 +51,12 @@ function mcp_parse_url(string $url) : ?array {
 	return ['scheme' => $scheme, 'host' => $host, 'port' => $port, 'path' => rtrim($path, '/')];
 }
 
+/**
+ * Determine whether a lowercase host string refers to a loopback address.
+ *
+ * @param string $host Hostname or bracketed IPv6 literal.
+ * @return bool True for localhost, 127.0.0.1, or ::1.
+ */
 function mcp_is_loopback_host(string $host) : bool {
 	if ($host !== '' && $host[0] === '[') {
 		// Any spelling of ::1, such as [0:0:0:0:0:0:0:1].
@@ -59,6 +66,12 @@ function mcp_is_loopback_host(string $host) : bool {
 	return in_array($host, ['localhost', '127.0.0.1'], true);
 }
 
+/**
+ * Serialize parsed URL parts into a canonical scheme://host[:port] origin string.
+ *
+ * @param array{scheme: string, host: string, port: int, path?: string} $parts Parsed URL parts.
+ * @return string Canonical origin string without trailing slash or default port.
+ */
 function mcp_origin_string(array $parts) : string {
 	$defaultPort = $parts['scheme'] === 'https' ? 443 : 80;
 
@@ -70,6 +83,9 @@ function mcp_origin_string(array $parts) : string {
  * Normalize a configured public URL: lowercase scheme and host, default port
  * dropped, no trailing slash, query or fragment. HTTPS is required except for
  * loopback hosts. Returns null when the value is not acceptable.
+ *
+ * @param string $value Raw configured public URL.
+ * @return ?string Normalized URL or null when invalid.
  */
 function mcp_normalize_public_url(string $value) : ?string {
 	$parts = mcp_parse_url(trim($value));
@@ -85,12 +101,23 @@ function mcp_normalize_public_url(string $value) : ?string {
 	return mcp_origin_string($parts) . $parts['path'];
 }
 
+/**
+ * Read and normalize the configured mcp_public_url option.
+ *
+ * @return ?string Normalized public URL or null when unset or invalid.
+ */
 function mcp_public_url() : ?string {
 	$value = read_config_option('mcp_public_url');
 
 	return is_string($value) ? mcp_normalize_public_url($value) : null;
 }
 
+/**
+ * Build the canonical MCP endpoint URI for a normalized public Cacti URL.
+ *
+ * @param string $publicUrl Normalized public Cacti base URL.
+ * @return string Canonical endpoint URI.
+ */
 function mcp_canonical_uri(string $publicUrl) : string {
 	return $publicUrl . '/plugins/mcp/mcp.php';
 }
@@ -98,6 +125,10 @@ function mcp_canonical_uri(string $publicUrl) : string {
 /**
  * An absent Origin header (non-browser client) is allowed. Otherwise the
  * header must be exactly the scheme, host and effective port of the public URL.
+ *
+ * @param ?string $origin    HTTP Origin header value or null when absent.
+ * @param string  $publicUrl Normalized public Cacti base URL.
+ * @return bool True if the request origin is allowed.
  */
 function mcp_origin_allowed(?string $origin, string $publicUrl) : bool {
 	if ($origin === null) {
