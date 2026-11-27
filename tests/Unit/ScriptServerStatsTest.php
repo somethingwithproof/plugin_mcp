@@ -348,4 +348,112 @@ final class ScriptServerStatsTest extends TestCase {
 			$this->assertSame('INVALID_ARGUMENTS', $error->reason);
 		}
 	}
+
+	public function testAipAndProviderEdgeCoverage() : void {
+		$fields = mcp_device_filter_fields();
+
+		// AIP-158 paging error and round-trip branches
+		$token = mcp_page_token(25, 'fp1');
+		$this->assertSame(['size' => 50, 'offset' => 25], mcp_page((object) ['pageSize' => 0, 'pageToken' => $token], 'fp1'));
+
+		foreach ([
+			[(object) ['pageSize' => -1], 'INVALID_ARGUMENTS'],
+			[(object) ['pageToken' => 'not-valid-token'], 'INVALID_PAGE_TOKEN'],
+			[(object) ['pageToken' => $token], 'INVALID_PAGE_TOKEN'],
+		] as [$args, $expectedReason]) {
+			try {
+				mcp_page($args, 'fp-mismatch');
+				$this->fail('Expected ' . $expectedReason);
+			} catch (AbilitiesError $error) {
+				$this->assertSame($expectedReason, $error->reason);
+			}
+		}
+
+		// AIP-160 filter error branches and AIP-132 orderBy branches
+		$this->assertSame('', mcp_filter_sql('   ', $fields));
+		$this->assertSame('h1.id', mcp_order_sql('   ', MCP_DEVICE_FIELDS, 'h1.id'));
+		$this->assertSame('h1.hostname DESC, h1.description ASC', mcp_order_sql('hostname desc, displayName asc', MCP_DEVICE_FIELDS, 'h1.id'));
+
+		foreach ([
+			'unknownField = "x"',
+			'hostname = true',
+			'disabled > true',
+			'state = "INVALID_STATE"',
+			'disabled = true disabled = false',
+		] as $badFilter) {
+			try {
+				mcp_filter_sql($badFilter, $fields);
+				$this->fail('Expected INVALID_FILTER for ' . $badFilter);
+			} catch (AbilitiesError $error) {
+				$this->assertSame('INVALID_FILTER', $error->reason);
+			}
+		}
+
+		try {
+			mcp_order_sql('notAField desc', MCP_DEVICE_FIELDS, 'h1.id');
+			$this->fail('Expected INVALID_ARGUMENTS for invalid orderBy field');
+		} catch (AbilitiesError $error) {
+			$this->assertSame('INVALID_ARGUMENTS', $error->reason);
+		}
+
+		$schemaJson = mcp_schema_json([
+			'type'       => 'object',
+			'properties' => [],
+			'items'      => ['type' => 'object', 'properties' => []],
+		]);
+		$this->assertInstanceOf(\stdClass::class, $schemaJson['properties']);
+		$this->assertInstanceOf(\stdClass::class, $schemaJson['items']['properties']);
+
+		// Provider helper edge paths: mcp_time, mcp_clog_path, mcp_plugin_file, mcp_query_page failure, and hook dispatch safety
+		$this->assertNull(mcp_time('0000-00-00 00:00:00'));
+		$this->assertSame('2026-11-26T12:00:00Z', mcp_time(1795694400));
+		$this->assertNull(mcp_time('not-a-timestamp'));
+
+		$GLOBALS['mcp_unit_state']['settings']['path_cactilog'] = '/var/log/cacti/cacti.log';
+		$this->assertSame('/var/log/cacti/cacti.log', mcp_clog_path());
+		unset($GLOBALS['mcp_unit_state']['settings']['path_cactilog']);
+		$this->assertSame('/tmp/log/cacti.log', mcp_clog_path());
+		$this->assertSame('/tmp/plugins/demo/setup.php', mcp_plugin_file('demo', 'setup.php'));
+
+		$GLOBALS['mcp_unit_state']['callbacks']['db_fetch_assoc_prepared'] = fn () => false;
+
+		try {
+			mcp_query_page('id', 'host', '', 'id', ['size' => 10, 'offset' => 0], 'Host query failed');
+			$this->fail('Expected RuntimeException on DB query failure');
+		} catch (RuntimeException $error) {
+			$this->assertSame('Host query failed', $error->getMessage());
+		}
+
+		// Plugin hook dispatch skips disabled, reserved cacti namespace, path traversal, missing function, and catches throws
+		$GLOBALS['mcp_unit_state']['enabled_plugins'] = [
+			'disabled_plug' => false,
+			'cacti'         => true,
+			'trav_plug'     => true,
+			'missing_fn'    => true,
+			'throwing_plug' => true,
+		];
+		$GLOBALS['mcp_unit_state']['callbacks']['db_fetch_assoc_prepared'] = fn () => [
+			['name' => 'disabled_plug', 'file' => 'setup.php', 'function' => 'nope'],
+			['name' => 'cacti', 'file' => 'setup.php', 'function' => 'nope'],
+			['name' => 'trav_plug', 'file' => '../evil.php', 'function' => 'nope'],
+			['name' => 'missing_fn', 'file' => 'nonexistent.php', 'function' => 'mcp_missing_hook_fn_xyz'],
+			['name' => 'throwing_plug', 'file' => 'nonexistent.php', 'function' => __NAMESPACE__ . '\\mcp_unit_throwing_hook_fn'],
+		];
+
+		if (!function_exists(__NAMESPACE__ . '\\mcp_unit_throwing_hook_fn')) {
+			/**
+			 * Test hook callback that throws to verify registration isolation.
+			 *
+			 * @param mixed $registrar Registrar argument.
+			 * @return never
+			 */
+			function mcp_unit_throwing_hook_fn(mixed $registrar) : never {
+				throw new RuntimeException('hook boom');
+			}
+		}
+
+		$reg = new AbilitiesRegistry();
+		mcp_dispatch_ability_hooks($reg);
+		$this->assertCount(3, $GLOBALS['mcp_unit_state']['logs']);
+	}
 }
