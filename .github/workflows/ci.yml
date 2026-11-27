@@ -137,6 +137,7 @@ jobs:
           test -f /tmp/mcp-package/mcp/INFO
           test -f /tmp/mcp-package/mcp/setup.php
           test -f /tmp/mcp-package/mcp/schema/mcp.schema.yaml
+          test -f /tmp/mcp-package/mcp/scripts/ss_mcp_stats.php
           test -f /tmp/mcp-package/mcp/images/mcp_logo.png
           test ! -d /tmp/mcp-package/mcp/tests
           test ! -d /tmp/mcp-package/mcp/.github
@@ -148,3 +149,116 @@ jobs:
           name: mcp-plugin
           path: dist/*
           if-no-files-found: error
+
+  cacti-smoke:
+    name: Cacti 1.2.31 / PHP 8.4 / MariaDB 11.8 smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MYSQL_PWD: cactiuser
+    services:
+      database:
+        image: mariadb:11.8
+        env:
+          MARIADB_ROOT_PASSWORD: cactiroot
+          MARIADB_DATABASE: cacti
+          MARIADB_USER: cactiuser
+          MARIADB_PASSWORD: cactiuser
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=24
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: Cacti/cacti
+          ref: release/1.2.31
+          path: cacti
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: cacti/plugins/mcp
+
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          coverage: none
+          extensions: curl, gd, gmp, intl, ldap, mbstring, openssl, pcntl, pdo_mysql, posix, sockets, xml, zlib
+          ini-values: memory_limit=256M, max_execution_time=60, date.timezone=UTC
+
+      - name: Install MariaDB client
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mariadb-client
+
+      - name: Initialize Cacti database
+        env:
+          MYSQL_PWD: cactiroot
+        run: |
+          cp include/config.php.dist include/config.php
+          sed -i "s/\$database_hostname[[:space:]]*= 'localhost'/\$database_hostname = '127.0.0.1'/" include/config.php
+          mariadb -h127.0.0.1 -uroot -e "ALTER DATABASE cacti CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+          mariadb -h127.0.0.1 -uroot cacti < cacti.sql
+          php -r "chdir('${GITHUB_WORKSPACE}/cacti'); include './include/cli_check.php'; db_execute_prepared('UPDATE version SET cacti = ?', ['1.2.31']);"
+        working-directory: cacti
+
+      - name: Install and enable plugin_mcp
+        run: |
+          php cli/plugin_manage.php --plugin=mcp --install --enable --allperms
+          test "$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT status FROM plugin_config WHERE directory='mcp';")" -eq 1
+          test "$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT COUNT(*) FROM plugin_hooks WHERE name='mcp' AND status=1;")" -eq 7
+          test "$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT COUNT(*) FROM plugin_realms WHERE plugin='mcp';")" -eq 2
+        working-directory: cacti
+
+      - name: Smoke test token CLI, script-server metrics, and integration hooks
+        run: |
+          mariadb -h127.0.0.1 -ucactiuser cacti -e "REPLACE INTO settings (name, value) VALUES ('mcp_public_url', 'http://localhost/cacti');"
+          TOKEN_VALUE="cmcp_pat_$(openssl rand -hex 32)"
+          TOKEN_OUT="$(CACTI_MCP_TOKEN="$TOKEN_VALUE" php plugins/mcp/tokens.php --create=admin --days=1)"
+          unset TOKEN_VALUE
+          echo "$TOKEN_OUT" | grep -Eq '^Created token ID [0-9]+$'
+          TOKEN_ID="$(echo "$TOKEN_OUT" | awk '{print $NF}')"
+          php plugins/mcp/tokens.php --list | grep -q "admin"
+
+          STATS="$(php plugins/mcp/scripts/ss_mcp_stats.php)"
+          echo "Script server stats: $STATS"
+          echo "$STATS" | grep -Eq '^abilities_total:9 abilities_enabled:9 active_tokens:1 audit_events_24h:[0-9]+ capability_blocks:0$'
+
+          php -r '
+            chdir($argv[1]);
+            include "./include/cli_check.php";
+            require_once "./plugins/mcp/setup.php";
+            $checks = mcp_doctor_register_checks(["mode" => "run"]);
+            if (count($checks) !== 3) { fwrite(STDERR, "Expected 3 Doctor checks\n"); exit(1); }
+            foreach ($checks as $c) {
+              if ($c["status"] !== "ok") { fwrite(STDERR, "Check failed: " . $c["id"] . "\n"); exit(1); }
+            }
+            $debug = mcp_doctor_register_debug_info();
+            if (count($debug) !== 1 || $debug[0]["fields"]["schema_tables_present"]["value"] !== true) {
+              fwrite(STDERR, "Unexpected debug info payload\n"); exit(1);
+            }
+            $export = mcp_casc_export();
+            if (($export["config"]["mcp_public_url"] ?? "") !== "http://localhost/cacti") {
+              fwrite(STDERR, "Unexpected CasC export\n"); exit(1);
+            }
+          ' "${GITHUB_WORKSPACE}/cacti"
+
+          php plugins/mcp/tokens.php --revoke="$TOKEN_ID"
+          STATS_AFTER="$(php plugins/mcp/scripts/ss_mcp_stats.php)"
+          echo "$STATS_AFTER" | grep -Eq '^abilities_total:9 abilities_enabled:9 active_tokens:0 audit_events_24h:[0-9]+ capability_blocks:0$'
+        working-directory: cacti
+
+      - name: Verify disable, uninstall token revocation, and reinstall lifecycle
+        run: |
+          php cli/plugin_manage.php --plugin=mcp --disable
+          php cli/plugin_manage.php --plugin=mcp --uninstall
+          test "$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT COUNT(*) FROM plugin_config WHERE directory='mcp';")" -eq 0
+          test "$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT COUNT(*) FROM plugin_mcp_token WHERE revoked = 0;")" -eq 0
+          php cli/plugin_manage.php --plugin=mcp --install --enable
+          test "$(mariadb -N -h127.0.0.1 -ucactiuser cacti -e "SELECT status FROM plugin_config WHERE directory='mcp';")" -eq 1
+        working-directory: cacti

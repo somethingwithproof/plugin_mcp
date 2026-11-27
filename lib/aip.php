@@ -27,8 +27,16 @@ const MCP_ERROR_MESSAGES = [
 	'CONTROL_PLANE_VIOLATION'=> 'Untrusted data attempted to access or mutate control-plane fields.',
 ];
 
-const MCP_PAGE_SIZE_DEFAULT = 50;
-const MCP_PAGE_SIZE_MAX     = 100;
+const MCP_PAGE_SIZE_DEFAULT  = 50;
+const MCP_PAGE_SIZE_MAX      = 100;
+const MCP_FILTER_MAX_LENGTH  = 4096;
+const MCP_FILTER_MAX_CLAUSES = 32;
+const MCP_ORDER_MAX_LENGTH   = 256;
+const MCP_ORDER_MAX_FIELDS   = 8;
+
+/* Unrolled possessive quoted-string pattern prevents PCRE backtracking overhead on long literals. */
+const MCP_FILTER_TERM_PATTERN = '/\G\s*([a-zA-Z][a-zA-Z0-9]*)\s*(!=|<=|>=|=|<|>)\s*("[^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+"|-?[0-9]+(?:\.[0-9]+)?|true|false)\s*/';
+const MCP_FILTER_AND_PATTERN  = '/\GAND\b/';
 
 /**
  * Build the AIP-193 error body.
@@ -158,14 +166,24 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 		return '';
 	}
 
-	$term    = '/\G\s*([a-zA-Z][a-zA-Z0-9]*)\s*(!=|<=|>=|=|<|>)\s*("(?:[^"\\\\]|\\\\.)*"|-?[0-9]+(?:\.[0-9]+)?|true|false)\s*/';
-	$and     = '/\GAND\b/';
-	$clauses = [];
-	$offset  = 0;
-	$length  = strlen($filter);
+	$length = strlen($filter);
+
+	if ($length > MCP_FILTER_MAX_LENGTH) {
+		throw mcp_filter_error('filter exceeds maximum length of ' . MCP_FILTER_MAX_LENGTH . ' bytes.');
+	}
+
+	$clauses     = [];
+	$clauseCount = 0;
+	$offset      = 0;
 
 	while (true) {
-		if (!preg_match($term, $filter, $match, 0, $offset)) {
+		$clauseCount++;
+
+		if ($clauseCount > MCP_FILTER_MAX_CLAUSES) {
+			throw mcp_filter_error('filter exceeds maximum of ' . MCP_FILTER_MAX_CLAUSES . ' clauses.');
+		}
+
+		if (!preg_match(MCP_FILTER_TERM_PATTERN, $filter, $match, 0, $offset)) {
 			throw mcp_filter_error('filter is not valid at position ' . ($offset + 1) . '.');
 		}
 
@@ -180,7 +198,8 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 		$spec = $fields[$field];
 
 		if ($literal[0] === '"') {
-			$value = stripcslashes(substr($literal, 1, -1));
+			$inner = substr($literal, 1, -1);
+			$value = str_contains($inner, '\\') ? stripcslashes($inner) : $inner;
 		} elseif ($literal === 'true' || $literal === 'false') {
 			if ($spec['type'] !== 'bool') {
 				throw mcp_filter_error('filter compares "' . $field . '" with a boolean.');
@@ -207,7 +226,7 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 			break;
 		}
 
-		if (!preg_match($and, $filter, $match, 0, $offset)) {
+		if (!preg_match(MCP_FILTER_AND_PATTERN, $filter, $match, 0, $offset)) {
 			throw mcp_filter_error('filter is not valid at position ' . ($offset + 1) . '.');
 		}
 
@@ -229,10 +248,23 @@ function mcp_filter_value(array $spec, mixed $value) : int|string|null {
 		case 'bool':
 			return is_bool($value) ? ($value ? 'on' : '') : null;
 		case 'int':
-			return is_string($value) && preg_match('/^-?[0-9]+$/', $value) ? (int) $value : null;
+			if (!is_string($value) || $value === '') {
+				return null;
+			}
+			$digits = $value[0] === '-' ? substr($value, 1) : $value;
+
+			return $digits !== '' && ctype_digit($digits) ? (int) $value : null;
 		case 'reference':
-			if (is_string($value) && preg_match('#^' . preg_quote($spec['collection'], '#') . '/([0-9]+)$#', $value, $m)) {
-				return (int) $m[1];
+			if (is_string($value)) {
+				$prefix = (string) $spec['collection'] . '/';
+
+				if (str_starts_with($value, $prefix)) {
+					$suffix = substr($value, strlen($prefix));
+
+					if ($suffix !== '' && ctype_digit($suffix)) {
+						return (int) $suffix;
+					}
+				}
 			}
 
 			return null;
@@ -260,9 +292,21 @@ function mcp_order_sql(string $orderBy, array $fields, string $default) : string
 		return $default;
 	}
 
+	if (strlen($orderBy) > MCP_ORDER_MAX_LENGTH) {
+		throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS', '',
+			[['field' => 'orderBy', 'description' => 'orderBy exceeds maximum length.']]);
+	}
+
+	$items = explode(',', $orderBy);
+
+	if (count($items) > MCP_ORDER_MAX_FIELDS) {
+		throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS', '',
+			[['field' => 'orderBy', 'description' => 'orderBy exceeds maximum field count.']]);
+	}
+
 	$parts = [];
 
-	foreach (explode(',', $orderBy) as $item) {
+	foreach ($items as $item) {
 		if (!preg_match('/^\s*([a-zA-Z][a-zA-Z0-9]*)(?:\s+(desc|asc))?\s*$/', $item, $m) || empty($fields[$m[1]]['order'])) {
 			throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS', '',
 				[['field' => 'orderBy', 'description' => 'orderBy is not valid: "' . trim($item) . '".']]);

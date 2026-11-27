@@ -44,6 +44,45 @@ const MCP_CAPABILITY_UNTRUSTED_FIELDS = [
 	'country', 'timezone', 'snmpIndex', 'lines', 'line', 'clog',
 ];
 
+/** O(1) lookup set for forbidden state-mutation verbs. */
+const MCP_CAPABILITY_MUTATION_VERB_SET = [
+	'create' => true, 'delete' => true, 'destroy' => true, 'drop' => true,
+	'edit' => true, 'exec' => true, 'execute' => true, 'grant' => true,
+	'insert' => true, 'modify' => true, 'mutate' => true, 'patch' => true,
+	'post' => true, 'purge' => true, 'put' => true, 'remove' => true,
+	'reset' => true, 'revoke' => true, 'save' => true, 'set' => true,
+	'truncate' => true, 'update' => true, 'upsert' => true, 'write' => true,
+];
+
+/** O(1) lookup set for forbidden control-plane escalation keys. */
+const MCP_CAPABILITY_ESCALATION_KEY_SET = [
+	'capabilitytoken' => true, 'capability_token' => true, '_capability' => true, '_control' => true,
+	'bypassrealm' => true, 'bypass_realm' => true, 'grantscopes' => true, 'grant_scopes' => true,
+	'escalate' => true, 'escalateprivilege' => true, 'escalate_privilege' => true,
+	'overridescope' => true, 'override_scope' => true, 'controlplane' => true, 'control_plane' => true,
+	'forcewrite' => true, 'force_write' => true, 'mutate' => true, 'write' => true,
+];
+
+/** O(1) lookup set for untrusted Cacti telemetry field names. */
+const MCP_CAPABILITY_UNTRUSTED_FIELD_SET = [
+	'sysDescr' => true, 'sys_descr' => true, 'description' => true, 'displayName' => true,
+	'hostname' => true, 'location' => true, 'notes' => true, 'lastError' => true,
+	'status_last_error' => true, 'title' => true, 'title_cache' => true,
+	'deviceDisplayName' => true, 'templateName' => true, 'externalId' => true,
+	'alternateId' => true, 'address1' => true, 'address2' => true, 'city' => true,
+	'state' => true, 'postalCode' => true, 'country' => true, 'timezone' => true,
+	'snmpIndex' => true, 'lines' => true, 'line' => true, 'clog' => true,
+];
+
+/** Printable ASCII bytes plus TAB, LF, and CR (always valid UTF-8 and control-free). */
+const MCP_CAPABILITY_SAFE_ASCII_CHARS = "\t\n\r !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+/** Combined prompt-injection boundary pattern replacing six separate regex passes. */
+const MCP_CAPABILITY_PROMPT_COMBINED_PATTERN = '/<\|[^|]{1,64}\|>|\[\/?INST\]|<<\/?SYS>>|<\/?(?:system|instructions|prompt|tool_call|function_call|developer|assistant)>|\b(?:BEGIN|END)[ \t]+(?:SYSTEM|OVERRIDE|HIDDEN)[ \t]+(?:PROMPT|INSTRUCTIONS?)\b|\bIGNORE[ \t]+(?:ALL[ \t]+)?(?:PREVIOUS|PRIOR|ABOVE)[ \t]+INSTRUCTIONS?\b/iu';
+
+/** Markdown heading prompt-boundary pattern checked only when "##" is present. */
+const MCP_CAPABILITY_PROMPT_HEADING_PATTERN = '/(?:^|\n)[ \t]*#{2,6}[ \t]*(?:system|instructions?|developer|assistant|override)[ \t]*:?/i';
+
 /**
  * Strip ANSI escape sequences, bidirectional Unicode overrides, zero-width
  * formatting characters, and unsafe C0/C1 control characters from a string.
@@ -52,6 +91,10 @@ const MCP_CAPABILITY_UNTRUSTED_FIELDS = [
  * @return string Cleaned UTF-8 string without unsafe control or bidi sequences.
  */
 function mcp_capability_strip_unsafe_chars(string $value) : string {
+	if ($value === '' || strspn($value, MCP_CAPABILITY_SAFE_ASCII_CHARS) === strlen($value)) {
+		return $value;
+	}
+
 	if (preg_match('//u', $value) !== 1) {
 		if (function_exists('mb_scrub')) {
 			$value = mb_scrub($value, 'UTF-8');
@@ -61,14 +104,9 @@ function mcp_capability_strip_unsafe_chars(string $value) : string {
 		}
 	}
 
-	// Remove ANSI CSI and OSC escape sequences before stripping bare ESC bytes.
-	$ansiPatterns = [
-		'/\x1B\[[0-9;?]*[ -\/]*[@-~]/',
-		'/\x1B\][^\x07\x1B]*(?:\x07|\x1B\\\\)/',
-	];
-
-	foreach ($ansiPatterns as $pattern) {
-		$cleaned = preg_replace($pattern, '', $value);
+	// Remove ANSI CSI and OSC escape sequences only when ESC is present.
+	if (str_contains($value, "\x1B")) {
+		$cleaned = preg_replace('/\x1B\[[0-9;?]*[ -\/]*[@-~]|\x1B\][^\x07\x1B]*(?:\x07|\x1B\\\\)/', '', $value);
 		$value   = is_string($cleaned) ? $cleaned : '';
 	}
 
@@ -87,20 +125,32 @@ function mcp_capability_strip_unsafe_chars(string $value) : string {
  * @return string String with adversarial prompt boundary markers neutralized.
  */
 function mcp_capability_neutralize_prompt_markers(string $value) : string {
-	$patterns = [
-		'/<\|[^|]{1,64}\|>/u'                                                          => '[filtered-boundary]',
-		'/\[\/?INST\]/i'                                                               => '[filtered-boundary]',
-		'/<<\/?SYS>>/i'                                                                => '[filtered-boundary]',
-		'/<\/?(?:system|instructions|prompt|tool_call|function_call|developer|assistant)>/i' => '[filtered-boundary]',
-		'/(?:^|\n)[ \t]*#{2,6}[ \t]*(?:system|instructions?|developer|assistant|override)[ \t]*:?/i' => "\n[filtered-boundary]",
-		'/\b(?:BEGIN|END)[ \t]+(?:SYSTEM|OVERRIDE|HIDDEN)[ \t]+(?:PROMPT|INSTRUCTIONS?)\b/i' => '[filtered-boundary]',
-		'/\bIGNORE[ \t]+(?:ALL[ \t]+)?(?:PREVIOUS|PRIOR|ABOVE)[ \t]+INSTRUCTIONS?\b/i' => '[filtered-boundary]',
-	];
+	if ($value === '') {
+		return '';
+	}
+
+	// Fast literal precheck: none of the boundary patterns can match without
+	// one of '<', '[', '#', or the words 'ignore', 'begin', or 'end'.
+	$hasDelimiter = strpbrk($value, '<[#') !== false;
+
+	if (!$hasDelimiter
+		&& stripos($value, 'ignore') === false
+		&& stripos($value, 'begin') === false
+		&& stripos($value, 'end') === false) {
+		return $value;
+	}
 
 	$startedWithNewline = str_starts_with($value, "\n");
 
-	foreach ($patterns as $pattern => $replacement) {
-		$replaced = preg_replace($pattern, $replacement, $value);
+	$replaced = preg_replace(MCP_CAPABILITY_PROMPT_COMBINED_PATTERN, '[filtered-boundary]', $value);
+
+	if (!is_string($replaced)) {
+		return '[filtered-boundary]';
+	}
+	$value = $replaced;
+
+	if (str_contains($value, '##')) {
+		$replaced = preg_replace(MCP_CAPABILITY_PROMPT_HEADING_PATTERN, "\n[filtered-boundary]", $value);
 
 		if (!is_string($replaced)) {
 			return '[filtered-boundary]';
@@ -175,7 +225,8 @@ function mcp_capability_sanitize_untrusted_string(
 
 	$cleaned = mcp_capability_neutralize_prompt_markers(mcp_capability_strip_unsafe_chars($value));
 
-	if (mcp_capability_utf8_length($cleaned) > $maxLength) {
+	// A UTF-8 string has at most strlen() code points, so short strings skip mb_strlen().
+	if (strlen($cleaned) > $maxLength && mcp_capability_utf8_length($cleaned) > $maxLength) {
 		if ($maxLength <= 3) {
 			return mcp_capability_utf8_slice($cleaned, $maxLength);
 		}
@@ -205,8 +256,15 @@ function mcp_capability_tag_untrusted_value(
 	}
 
 	$cleaned   = mcp_capability_neutralize_prompt_markers(mcp_capability_strip_unsafe_chars($value));
-	$truncated = mcp_capability_utf8_length($cleaned) > $maxLength;
-	$sanitized = mcp_capability_sanitize_untrusted_string($value, $sourceField, $maxLength);
+	$truncated = strlen($cleaned) > $maxLength && mcp_capability_utf8_length($cleaned) > $maxLength;
+
+	if ($truncated) {
+		$sanitized = $maxLength <= 3
+			? mcp_capability_utf8_slice($cleaned, $maxLength)
+			: mcp_capability_utf8_slice($cleaned, $maxLength - 3) . '...';
+	} else {
+		$sanitized = $cleaned;
+	}
 
 	return [
 		'provenance'  => MCP_CAPABILITY_PROVENANCE_UNTRUSTED,
@@ -218,6 +276,30 @@ function mcp_capability_tag_untrusted_value(
 }
 
 /**
+ * Collect unique untrusted field paths present in an ability result payload
+ * into a deduplicating set so repeated rows avoid O(N) duplicate allocations.
+ *
+ * @param array<int|string, mixed> $payload Ability result array.
+ * @param string                   $prefix  Dot-separated parent field path.
+ * @param array<string, bool>      $seen    Deduplicated set of discovered untrusted field paths.
+ * @return void
+ */
+function mcp_capability_collect_untrusted_field_set(array $payload, string $prefix, array &$seen) : void {
+	foreach ($payload as $key => $value) {
+		$segment = is_int($key) ? '[]' : (string) $key;
+		$path    = $prefix === '' ? $segment : $prefix . '.' . $segment;
+
+		if (is_string($key) && isset(MCP_CAPABILITY_UNTRUSTED_FIELD_SET[$key])) {
+			$seen[$path] = true;
+		}
+
+		if (is_array($value)) {
+			mcp_capability_collect_untrusted_field_set($value, $path, $seen);
+		}
+	}
+}
+
+/**
  * Collect untrusted field paths present in an ability result payload.
  *
  * @param array<int|string, mixed> $payload Ability result array.
@@ -226,17 +308,11 @@ function mcp_capability_tag_untrusted_value(
  * @return void
  */
 function mcp_capability_collect_untrusted_fields(array $payload, string $prefix, array &$fields) : void {
-	foreach ($payload as $key => $value) {
-		$segment = is_int($key) ? '[]' : (string) $key;
-		$path    = $prefix === '' ? $segment : $prefix . '.' . $segment;
+	$seen = [];
+	mcp_capability_collect_untrusted_field_set($payload, $prefix, $seen);
 
-		if (is_string($key) && in_array($key, MCP_CAPABILITY_UNTRUSTED_FIELDS, true)) {
-			$fields[] = $path;
-		}
-
-		if (is_array($value)) {
-			mcp_capability_collect_untrusted_fields($value, $path, $fields);
-		}
+	foreach (array_keys($seen) as $path) {
+		$fields[] = $path;
 	}
 }
 
@@ -249,13 +325,13 @@ function mcp_capability_collect_untrusted_fields(array $payload, string $prefix,
  * @return array{provenance: string, ability: string, untrustedFields: list<string>, controlPlaneProtected: bool}
  */
 function mcp_capability_provenance_manifest(string $abilityId, array $payload) : array {
-	$fields = [];
-	mcp_capability_collect_untrusted_fields($payload, '', $fields);
+	$seen = [];
+	mcp_capability_collect_untrusted_field_set($payload, '', $seen);
 
 	return [
 		'provenance'            => MCP_CAPABILITY_PROVENANCE_UNTRUSTED,
 		'ability'               => $abilityId,
-		'untrustedFields'       => array_values(array_unique($fields)),
+		'untrustedFields'       => array_keys($seen),
 		'controlPlaneProtected' => true,
 	];
 }
@@ -274,7 +350,7 @@ function mcp_capability_has_mutation_verb(string $abilityId) : bool {
 	}
 
 	foreach ($segments as $segment) {
-		if ($segment !== '' && in_array($segment, MCP_CAPABILITY_MUTATION_VERBS, true)) {
+		if ($segment !== '' && isset(MCP_CAPABILITY_MUTATION_VERB_SET[$segment])) {
 			return true;
 		}
 	}
@@ -386,14 +462,16 @@ function mcp_capability_assert_no_control_escalation(mixed $value, int $depth = 
 	}
 
 	foreach ($value as $key => $item) {
-		if (is_string($key) && in_array(strtolower($key), MCP_CAPABILITY_ESCALATION_KEYS, true)) {
+		if (is_string($key) && isset(MCP_CAPABILITY_ESCALATION_KEY_SET[strtolower($key)])) {
 			throw new AbilitiesError(
 				'PERMISSION_DENIED',
 				'CONTROL_PLANE_VIOLATION',
 				'Untrusted payload cannot carry control-plane capability fields.'
 			);
 		}
-		mcp_capability_assert_no_control_escalation($item, $depth + 1);
+		if (is_array($item) || $item instanceof stdClass) {
+			mcp_capability_assert_no_control_escalation($item, $depth + 1);
+		}
 	}
 }
 
@@ -417,13 +495,69 @@ function mcp_capability_sanitize_payload(
 		$fieldName = is_string($key) ? $key : $parentKey;
 
 		if (is_string($value)) {
-			if (in_array($fieldName, MCP_CAPABILITY_UNTRUSTED_FIELDS, true)) {
+			if (isset(MCP_CAPABILITY_UNTRUSTED_FIELD_SET[$fieldName])) {
 				$sanitized[$key] = mcp_capability_sanitize_untrusted_string($value, $fieldName, $maxLength);
 			} else {
 				$sanitized[$key] = mcp_capability_neutralize_prompt_markers(mcp_capability_strip_unsafe_chars($value));
 			}
 		} elseif (is_array($value)) {
 			$sanitized[$key] = mcp_capability_sanitize_payload($value, $maxLength, $fieldName);
+		} else {
+			$sanitized[$key] = $value;
+		}
+	}
+
+	return $sanitized;
+}
+
+/**
+ * Single-pass post-execution tree guard that enforces nesting depth, rejects
+ * control-plane escalation keys, and sanitizes untrusted Cacti telemetry strings.
+ *
+ * @param array<int|string, mixed> $payload   Payload subtree to inspect and sanitize.
+ * @param int                      $maxLength Maximum character length for untrusted strings.
+ * @param string                   $parentKey Parent field name for nested list/map context.
+ * @param int                      $depth     Current recursion depth (capped at 32).
+ * @return array<int|string, mixed> Sanitized payload subtree.
+ * @throws AbilitiesError When control-plane escalation keys or excessive nesting are encountered.
+ */
+function mcp_capability_guard_sanitize_tree(
+	array $payload,
+	int $maxLength,
+	string $parentKey = '',
+	int $depth = 0
+) : array {
+	if ($depth > 32) {
+		throw new AbilitiesError('PERMISSION_DENIED', 'CONTROL_PLANE_VIOLATION', 'Payload nesting exceeds capability guard limit.');
+	}
+
+	$sanitized = [];
+
+	foreach ($payload as $key => $value) {
+		if (is_string($key)) {
+			if (isset(MCP_CAPABILITY_ESCALATION_KEY_SET[strtolower($key)])) {
+				throw new AbilitiesError(
+					'PERMISSION_DENIED',
+					'CONTROL_PLANE_VIOLATION',
+					'Untrusted payload cannot carry control-plane capability fields.'
+				);
+			}
+			$fieldName = $key;
+		} else {
+			$fieldName = $parentKey;
+		}
+
+		if (is_string($value)) {
+			if (isset(MCP_CAPABILITY_UNTRUSTED_FIELD_SET[$fieldName])) {
+				$sanitized[$key] = mcp_capability_sanitize_untrusted_string($value, $fieldName, $maxLength);
+			} else {
+				$sanitized[$key] = mcp_capability_neutralize_prompt_markers(mcp_capability_strip_unsafe_chars($value));
+			}
+		} elseif (is_array($value)) {
+			$sanitized[$key] = mcp_capability_guard_sanitize_tree($value, $maxLength, $fieldName, $depth + 1);
+		} elseif ($value instanceof stdClass) {
+			mcp_capability_assert_no_control_escalation($value, $depth + 1);
+			$sanitized[$key] = $value;
 		} else {
 			$sanitized[$key] = $value;
 		}
@@ -475,10 +609,8 @@ function mcp_capability_guard_after_execute(
 	array $result,
 	int $maxLength = MCP_CAPABILITY_MAX_STRING_LENGTH
 ) : array {
-	mcp_capability_assert_no_control_escalation($result);
-
 	/** @var array<string, mixed> $cleaned */
-	$cleaned = mcp_capability_sanitize_payload($result, $maxLength);
+	$cleaned = mcp_capability_guard_sanitize_tree($result, $maxLength);
 
 	return $cleaned;
 }

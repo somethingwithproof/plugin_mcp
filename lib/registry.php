@@ -217,9 +217,26 @@ function abilities_validate(mixed $value, array $schema, bool $capStrings = true
 	}
 
 	if ($type === 'string') {
-		$length = preg_match_all('/./us', $value);
+		$minLength = $schema['minLength'] ?? 0;
+		$maxLength = $schema['maxLength'] ?? ($capStrings ? 4096 : PHP_INT_MAX);
 
-		if ($length === false || $length < ($schema['minLength'] ?? 0) || $length > ($schema['maxLength'] ?? ($capStrings ? 4096 : PHP_INT_MAX))
+		// Fast path: check valid UTF-8 and avoid expensive preg_match_all('/./us') scans.
+		if (function_exists('mb_check_encoding') && function_exists('mb_strlen')) {
+			if (!mb_check_encoding($value, 'UTF-8')) {
+				throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS');
+			}
+			$length = ($minLength === 0 && strlen($value) <= $maxLength)
+				? strlen($value)
+				: mb_strlen($value, 'UTF-8');
+		} else {
+			$length = preg_match_all('/./us', $value);
+
+			if ($length === false) {
+				throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS');
+			}
+		}
+
+		if ($length < $minLength || $length > $maxLength
 			|| (isset($schema['enum']) && !in_array($value, $schema['enum'], true))
 			|| (isset($schema['pattern']) && preg_match('~' . $schema['pattern'] . '~Du', $value) !== 1)) {
 			throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS');

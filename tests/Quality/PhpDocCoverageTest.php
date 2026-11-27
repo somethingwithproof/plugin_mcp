@@ -18,7 +18,8 @@ final class PhpDocCoverageTest extends TestCase {
 		$root  = dirname(__DIR__, 2);
 		$files = array_merge(
 			glob($root . '/*.php') ?: [],
-			glob($root . '/lib/*.php') ?: []
+			glob($root . '/lib/*.php') ?: [],
+			glob($root . '/scripts/*.php') ?: []
 		);
 		sort($files);
 

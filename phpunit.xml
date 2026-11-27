@@ -19,6 +19,7 @@
         <include>
             <file>setup.php</file>
             <directory suffix=".php">lib</directory>
+            <directory suffix=".php">scripts</directory>
         </include>
     </source>
 </phpunit>

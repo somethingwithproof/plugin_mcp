@@ -1021,27 +1021,92 @@ function mcp_clog_path() : string {
  * @return string Redacted and sanitized log line.
  */
 function mcp_redact_log_line(string $line) : string {
+	static $keyPresencePattern = null;
+	static $quotedPattern      = null;
+	static $spaceQuotedPattern = null;
+	static $sepUnquotedPattern = null;
+	static $spaceUnquotedPattern = null;
+
+	if ($keyPresencePattern === null) {
+		$keys = 'authorization|password|passwd|passphrase|pass|secret|token|community|'
+			. 'api[_-]?key|auth[_-]?key|priv(?:ate)?[_-]?key|dbpass|dbsslkey';
+		$keyPresencePattern   = '/(?:' . $keys . ')\b/i';
+		$quotedPattern        = '/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(["\'])'
+			. '(?:\\\\[^\r\n]|(?!\2)[^\\\\\r\n])*+(?:\2|\\\\?(?=\r?$))/im';
+		$spaceQuotedPattern   = '/(\b\w*(?:' . $keys . ')\b\s+)(["\'])'
+			. '(?:\\\\[^\r\n]|(?!\2)[^\\\\\r\n])*+(?:\2|\\\\?(?=\r?$))/im';
+		$sepUnquotedPattern   = '/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(?!["\'])[^\s;,"\'\r\n]+/i';
+		$spaceUnquotedPattern = '/(\b\w*(?:' . $keys . ')\b\s+)(?!["\'])[^\s;,"\'\r\n]+/i';
+	}
+
 	// Strip unsafe control and zero-width chars first so obfuscation cannot bypass secret redaction.
 	$line = mcp_capability_strip_unsafe_chars($line);
 
-	$keys     = 'authorization|password|passwd|passphrase|pass|secret|token|community|'
-		. 'api[_-]?key|auth[_-]?key|priv(?:ate)?[_-]?key|dbpass|dbsslkey';
-	$quoted   = '/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(["\'])'
-		. '(?:\\\\[^\r\n]|(?!\2)[^\\\\\r\n])*+(?:\2|\\\\?(?=\r?$))/im';
-	$spaceQuoted = '/(\b\w*(?:' . $keys . ')\b\s+)(["\'])'
-		. '(?:\\\\[^\r\n]|(?!\2)[^\\\\\r\n])*+(?:\2|\\\\?(?=\r?$))/im';
-	$patterns = [
-		['/\bcmcp_pat_[a-f0-9]+\b/i', '[redacted]'],
-		['/(\b(?:Bearer|Basic)[ \t]+)(?:\\\\[^\r\n]|[^\s;,"\'\\\\\r\n])+/i', '$1[redacted]'],
-		[$quoted, '$1$2[redacted]$2'],
-		[$spaceQuoted, '$1$2[redacted]$2'],
-		['/(\b\w*(?:' . $keys . ')\b["\']?\s*[=:]\s*)(?!["\'])[^\s;,"\'\r\n]+/i', '$1[redacted]'],
-		['/(\b\w*(?:' . $keys . ')\b\s+)(?!["\'])[^\s;,"\'\r\n]+/i', '$1[redacted]'],
-		['/(\b[a-z][a-z0-9+.\-]*:\/\/[^:\/@?#\s]+:)[^\/\s?#]+(@)/i', '$1[redacted]$2'],
-	];
+	if (stripos($line, 'cmcp_pat_') !== false) {
+		$replaced = preg_replace('/\bcmcp_pat_[a-f0-9]+\b/i', '[redacted]', $line);
 
-	foreach ($patterns as [$pattern, $replacement]) {
-		$replaced = preg_replace($pattern, $replacement, $line);
+		if ($replaced === null) {
+			return '[redacted]';
+		}
+		$line = $replaced;
+	}
+
+	if (stripos($line, 'bearer') !== false || stripos($line, 'basic') !== false) {
+		$replaced = preg_replace('/(\b(?:Bearer|Basic)[ \t]+)(?:\\\\[^\r\n]|[^\s;,"\'\\\\\r\n])+/i', '$1[redacted]', $line);
+
+		if ($replaced === null) {
+			return '[redacted]';
+		}
+		$line = $replaced;
+	}
+
+	$hasKey = preg_match($keyPresencePattern, $line);
+
+	if ($hasKey === false) {
+		return '[redacted]';
+	}
+
+	if ($hasKey === 1) {
+		$hasSep   = str_contains($line, '=') || str_contains($line, ':');
+		$hasQuote = str_contains($line, '"') || str_contains($line, "'");
+
+		if ($hasSep && $hasQuote) {
+			$replaced = preg_replace($quotedPattern, '$1$2[redacted]$2', $line);
+
+			if ($replaced === null) {
+				return '[redacted]';
+			}
+			$line = $replaced;
+		}
+
+		if ($hasQuote) {
+			$replaced = preg_replace($spaceQuotedPattern, '$1$2[redacted]$2', $line);
+
+			if ($replaced === null) {
+				return '[redacted]';
+			}
+			$line = $replaced;
+		}
+
+		if ($hasSep) {
+			$replaced = preg_replace($sepUnquotedPattern, '$1[redacted]', $line);
+
+			if ($replaced === null) {
+				return '[redacted]';
+			}
+			$line = $replaced;
+		}
+
+		$replaced = preg_replace($spaceUnquotedPattern, '$1[redacted]', $line);
+
+		if ($replaced === null) {
+			return '[redacted]';
+		}
+		$line = $replaced;
+	}
+
+	if (str_contains($line, '://')) {
+		$replaced = preg_replace('/(\b[a-z][a-z0-9+.\-]*:\/\/[^:\/@?#\s]+:)[^\/\s?#]+(@)/i', '$1[redacted]$2', $line);
 
 		if ($replaced === null) {
 			return '[redacted]';
@@ -1060,6 +1125,11 @@ function mcp_redact_log_line(string $line) : string {
 
 /**
  * Read a bounded tail of the Cacti log, filter by severity/search, and redact secrets.
+ *
+ * Scans backwards from the newest line so requests return once $limit matching
+ * lines (plus one lookahead match for accurate truncation reporting) are found,
+ * while always redacting each inspected line before applying search filters so
+ * search cannot act as a secret oracle.
  *
  * @param string $path     Filesystem path to the Cacti log file.
  * @param int    $limit    Maximum number of matching lines to return.
@@ -1101,19 +1171,18 @@ function mcp_read_clog_tail(
 		throw new AbilitiesError('FAILED_PRECONDITION', 'LOG_UNAVAILABLE');
 	}
 
-	$rawLines = preg_split('/\r?\n/', trim($contents));
+	$trimmed  = trim($contents);
+	$rawLines = $trimmed === '' ? [] : explode("\n", $trimmed);
+	$startIdx = ($dropFirstLine && $rawLines !== []) ? 1 : 0;
 
-	if (!is_array($rawLines)) {
-		$rawLines = [];
-	}
+	$severityPattern = $severity !== 'ALL' ? '/\b' . preg_quote($severity, '/') . '\b/i' : null;
+	$matchedReverse  = [];
+	$matchedCount    = 0;
+	$moreMatches     = false;
 
-	if ($dropFirstLine && $rawLines !== []) {
-		array_shift($rawLines);
-	}
+	for ($i = count($rawLines) - 1; $i >= $startIdx; $i--) {
+		$line = rtrim($rawLines[$i], "\r");
 
-	$matched = [];
-
-	foreach ($rawLines as $line) {
 		if ($line === '') {
 			continue;
 		}
@@ -1121,7 +1190,8 @@ function mcp_read_clog_tail(
 		// Redact before applying caller search filters so search cannot act as a secret oracle.
 		$redacted = mcp_redact_log_line($line);
 
-		if ($severity !== 'ALL' && preg_match('/\b' . preg_quote($severity, '/') . '\b/i', $redacted) !== 1) {
+		if ($severityPattern !== null
+			&& (stripos($redacted, $severity) === false || preg_match($severityPattern, $redacted) !== 1)) {
 			continue;
 		}
 
@@ -1129,15 +1199,21 @@ function mcp_read_clog_tail(
 			continue;
 		}
 
-		$matched[] = $redacted;
+		if ($matchedCount >= $limit) {
+			$moreMatches = true;
+
+			break;
+		}
+
+		$matchedReverse[] = $redacted;
+		$matchedCount++;
 	}
 
-	$truncated = $byteTruncated || count($matched) > $limit;
-	$tail      = array_values(array_slice($matched, -$limit));
+	$tail = array_reverse($matchedReverse);
 
 	return [
 		'lines'     => $tail,
-		'count'     => count($tail),
-		'truncated' => $truncated,
+		'count'     => $matchedCount,
+		'truncated' => $byteTruncated || $moreMatches,
 	];
 }

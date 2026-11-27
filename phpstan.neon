@@ -16,6 +16,7 @@ parameters:
 		- lib/providers.php
 		- lib/registry.php
 		- lib/storage.php
+		- scripts/ss_mcp_stats.php
 	scanFiles:
 		- tests/phpstan-stubs.php
 	dynamicConstantNames:
@@ -23,6 +24,9 @@ parameters:
 		- CACTI_PATH_LOG
 	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
+		-
+			identifier: includeOnce.fileNotFound
+			path: scripts/ss_mcp_stats.php
 		-
 			identifier: missingType.iterableValue
 			paths:
