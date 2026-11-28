@@ -7,8 +7,8 @@ require_once __DIR__ . '/../lib/providers.php';
 // mcp_time() reads stored times in the PHP default zone, so the expected strings assume UTC.
 date_default_timezone_set('UTC');
 
-$config = ['cacti_version' => '1.2.31'];
-$realms = [7 => [3, 15], 8 => []];
+$config = ['cacti_version' => '1.2.31', 'base_path' => '/tmp'];
+$realms = [7 => [3, 7, 15, 19], 8 => []];
 $calls  = [];
 $logs   = [];
 $hooks  = [];
@@ -54,9 +54,33 @@ function get_allowed_devices($sql_where = '', $sql_order = 'description', $sql_l
 	if ($device_id) {
 		return array_values(array_filter($rows, fn ($row) => (int) $row['id'] === $device_id));
 	}
+
+	if ($sql_limit === '') {
+		return $rows;
+	}
 	[$offset, $limit] = array_map('intval', explode(',', $sql_limit));
 
 	return array_slice($rows, $offset, $limit);
+}
+
+function get_allowed_trees($edit = false, $return_sql = false, $sql_where = '', $sql_order = 'name', $sql_limit = '', &$total_rows = 0, $user_id = 0) {
+	return [];
+}
+
+function is_tree_allowed($tree_id, $user_id = 0) {
+	return true;
+}
+
+function get_allowed_graphs($sql_where = '', $sql_order = 'gtg.title_cache', $sql_limit = '', &$total_rows = 0, $user_id = 0, $graph_id = 0) {
+	return [];
+}
+
+function is_graph_allowed($local_graph_id, $user_id = 0) {
+	return true;
+}
+
+function read_config_option($name, $force = false) {
+	return '';
 }
 
 function db_fetch_assoc_prepared($sql, $params = []) {
@@ -134,7 +158,7 @@ $audit     = function ($id, $name, $outcome) {};
 
 // built-ins only
 $registry = mcp_registry();
-check(count($registry->discover($principal)) === 3, 'Three built-ins');
+check(count($registry->discover($principal)) === 9, 'Nine built-ins');
 check($registry->discover(['user_id' => 8] + $principal) === [], 'Provider realm isolation');
 $result = $registry->execute($principal, 'cacti-get-system-info', new stdClass(), $audit);
 check($result['result'] === ['cactiVersion' => '1.2.31', 'pluginVersion' => plugin_mcp_version()['version'], 'abilitiesApiVersion' => '2'], 'System info');
@@ -211,7 +235,7 @@ $hooks = [
 ];
 $logs     = [];
 $registry = mcp_registry();
-check(count($registry->discover($principal)) === 3, 'A failing plugin leaves only the built-ins');
+check(count($registry->discover($principal)) === 9, 'A failing plugin leaves only the built-ins');
 check($registry->get($principal, 'fixture-half-done') === null, 'Partial registration discarded');
 check(count(array_filter($logs, fn ($log) => str_contains($log[0], 'registration failed'))) === 1, 'Failure logged once');
 check($logs[0] === ['MCP: ability registration failed for plugin fixture (RuntimeException)', false, 'MCP'], 'Failure log text');
@@ -229,19 +253,19 @@ check($logs === [['MCP: ability registration failed for plugin fixture (RuntimeE
 // reserved_namespace: a plugin named cacti cannot register as a built-in
 $hooks = [['name' => 'cacti', 'file' => 'setup.php', 'function' => 'fixture_register'], ['name' => 'cacti', 'file' => 'setup.php', 'function' => 'fixture_spoof']];
 $logs  = [];
-check(count(mcp_registry()->all()) === 3 && !array_intersect(['fixture-ok-one', 'cacti-spoofed-thing'], array_column(mcp_registry()->all(), 'id')), 'Plugin named cacti is skipped, even for a cacti-* id');
+check(count(mcp_registry()->all()) === 9 && !array_intersect(['fixture-ok-one', 'cacti-spoofed-thing'], array_column(mcp_registry()->all(), 'id')), 'Plugin named cacti is skipped, even for a cacti-* id');
 check($logs[0] === ['MCP: ability registration skipped for plugin cacti: reserved namespace', false, 'MCP'], 'Reserved namespace logged');
 
 // a later healthy plugin still registers after a failing one
 $hooks    = [$hooks[0], ['name' => 'fixture', 'file' => 'setup.php', 'function' => 'fixture_register']];
 $registry = mcp_registry();
-check(count($registry->discover($principal)) === 3, 'A plugin ability is hidden until an admin exposes it');
+check(count($registry->discover($principal)) === 9, 'A plugin ability is hidden until an admin exposes it');
 check($registry->get($principal, 'fixture-ok-one') === null, 'Hidden plugin ability is absent');
 rejects(fn () => $registry->execute($principal, 'fixture-ok-one', new stdClass(), $audit), 'ABILITY_NOT_FOUND');
 $exposureRows = [['id' => 'fixture-ok-one', 'exposed' => '1'], ['id' => 'cacti-get-device', 'exposed' => '0']];
 mcp_exposure_map(true);
 $ids = array_column($registry->discover($principal), 'id');
-check(count($ids) === 3 && in_array('fixture-ok-one', $ids, true) && !in_array('cacti-get-device', $ids, true), 'Stored exposure overrides the defaults');
+check(count($ids) === 9 && in_array('fixture-ok-one', $ids, true) && !in_array('cacti-get-device', $ids, true), 'Stored exposure overrides the defaults');
 check($registry->execute($principal, 'fixture-ok-one', new stdClass(), $audit)['result']['version'] === 'ok', 'Plugin ability executes');
 $reads = $exposureReads;
 $registry->discover($principal);

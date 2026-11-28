@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Tác giả plugin có thể tự đăng ký các ability chỉ đọc của riê
 
 Hiện đã có:
 
-- Các ability tích hợp sẵn ở chế độ chỉ đọc để lấy thông tin phiên bản hệ thống và danh sách thiết bị.
+- Chín ability tích hợp sẵn ở chế độ chỉ đọc bao gồm phiên bản hệ thống, thiết bị, site, poller, cây đồ thị, đồ thị, nguồn dữ liệu và phần cuối nhật ký Cacti có giới hạn dung lượng và đã được che thông tin nhạy cảm.
 - Personal access token (`cmcp_pat_...`) là loại thông tin xác thực duy nhất.
 - Bảng điều khiển Management > MCP: công khai hoặc ẩn ability, tạo và thu hồi token, xem nhật ký kiểm tra (audit log).
 - Management > My MCP Tokens: người dùng tự quản lý token của mình, xem hoạt động của bản thân và xem những công cụ nào mà token của họ có thể sử dụng.
@@ -47,17 +47,38 @@ Thiết kế nằm trong [đặc tả thiết kế endpoint](../../superpowers/s
 
 ## Ability tích hợp sẵn
 
-| ID | Tham số | Realm Cacti cần thiết |
+| ID | Danh mục | Tham số | Realm Cacti cần thiết |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | không có | 15 |
+| `cacti-list-devices` | `inventory` | tùy chọn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | bắt buộc `name`, ví dụ `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | tùy chọn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | tùy chọn `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | tùy chọn `pageSize`, `pageToken`, `filter`, `orderBy` | 7 hoặc 4 |
+| `cacti-list-graphs` | `inventory` | tùy chọn `pageSize`, `pageToken`, `filter`, `orderBy` | 7 hoặc 5 |
+| `cacti-list-data-sources` | `inventory` | tùy chọn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | tùy chọn `lines` (1 đến 200, mặc định 50), `severity`, `search` | 19 hoặc 18 |
+
+Mọi lệnh gọi cũng cần chủ sở hữu token có realm **MCP and Abilities API**, phạm vi (scope) `abilities:read` (mọi personal token đều có sẵn), và ability đó phải đang được công khai. Tab Abilities trên bảng điều khiển sẽ hiển thị realm chính mà mỗi ability tích hợp sẵn yêu cầu.
+
+Tất cả sáu ability `cacti-list-*` đều trả về từng trang tối đa 100 mục (mặc định 50) kèm theo `nextPageToken`. Page token chỉ hợp lệ khi dùng cùng một `filter` và `orderBy`. `filter` là một biểu thức AIP-160 gồm các phép so sánh (`=`, `!=`, `<`, `<=`, `>`, `>=`) nối với nhau bằng `AND`, ví dụ `state = "DOWN" AND disabled = false`. `orderBy` nhận một danh sách các trường có thể sắp xếp được phân tách bằng dấu phẩy, mỗi trường có thể tùy chọn theo sau bởi `asc` hoặc `desc`.
+
+| Ability | Trường lọc | Trường sắp xếp |
 | --- | --- | --- |
-| `cacti-get-system-info` | không có | 15 |
-| `cacti-list-devices` | tùy chọn `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | bắt buộc `name`, ví dụ `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-Mọi lệnh gọi cũng cần chủ sở hữu token có realm **MCP and Abilities API**, phạm vi (scope) `abilities:read` (mọi personal token đều có sẵn), và ability đó phải đang được công khai. Tab Abilities trên bảng điều khiển sẽ hiển thị realm mà mỗi ability tích hợp sẵn yêu cầu.
+Phạm vi quyền và loại trừ thông tin bí mật:
 
-- `cacti-list-devices` trả về từng trang tối đa 100 thiết bị (mặc định 50) kèm theo `nextPageToken`. Page token chỉ hợp lệ khi dùng cùng một `filter` và `orderBy`. `filter` là một biểu thức AIP-160 gồm các phép so sánh nối với nhau bằng `AND`, ví dụ `state = "DOWN" AND disabled = false`. Các trường lọc gồm `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, và `state`. `orderBy` nhận `displayName`, `hostname`, hoặc `name`, mỗi trường có thể tùy chọn theo sau bởi `desc`.
-- Các truy vấn thiết bị đi qua hàm `get_allowed_devices()` của Cacti, nên người dùng chỉ thấy những thiết bị mà Cacti cho phép họ xem.
-- Các trường thông tin thiết bị loại bỏ chuỗi SNMP community, cụm mật khẩu (passphrase) và các thông tin xác thực khác.
+- `cacti-list-devices` và `cacti-get-device` truy vấn qua hàm `get_allowed_devices()` của Cacti và loại bỏ chuỗi SNMP community, cụm mật khẩu (passphrase) và các thông tin xác thực khác.
+- `cacti-list-trees` truy vấn qua `get_allowed_trees()` (và lọc bằng `is_tree_allowed()` khi khả dụng); `cacti-list-graphs` truy vấn qua `get_allowed_graphs()` (và lọc bằng `is_graph_allowed()` khi khả dụng).
+- `cacti-list-data-sources` giới hạn các hàng trong phạm vi thiết bị được phép của người gọi từ `get_allowed_devices()` (và `is_device_allowed()` khi khả dụng) và chỉ trả về siêu dữ liệu mà không truy vấn `data_input_data` hay làm lộ giá trị đầu vào bí mật.
+- `cacti-list-pollers` loại bỏ thông tin xác thực cơ sở dữ liệu (`dbpass`, `dbuser`) và các cột khóa cùng chứng chỉ TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` đọc tối đa 1 MiB cuối cùng của tệp nhật ký Cacti đã cấu hình (cắt ngắn từng dòng vượt quá 2048 byte), lọc theo `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; mặc định `ALL`) và `search` không phân biệt chữ hoa chữ thường (tối đa 256 ký tự), rồi trả về `lines`, `count` và `truncated`. Mỗi dòng được che thông tin đối với token cá nhân, tiêu đề bearer/basic, mật khẩu, bí mật, chuỗi SNMP community, khóa, `dbpass`, `dbsslkey` và thông tin người dùng trong URL trước khi bộ lọc `severity` và `search` chạy để `search` không thể đóng vai trò là công cụ dò bí mật. Cơ chế che thông tin áp dụng fail-closed với `[redacted]`, và tệp nhật ký không thể đọc được sẽ trả về `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Cài đặt
 
@@ -273,7 +294,7 @@ Lỗi tuân theo chuẩn AIP-193: một đối tượng `error` gồm `code`, `m
 
 | HTTP | Giá trị `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (cũng gửi kèm `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -387,17 +408,17 @@ ngoài plugin.
 
 ## Phát triển và kiểm thử
 
-Các bài kiểm thử là những script PHP thuần chạy không cần Cacti:
+Bộ kiểm thử bao gồm các script PHP thuần trong `tests/` cùng với các bài kiểm thử đơn vị PHPUnit trong `tests/Unit/` và phân tích tĩnh PHPStan (mức 6), tất cả đều chạy mà không cần cài đặt Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI kiểm tra cú pháp PHP và chạy các script trong `tests/` (mỗi script được liệt kê trong
-`.github/workflows/ci.yml`) trên PHP 8.2 đến 8.5, sau đó đóng gói gói cài đặt `mcp/` cùng
-checksum của nó. Các bài kiểm thử có chạm tới Cacti sử dụng fixture tại ranh giới hàm
-trợ giúp Cacti; chúng không chạy trên một bản cài đặt Cacti đầy đủ.
+CI chạy trên PHP 8.2 đến 8.5: một tác vụ `test` kiểm tra cú pháp PHP (`php -l`) và chạy 13 script kiểm thử PHP thuần được liệt kê trong `.github/workflows/ci.yml`, một tác vụ `quality` chạy `composer phpstan` và `composer test`, và một tác vụ `package` xây dựng gói lưu trữ `mcp/` có thể cài đặt (loại trừ các tệp phát triển và kiểm thử được liệt kê trong `.gitattributes`) cùng `SHA256SUMS` của nó. Các bài kiểm thử có chạm tới Cacti sử dụng fixture tại ranh giới hàm trợ giúp Cacti; chúng không chạy trên một bản cài đặt Cacti đầy đủ.
 
 ### Kiểm thử tích hợp
 

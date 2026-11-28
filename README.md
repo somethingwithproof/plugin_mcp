@@ -37,7 +37,9 @@ protocol code.
 
 Available today:
 
-- Read-only built-in abilities for system versions and device inventory.
+- Nine read-only built-in abilities covering system versions, devices, sites,
+  pollers, graph trees, graphs, data sources, and a bounded, redacted Cacti log
+  tail.
 - Personal access tokens (`cmcp_pat_...`) as the only credential.
 - The Management > MCP console: expose or hide abilities, create and revoke
   tokens, read the audit log.
@@ -59,27 +61,64 @@ and the build sequence is in [docs/plan.md](docs/plan.md).
 
 ## Built-in abilities
 
-| ID | Arguments | Cacti realm needed |
-| --- | --- | --- |
-| `cacti-get-system-info` | none | 15 |
-| `cacti-list-devices` | optional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | required `name`, such as `devices/12` | 3 |
+| ID | Category | Arguments | Cacti realm needed |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | none | 15 |
+| `cacti-list-devices` | `inventory` | optional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | required `name`, such as `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | optional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | optional `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | optional `pageSize`, `pageToken`, `filter`, `orderBy` | 7 or 4 |
+| `cacti-list-graphs` | `inventory` | optional `pageSize`, `pageToken`, `filter`, `orderBy` | 7 or 5 |
+| `cacti-list-data-sources` | `inventory` | optional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | optional `lines` (1 to 200, default 50), `severity`, `search` | 19 or 18 |
 
 Every call also needs the **MCP and Abilities API** realm for the token owner,
 the `abilities:read` scope (every personal token has it), and an exposed
-ability. The Abilities tab of the console shows the realm each built-in needs.
+ability. The Abilities tab of the console shows the primary realm each built-in
+needs.
 
-- `cacti-list-devices` returns pages of up to 100 devices (default 50) and a
-  `nextPageToken`. A page token is valid only for the same `filter` and
-  `orderBy`. `filter` is an AIP-160 expression of comparisons joined by `AND`,
-  for example `state = "DOWN" AND disabled = false`. Filter fields are
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId`, and `state`. `orderBy` takes `displayName`, `hostname`, or `name`,
-  each optionally followed by `desc`.
-- Device queries go through Cacti's `get_allowed_devices()`, so a user sees only
-  the devices Cacti would show them.
-- Device fields exclude SNMP community strings, passphrases, and other
-  credentials.
+All six `cacti-list-*` abilities return pages of up to 100 items (default 50)
+and a `nextPageToken`. A page token is valid only for the same `filter` and
+`orderBy`. `filter` is an AIP-160 expression of comparisons (`=`, `!=`, `<`,
+`<=`, `>`, `>=`) joined by `AND`, for example `state = "DOWN" AND disabled = false`.
+`orderBy` accepts a comma-separated list of orderable fields, each optionally
+followed by `asc` or `desc`.
+
+| Ability | Filter fields | Order fields |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Permission scoping and secret exclusion:
+
+- `cacti-list-devices` and `cacti-get-device` query through Cacti's
+  `get_allowed_devices()` and exclude SNMP community strings, passphrases, and
+  other credentials.
+- `cacti-list-trees` queries through `get_allowed_trees()` (and filters with
+  `is_tree_allowed()` when available); `cacti-list-graphs` queries through
+  `get_allowed_graphs()` (and filters with `is_graph_allowed()` when available).
+- `cacti-list-data-sources` scopes rows to the caller's allowed devices from
+  `get_allowed_devices()` (and `is_device_allowed()` when available) and returns
+  metadata only without querying `data_input_data` or exposing secret input
+  values.
+- `cacti-list-pollers` excludes database credentials (`dbpass`, `dbuser`) and
+  TLS key and certificate columns (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` reads up to the final 1 MiB of the configured Cacti log
+  (truncating individual lines over 2048 bytes), filters by `severity` (`ALL`,
+  `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`,
+  `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; default `ALL`) and
+  case-insensitive `search` (up to 256 characters), and returns `lines`,
+  `count`, and `truncated`. Each line is redacted for personal tokens,
+  bearer/basic headers, passwords, secrets, SNMP communities, keys, `dbpass`,
+  `dbsslkey`, and URL userinfo before `severity` and `search` filters run so
+  `search` cannot act as a secret oracle. Redaction fails closed with
+  `[redacted]`, and an unreadable log returns `FAILED_PRECONDITION`
+  (`LOG_UNAVAILABLE`).
 
 ## Install
 
@@ -423,7 +462,7 @@ or the server is not the main poller.
 
 | HTTP | `reason` values |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (also sends `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -566,16 +605,25 @@ policy outside the plugin.
 
 ## Development and tests
 
-Tests are plain PHP scripts that run without Cacti:
+The test suite includes plain PHP scripts in `tests/` plus PHPUnit unit tests
+in `tests/Unit/` and PHPStan static analysis (level 6), all running without a
+Cacti installation:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI lints PHP and runs the scripts in `tests/` (each is listed in
-`.github/workflows/ci.yml`) on PHP 8.2 through 8.5, then builds the installable `mcp/` archive and its checksum. Tests that touch Cacti use
-fixtures at the Cacti helper boundary; they do not exercise a full Cacti install.
+CI runs on PHP 8.2 through 8.5: a `test` job that lints PHP syntax (`php -l`)
+and runs the 13 plain PHP test scripts listed in `.github/workflows/ci.yml`, a
+`quality` job that runs `composer phpstan` and `composer test`, and a `package`
+job that builds the installable `mcp/` archive (excluding development and test
+files listed in `.gitattributes`) and its `SHA256SUMS`. Tests that touch Cacti
+use fixtures at the Cacti helper boundary; they do not exercise a full Cacti
+install.
 
 ### Integration tests
 

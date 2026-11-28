@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -39,7 +39,9 @@ protocolcode.
 
 Vandaag beschikbaar:
 
-- Ingebouwde alleen-lezen abilities voor systeemversies en apparaatinventaris.
+- Negen ingebouwde alleen-lezen abilities voor systeemversies, apparaten,
+  locaties (sites), pollers, grafiekbomen, grafieken, gegevensbronnen en een
+  begrensde, geredigeerde staart van het Cacti-logboek.
 - Persoonlijke toegangstokens (`cmcp_pat_...`) als enige authenticatiegegevens.
 - De console onder Management > MCP: abilities vrijgeven of verbergen, tokens aanmaken en intrekken,
   het auditlogboek lezen.
@@ -61,27 +63,65 @@ en de bouwvolgorde staat in [docs/plan.md](../../plan.md).
 
 ## Ingebouwde abilities
 
-| ID | Argumenten | Vereiste Cacti-realm |
-| --- | --- | --- |
-| `cacti-get-system-info` | geen | 15 |
-| `cacti-list-devices` | optioneel `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | verplicht `name`, zoals `devices/12` | 3 |
+| ID | Categorie | Argumenten | Vereiste Cacti-realm |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | geen | 15 |
+| `cacti-list-devices` | `inventory` | optioneel `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | verplicht `name`, zoals `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | optioneel `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | optioneel `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | optioneel `pageSize`, `pageToken`, `filter`, `orderBy` | 7 of 4 |
+| `cacti-list-graphs` | `inventory` | optioneel `pageSize`, `pageToken`, `filter`, `orderBy` | 7 of 5 |
+| `cacti-list-data-sources` | `inventory` | optioneel `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | optioneel `lines` (1 tot 200, standaard 50), `severity`, `search` | 19 of 18 |
 
 Elke aanroep vereist ook de realm **MCP and Abilities API** voor de tokeneigenaar,
 de scope `abilities:read` (elk persoonlijk token heeft deze) en een vrijgegeven
-ability. Het tabblad Abilities in de console toont welke realm elke ingebouwde ability nodig heeft.
+ability. Het tabblad Abilities in de console toont welke primaire realm elke ingebouwde ability nodig heeft.
 
-- `cacti-list-devices` retourneert pagina's van maximaal 100 apparaten (standaard 50) en een
-  `nextPageToken`. Een paginatoken is alleen geldig voor dezelfde `filter` en
-  `orderBy`. `filter` is een AIP-160-expressie van vergelijkingen gekoppeld met `AND`,
-  bijvoorbeeld `state = "DOWN" AND disabled = false`. Filtervelden zijn
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId` en `state`. `orderBy` accepteert `displayName`, `hostname` of `name`,
-  elk optioneel gevolgd door `desc`.
-- Apparaatquery's lopen via `get_allowed_devices()` van Cacti, zodat een gebruiker alleen
-  de apparaten ziet die Cacti aan die gebruiker zou tonen.
-- Apparaatvelden sluiten SNMP-communitystrings, wachtwoordzinnen en andere
-  inloggegevens uit.
+Alle zes `cacti-list-*`-abilities retourneren pagina's van maximaal 100 items
+(standaard 50) en een `nextPageToken`. Een paginatoken is alleen geldig voor
+dezelfde `filter` en `orderBy`. `filter` is een AIP-160-expressie van
+vergelijkingen (`=`, `!=`, `<`, `<=`, `>`, `>=`) gekoppeld met `AND`,
+bijvoorbeeld `state = "DOWN" AND disabled = false`. `orderBy` accepteert een
+komma-gescheiden lijst van sorteerbare velden, elk optioneel gevolgd door `asc`
+of `desc`.
+
+| Ability | Filtervelden | Sorteervelden |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Machtigingsafbakening en uitsluiting van geheimen:
+
+- `cacti-list-devices` en `cacti-get-device` voeren query's uit via
+  `get_allowed_devices()` van Cacti en sluiten SNMP-communitystrings,
+  wachtwoordzinnen en andere inloggegevens uit.
+- `cacti-list-trees` voert query's uit via `get_allowed_trees()` (en filtert met
+  `is_tree_allowed()` indien beschikbaar); `cacti-list-graphs` voert query's uit
+  via `get_allowed_graphs()` (en filtert met `is_graph_allowed()` indien
+  beschikbaar).
+- `cacti-list-data-sources` beperkt rijen tot de toegestane apparaten van de
+  aanroeper uit `get_allowed_devices()` (en `is_device_allowed()` indien
+  beschikbaar) en retourneert alleen metadata zonder `data_input_data` te
+  bevragen of geheime invoerwaarden bloot te geven.
+- `cacti-list-pollers` sluit databasegegevens (`dbpass`, `dbuser`) en
+  TLS-sleutel- en certificaatkolommen (`dbsslkey`, `dbsslcert`, `dbsslca`) uit.
+- `cacti-get-clog` leest maximaal de laatste 1 MiB van het geconfigureerde
+  Cacti-logboek (waarbij afzonderlijke regels langer dan 2048 bytes worden
+  afgekapt), filtert op `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`,
+  `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`,
+  `SYSTEM`; standaard `ALL`) en hoofdletterongevoelige `search` (maximaal 256
+  tekens), en retourneert `lines`, `count` en `truncated`. Elke regel wordt
+  geschoond van persoonlijke tokens, bearer/basic-headers, wachtwoorden, geheimen,
+  SNMP-communities, sleutels, `dbpass`, `dbsslkey` en URL-userinfo voordat de
+  filters `severity` en `search` draaien, zodat `search` niet als geheime
+  orakel kan fungeren. Redactie faalt gesloten met `[redacted]`, en een
+  onleesbaar logboek retourneert `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Installatie
 
@@ -434,7 +474,7 @@ hoofdpoller is.
 
 | HTTP | `reason`-waarden |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (stuurt ook `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -588,17 +628,26 @@ audits toe.
 
 ## Ontwikkeling en tests
 
-Tests zijn gewone PHP-scripts die zonder Cacti draaien:
+De testsuite omvat gewone PHP-scripts in `tests/` plus PHPUnit-unittests in
+`tests/Unit/` en statische analyse met PHPStan (niveau 6), allemaal uitvoerbaar
+zonder Cacti-installatie:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI controleert PHP met een linter en voert de scripts in `tests/` uit (elk staat vermeld in
-`.github/workflows/ci.yml`) op PHP 8.2 tot en met 8.5, en bouwt vervolgens het
-installeerbare `mcp/`-archief en de bijbehorende controlesom. Tests die Cacti raken gebruiken
-fixtures op de grens van de Cacti-helpers; ze testen geen volledige Cacti-installatie.
+CI draait op PHP 8.2 tot en met 8.5: een `test`-taak die de PHP-syntaxis
+controleert (`php -l`) en de 13 gewone PHP-testscripts uitvoert die in
+`.github/workflows/ci.yml` staan vermeld, een `quality`-taak die
+`composer phpstan` en `composer test` uitvoert, en een `package`-taak die het
+installeerbare `mcp/`-archief (zonder de ontwikkelings- en testbestanden die in
+`.gitattributes` staan vermeld) en de bijbehorende `SHA256SUMS` bouwt. Tests
+die Cacti raken gebruiken fixtures op de grens van de Cacti-helpers; ze testen
+geen volledige Cacti-installatie.
 
 ### Integratietests
 

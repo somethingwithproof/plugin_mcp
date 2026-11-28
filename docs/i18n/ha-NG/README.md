@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Masu rubuta plugin za su iya yin rajistar nasu abilities na karatu kawai ta hany
 
 Abubuwan da ake samu a yau:
 
-- Built-in abilities na karatu kawai don nau'ikan tsari da jerin na'urori.
+- Built-in abilities guda tara na karatu kawai da suka shafi nau'ikan tsari, na'urori, shafukan wurare (sites), pollers, itatuwan jadawali (graph trees), jadawalai (graphs), tushen bayanai (data sources), da iyakantaccen ƙarshen rajistar Cacti da aka rufe sirri.
 - Alamomin samun dama na sirri (`cmcp_pat_...`) a matsayin shaidar shiga kaɗai.
 - Shafin gudanarwa na Management > MCP: bayyana ko ɓoye abilities, ƙirƙira da soke alamomi, karanta rajistar bincike.
 - Management > My MCP Tokens: masu amfani suna sarrafa nasu alamomin, suna ganin ayyukansu, kuma suna ganin waɗanne kayan aiki alamominsu za su iya amfani da su.
@@ -49,17 +49,38 @@ kuma jerin gina shi yana cikin [docs/plan.md](../../plan.md).
 
 ## Abilities da ke ciki
 
-| ID | Muhawara | Cacti realm da ake buƙata |
+| ID | Rukunin | Muhawara | Cacti realm da ake buƙata |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | babu | 15 |
+| `cacti-list-devices` | `inventory` | na zaɓi `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | na dole `name`, kamar `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | na zaɓi `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | na zaɓi `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | na zaɓi `pageSize`, `pageToken`, `filter`, `orderBy` | 7 ko 4 |
+| `cacti-list-graphs` | `inventory` | na zaɓi `pageSize`, `pageToken`, `filter`, `orderBy` | 7 ko 5 |
+| `cacti-list-data-sources` | `inventory` | na zaɓi `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | na zaɓi `lines` (1 zuwa 200, tsoho 50), `severity`, `search` | 19 ko 18 |
+
+Kowane kira yana buƙatar realm na **MCP and Abilities API** ga mai mallakar token, iyakar `abilities:read` (kowane personal token yana da shi), da kuma ability da aka bayyana. Shafin Abilities na console yana nuna babban realm ɗin da kowane built-in ke buƙata.
+
+Dukkan `cacti-list-*` abilities guda shida suna dawo da shafuka na har zuwa abubuwa 100 (tsoho 50) da kuma `nextPageToken`. Token na shafi yana aiki ne kawai don `filter` da `orderBy` iri ɗaya. `filter` wani furucin AIP-160 ne na kwatance (`=`, `!=`, `<`, `<=`, `>`, `>=`) da aka haɗa da `AND`, misali `state = "DOWN" AND disabled = false`. `orderBy` yana karɓar jerin filayen da za a iya tsarawa waɗanda aka raba da waƙafi, kowanne na iya samun `asc` ko `desc` a baya idan an so.
+
+| Ability | Filayen tacewa | Filayen tsarawa |
 | --- | --- | --- |
-| `cacti-get-system-info` | babu | 15 |
-| `cacti-list-devices` | na zaɓi `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | na dole `name`, kamar `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-Kowane kira yana buƙatar realm na **MCP and Abilities API** ga mai mallakar token, iyakar `abilities:read` (kowane personal token yana da shi), da kuma ability da aka bayyana. Shafin Abilities na console yana nuna realm ɗin da kowane built-in ke buƙata.
+Iyakar izini da cire bayanan sirri:
 
-- `cacti-list-devices` yana dawo da shafuka na har zuwa na'urori 100 (tsoho 50) da kuma `nextPageToken`. Token na shafi yana aiki ne kawai don `filter` da `orderBy` iri ɗaya. `filter` wani furucin AIP-160 ne na kwatance da aka haɗa da `AND`, misali `state = "DOWN" AND disabled = false`. Filayen tacewa su ne `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, da `state`. `orderBy` yana karɓar `displayName`, `hostname`, ko `name`, kowanne na iya samun `desc` a baya idan an so.
-- Tambayoyin na'urori suna bi ta cikin `get_allowed_devices()` na Cacti, don haka mai amfani zai ga na'urorin da Cacti zai nuna masa ne kawai.
-- Filayen na'urori ba sa haɗa da SNMP community strings, passphrases, da sauran shaidun sirri.
+- `cacti-list-devices` da `cacti-get-device` suna yin tambaya ta hanyar `get_allowed_devices()` na Cacti kuma ba sa haɗa da SNMP community strings, passphrases, da sauran shaidun sirri.
+- `cacti-list-trees` yana yin tambaya ta hanyar `get_allowed_trees()` (kuma yana tacewa da `is_tree_allowed()` idan akwai); `cacti-list-graphs` yana yin tambaya ta hanyar `get_allowed_graphs()` (kuma yana tacewa da `is_graph_allowed()` idan akwai).
+- `cacti-list-data-sources` yana iyakance layuka zuwa na'urorin da aka ba mai kiran izini daga `get_allowed_devices()` (da `is_device_allowed()` idan akwai) kuma yana dawo da metadata kaɗai ba tare da tambayar `data_input_data` ko bayyana ƙimomin shigarwa na sirri ba.
+- `cacti-list-pollers` yana cire shaidun shiga ma'ajin bayanai (`dbpass`, `dbuser`) da ginshiƙan mabuɗan TLS da takaddun shaida (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` yana karanta har zuwa 1 MiB na ƙarshe na rajistar Cacti da aka saita (yana rage kowane layi da ya wuce baiti 2048), yana tacewa ta `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; tsoho `ALL`) da `search` wanda ba ya bambanta babba da ƙaramin harafi (har zuwa haruffa 256), sannan yana dawo da `lines`, `count`, da `truncated`. Ana rufe bayanan sirri a kowane layi don alamomin sirri (personal tokens), kanun bearer/basic, kalmomin sirri, sirrika, SNMP communities, mabuɗai, `dbpass`, `dbsslkey`, da bayanin mai amfani na URL kafin a gudanar da matattarun `severity` da `search` domin `search` kada ya zama hanyar gano sirri. Rufe bayanin sirri yana gazawa a rufe tare da `[redacted]`, kuma rajistar da ba za a iya karantawa ba tana dawo da `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Shigarwa
 
@@ -327,7 +348,7 @@ ko sabar ba ita ce babbar na'urar tattara bayanai ba.
 
 | HTTP | Ƙimomin `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (kuma yana aika `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -475,17 +496,17 @@ tsarin riƙe bayanan audit a wajen ƙarin.
 
 ## Haɓakawa da gwaje-gwaje
 
-Gwaje-gwaje rubutun PHP ne na yau da kullun da ke gudana ba tare da Cacti ba:
+Jerin gwaje-gwajen ya ƙunshi rubutun PHP na yau da kullun a cikin `tests/` tare da gwaje-gwajen raka'a na PHPUnit a cikin `tests/Unit/` da nazarin tsaye na PHPStan (mataki na 6), dukkansu suna gudana ba tare da shigar da Cacti ba:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI yana duba ingancin PHP (lint) kuma yana gudanar da rubutun da ke cikin `tests/` (kowanne
-yana jere a cikin `.github/workflows/ci.yml`) akan PHP 8.2 zuwa 8.5, sannan ya gina rumbun
-adanawa na `mcp/` mai shigarwa da checksum ɗinsa. Gwaje-gwajen da suka shafi Cacti suna
-amfani da fixtures a iyakar mataimakin Cacti; ba sa gwada cikakken shigarwar Cacti.
+CI yana gudana akan PHP 8.2 zuwa 8.5: aikin `test` wanda ke duba ingancin PHP (`php -l`) kuma yana gudanar da rubutun gwajin PHP guda 13 da ke jere a cikin `.github/workflows/ci.yml`, aikin `quality` wanda ke gudanar da `composer phpstan` da `composer test`, da kuma aikin `package` wanda ke gina rumbun adanawa na `mcp/` mai shigarwa (banda fayilolin haɓakawa da gwaji da ke jere a cikin `.gitattributes`) da `SHA256SUMS` ɗinsa. Gwaje-gwajen da suka shafi Cacti suna amfani da fixtures a iyakar mataimakin Cacti; ba sa gwada cikakken shigarwar Cacti.
 
 ### Gwaje-gwajen haɗin kai
 

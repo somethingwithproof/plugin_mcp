@@ -22,12 +22,28 @@ const MCP_ERROR_MESSAGES = [
 	'UNSUPPORTED_MEDIA_TYPE' => 'The request content type is not supported.',
 	'REQUEST_TOO_LARGE'      => 'The request body exceeds the size limit.',
 	'CACTI_UNAVAILABLE'      => 'Cacti is not available.',
+	'LOG_UNAVAILABLE'        => 'The Cacti log file is not readable.',
+	'CAPABILITY_DENIED'      => 'The capability boundary denied this request.',
+	'CONTROL_PLANE_VIOLATION'=> 'Untrusted data attempted to access or mutate control-plane fields.',
 ];
 
-const MCP_PAGE_SIZE_DEFAULT = 50;
-const MCP_PAGE_SIZE_MAX     = 100;
+const MCP_PAGE_SIZE_DEFAULT  = 50;
+const MCP_PAGE_SIZE_MAX      = 100;
+const MCP_FILTER_MAX_LENGTH  = 4096;
+const MCP_FILTER_MAX_CLAUSES = 32;
+const MCP_ORDER_MAX_LENGTH   = 256;
+const MCP_ORDER_MAX_FIELDS   = 8;
 
-/** Build the AIP-193 error body. @return array<string, mixed> */
+/* Unrolled possessive quoted-string pattern prevents PCRE backtracking overhead on long literals. */
+const MCP_FILTER_TERM_PATTERN = '/\G\s*([a-zA-Z][a-zA-Z0-9]*)\s*(!=|<=|>=|=|<|>)\s*("[^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+"|-?[0-9]+(?:\.[0-9]+)?|true|false)\s*/';
+const MCP_FILTER_AND_PATTERN  = '/\GAND\b/';
+
+/**
+ * Build the AIP-193 error body.
+ *
+ * @param AbilitiesError $e Error instance to serialize.
+ * @return array<string, mixed> AIP-193 error envelope.
+ */
 function mcp_error_body(AbilitiesError $e) : array {
 	$code    = $e->httpStatus();
 	$details = [[
@@ -54,7 +70,12 @@ function mcp_error_body(AbilitiesError $e) : array {
 	]];
 }
 
-/** Make empty "properties" lists encode as JSON objects. */
+/**
+ * Make empty "properties" lists encode as JSON objects.
+ *
+ * @param array<string, mixed> $schema Ability JSON schema definition.
+ * @return array<string, mixed> Normalized JSON schema ready for json_encode().
+ */
 function mcp_schema_json(array $schema) : array {
 	if (isset($schema['properties']) && is_array($schema['properties'])) {
 		$properties = array_map('mcp_schema_json', $schema['properties']);
@@ -68,7 +89,15 @@ function mcp_schema_json(array $schema) : array {
 	return $schema;
 }
 
-/** Read pageSize and pageToken. The token binds the offset to the query fingerprint. @return array{size: int, offset: int} */
+/**
+ * Read pageSize and pageToken. The token binds the offset to the query fingerprint.
+ *
+ * @param stdClass $args        Caller arguments object.
+ * @param string   $fingerprint Query fingerprint binding pageToken to filter/order.
+ * @param int      $default     Default page size when omitted or zero.
+ * @param int      $max         Maximum allowed page size.
+ * @return array{size: int, offset: int}
+ */
 function mcp_page(stdClass $args, string $fingerprint, int $default = MCP_PAGE_SIZE_DEFAULT, int $max = MCP_PAGE_SIZE_MAX) : array {
 	$size = $default;
 
@@ -99,11 +128,23 @@ function mcp_page(stdClass $args, string $fingerprint, int $default = MCP_PAGE_S
 	return ['size' => $size, 'offset' => $offset];
 }
 
-/** Issue the pageToken for the page that starts at $offset. */
+/**
+ * Issue the pageToken for the page that starts at $offset.
+ *
+ * @param int    $offset      Zero-based row offset for the next page.
+ * @param string $fingerprint Query fingerprint bound into the token.
+ * @return string URL-safe base64 page token.
+ */
 function mcp_page_token(int $offset, string $fingerprint) : string {
 	return rtrim(strtr(base64_encode((string) json_encode(['o' => $offset, 'f' => $fingerprint])), '+/', '-_'), '=');
 }
 
+/**
+ * Build an INVALID_FILTER error for the filter field.
+ *
+ * @param string $description Field violation explanation.
+ * @return AbilitiesError Error ready to throw.
+ */
 function mcp_filter_error(string $description) : AbilitiesError {
 	return new AbilitiesError('INVALID_ARGUMENT', 'INVALID_FILTER', '', [['field' => 'filter', 'description' => $description]]);
 }
@@ -114,7 +155,9 @@ function mcp_filter_error(string $description) : AbilitiesError {
  * Comparisons (= != < <= > >=) joined by AND; values are a double quoted
  * string, a number, true, or false. Only fields marked 'filter' are allowed.
  *
- * @param array<string, array<string, mixed>> $fields
+ * @param string                              $filter AIP-160 filter expression.
+ * @param array<string, array<string, mixed>> $fields Allowed field specifications.
+ * @return string SQL WHERE fragment or empty string when $filter is blank.
  */
 function mcp_filter_sql(string $filter, array $fields) : string {
 	$filter = trim($filter);
@@ -123,14 +166,24 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 		return '';
 	}
 
-	$term    = '/\G\s*([a-zA-Z][a-zA-Z0-9]*)\s*(!=|<=|>=|=|<|>)\s*("(?:[^"\\\\]|\\\\.)*"|-?[0-9]+(?:\.[0-9]+)?|true|false)\s*/';
-	$and     = '/\GAND\b/';
-	$clauses = [];
-	$offset  = 0;
-	$length  = strlen($filter);
+	$length = strlen($filter);
+
+	if ($length > MCP_FILTER_MAX_LENGTH) {
+		throw mcp_filter_error('filter exceeds maximum length of ' . MCP_FILTER_MAX_LENGTH . ' bytes.');
+	}
+
+	$clauses     = [];
+	$clauseCount = 0;
+	$offset      = 0;
 
 	while (true) {
-		if (!preg_match($term, $filter, $match, 0, $offset)) {
+		$clauseCount++;
+
+		if ($clauseCount > MCP_FILTER_MAX_CLAUSES) {
+			throw mcp_filter_error('filter exceeds maximum of ' . MCP_FILTER_MAX_CLAUSES . ' clauses.');
+		}
+
+		if (!preg_match(MCP_FILTER_TERM_PATTERN, $filter, $match, 0, $offset)) {
 			throw mcp_filter_error('filter is not valid at position ' . ($offset + 1) . '.');
 		}
 
@@ -145,7 +198,8 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 		$spec = $fields[$field];
 
 		if ($literal[0] === '"') {
-			$value = stripcslashes(substr($literal, 1, -1));
+			$inner = substr($literal, 1, -1);
+			$value = str_contains($inner, '\\') ? stripcslashes($inner) : $inner;
 		} elseif ($literal === 'true' || $literal === 'false') {
 			if ($spec['type'] !== 'bool') {
 				throw mcp_filter_error('filter compares "' . $field . '" with a boolean.');
@@ -172,7 +226,7 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 			break;
 		}
 
-		if (!preg_match($and, $filter, $match, 0, $offset)) {
+		if (!preg_match(MCP_FILTER_AND_PATTERN, $filter, $match, 0, $offset)) {
 			throw mcp_filter_error('filter is not valid at position ' . ($offset + 1) . '.');
 		}
 
@@ -182,16 +236,35 @@ function mcp_filter_sql(string $filter, array $fields) : string {
 	return implode(' AND ', $clauses);
 }
 
-/** Convert a filter literal to the stored representation of a field; null when it does not fit. */
+/**
+ * Convert a filter literal to the stored representation of a field; null when it does not fit.
+ *
+ * @param array<string, mixed> $spec  Field specification from the resource field map.
+ * @param mixed                $value Parsed literal value.
+ * @return int|string|null Stored database representation, or null if incompatible.
+ */
 function mcp_filter_value(array $spec, mixed $value) : int|string|null {
 	switch ($spec['type']) {
 		case 'bool':
 			return is_bool($value) ? ($value ? 'on' : '') : null;
 		case 'int':
-			return is_string($value) && preg_match('/^-?[0-9]+$/', $value) ? (int) $value : null;
+			if (!is_string($value) || $value === '') {
+				return null;
+			}
+			$digits = $value[0] === '-' ? substr($value, 1) : $value;
+
+			return $digits !== '' && ctype_digit($digits) ? (int) $value : null;
 		case 'reference':
-			if (is_string($value) && preg_match('#^' . preg_quote($spec['collection'], '#') . '/([0-9]+)$#', $value, $m)) {
-				return (int) $m[1];
+			if (is_string($value)) {
+				$prefix = (string) $spec['collection'] . '/';
+
+				if (str_starts_with($value, $prefix)) {
+					$suffix = substr($value, strlen($prefix));
+
+					if ($suffix !== '' && ctype_digit($suffix)) {
+						return (int) $suffix;
+					}
+				}
 			}
 
 			return null;
@@ -207,8 +280,10 @@ function mcp_filter_value(array $spec, mixed $value) : int|string|null {
 /**
  * Translate an AIP-132 orderBy into SQL using fields marked 'order'.
  *
- * @param array<string, array<string, mixed>> $fields
+ * @param string                              $orderBy AIP-132 orderBy clause.
+ * @param array<string, array<string, mixed>> $fields  Allowed field specifications.
  * @param string                              $default SQL used when orderBy is empty.
+ * @return string SQL ORDER BY fragment.
  */
 function mcp_order_sql(string $orderBy, array $fields, string $default) : string {
 	$orderBy = trim($orderBy);
@@ -217,9 +292,21 @@ function mcp_order_sql(string $orderBy, array $fields, string $default) : string
 		return $default;
 	}
 
+	if (strlen($orderBy) > MCP_ORDER_MAX_LENGTH) {
+		throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS', '',
+			[['field' => 'orderBy', 'description' => 'orderBy exceeds maximum length.']]);
+	}
+
+	$items = explode(',', $orderBy);
+
+	if (count($items) > MCP_ORDER_MAX_FIELDS) {
+		throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS', '',
+			[['field' => 'orderBy', 'description' => 'orderBy exceeds maximum field count.']]);
+	}
+
 	$parts = [];
 
-	foreach (explode(',', $orderBy) as $item) {
+	foreach ($items as $item) {
 		if (!preg_match('/^\s*([a-zA-Z][a-zA-Z0-9]*)(?:\s+(desc|asc))?\s*$/', $item, $m) || empty($fields[$m[1]]['order'])) {
 			throw new AbilitiesError('INVALID_ARGUMENT', 'INVALID_ARGUMENTS', '',
 				[['field' => 'orderBy', 'description' => 'orderBy is not valid: "' . trim($item) . '".']]);

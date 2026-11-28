@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP 是一款 Cacti 外掛程式，可讓 AI 用戶端透過具名且經�
 
 目前已提供：
 
-- 用於查詢系統版本與裝置清冊的內建唯讀能力。
+- 九項內建唯讀能力，涵蓋系統版本、裝置、站台、輪詢器、圖形樹、圖形、資料來源，以及受限且經過遮罩處理的 Cacti 日誌尾端內容。
 - 以個人存取權杖（`cmcp_pat_...`）作為唯一的驗證憑證。
 - Management > MCP 主控台：公開或隱藏能力、建立與撤銷權杖，以及檢視稽核日誌。
 - Management > My MCP Tokens：使用者可管理自己的權杖、檢視活動紀錄，以及查看其權杖可使用的工具。
@@ -47,17 +47,38 @@ Cacti MCP 是一款 Cacti 外掛程式，可讓 AI 用戶端透過具名且經�
 
 ## 內建能力
 
-| ID | 參數 | 所需的 Cacti 權限領域 |
+| ID | 分類 | 參數 | 所需的 Cacti 權限領域 |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | 無 | 15 |
+| `cacti-list-devices` | `inventory` | 選填 `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
+| `cacti-get-device` | `inventory` | 必填 `name`，例如 `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | 選填 `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
+| `cacti-list-pollers` | `system` | 選填 `pageSize`、`pageToken`、`filter`、`orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | 選填 `pageSize`、`pageToken`、`filter`、`orderBy` | 7 或 4 |
+| `cacti-list-graphs` | `inventory` | 選填 `pageSize`、`pageToken`、`filter`、`orderBy` | 7 或 5 |
+| `cacti-list-data-sources` | `inventory` | 選填 `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
+| `cacti-get-clog` | `system` | 選填 `lines`（1 至 200，預設為 50）、`severity`、`search` | 19 或 18 |
+
+每次呼叫也必須符合以下條件：權杖擁有者具備 **MCP and Abilities API** 權限領域、權杖具有 `abilities:read` 範圍（所有個人權杖皆具備此範圍），且該能力已設為公開。主控台的 Abilities 分頁會顯示每個內建能力所需的主要權限領域。
+
+所有六項 `cacti-list-*` 能力每次分頁最多回傳 100 筆項目（預設為 50 筆）以及一個 `nextPageToken`。分頁權杖僅在相同的 `filter` 與 `orderBy` 條件下有效。`filter` 是由 `AND` 連接的比較運算（`=`、`!=`、`<`、`<=`、`>`、`>=`）組成的 AIP-160 運算式，例如 `state = "DOWN" AND disabled = false`。`orderBy` 可接受以逗號分隔的可排序欄位清單，每個欄位後方皆可選擇性地加上 `asc` 或 `desc`。
+
+| 能力 | 篩選欄位 | 排序欄位 |
 | --- | --- | --- |
-| `cacti-get-system-info` | 無 | 15 |
-| `cacti-list-devices` | 選填 `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
-| `cacti-get-device` | 必填 `name`，例如 `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`、`hostname`、`disabled`、`site`、`poller`、`deviceTemplate`、`externalId`、`state`（`UNKNOWN`、`DOWN`、`RECOVERING`、`UP`、`ERROR`） | `displayName`、`hostname`、`name` |
+| `cacti-list-sites` | `displayName`、`city`、`state`、`country`、`timezone`、`alternateId` | `displayName`、`city`、`state`、`country`、`name` |
+| `cacti-list-pollers` | `displayName`、`hostname`、`disabled`、`state`（`NEW`、`RUNNING`、`IDLE`、`UNKNOWN`、`DISABLED`、`RECOVERING`、`ERROR`） | `displayName`、`hostname`、`name` |
+| `cacti-list-trees` | `displayName`、`enabled` | `displayName`、`name` |
+| `cacti-list-graphs` | `title`、`device`、`graphTemplate`、`templateName` | `title`、`templateName`、`name` |
+| `cacti-list-data-sources` | `displayName`、`device`、`dataTemplate`、`active` | `displayName`、`name` |
 
-每次呼叫也必須符合以下條件：權杖擁有者具備 **MCP and Abilities API** 權限領域、權杖具有 `abilities:read` 範圍（所有個人權杖皆具備此範圍），且該能力已設為公開。主控台的 Abilities 分頁會顯示每個內建能力所需的權限領域。
+權限範圍限制與機密資訊排除：
 
-- `cacti-list-devices` 每次分頁最多回傳 100 部裝置（預設為 50 部）以及一個 `nextPageToken`。分頁權杖僅在相同的 `filter` 與 `orderBy` 條件下有效。`filter` 是由 `AND` 連接的比較運算組成的 AIP-160 運算式，例如 `state = "DOWN" AND disabled = false`。篩選欄位包含 `displayName`、`hostname`、`disabled`、`site`、`poller`、`deviceTemplate`、`externalId` 與 `state`。`orderBy` 可接受 `displayName`、`hostname` 或 `name`，每個欄位後方皆可選擇性地加上 `desc`。
-- 裝置查詢會經過 Cacti 的 `get_allowed_devices()`，因此使用者只會看到 Cacti 本身允許其檢視的裝置。
-- 回傳的裝置欄位會排除 SNMP 社群字串、密碼片語及其他憑證資訊。
+- `cacti-list-devices` 與 `cacti-get-device` 會透過 Cacti 的 `get_allowed_devices()` 進行查詢，並排除 SNMP 社群字串、密碼片語及其他憑證資訊。
+- `cacti-list-trees` 透過 `get_allowed_trees()` 查詢（並在可用時以 `is_tree_allowed()` 過濾）；`cacti-list-graphs` 透過 `get_allowed_graphs()` 查詢（並在可用時以 `is_graph_allowed()` 過濾）。
+- `cacti-list-data-sources` 會將資料列限縮為呼叫端透過 `get_allowed_devices()`（以及可用時的 `is_device_allowed()`）獲准存取的裝置，且僅回傳中繼資料，不會查詢 `data_input_data` 或暴露機密輸入值。
+- `cacti-list-pollers` 會排除資料庫憑證（`dbpass`、`dbuser`）以及 TLS 金鑰與憑證欄位（`dbsslkey`、`dbsslcert`、`dbsslca`）。
+- `cacti-get-clog` 會讀取已設定之 Cacti 日誌最後最多 1 MiB 的內容（截斷超過 2048 位元組的單一資料列），依 `severity`（`ALL`、`DEBUG`、`INFO`、`NOTICE`、`WARNING`、`ERROR`、`CRITICAL`、`ALERT`、`EMERGENCY`、`FATAL`、`STATS`、`POLLER`、`SYSTEM`；預設為 `ALL`）及不分大小寫的 `search`（最多 256 個字元）進行過濾，並回傳 `lines`、`count` 與 `truncated`。在執行 `severity` 與 `search` 過濾器之前，每一列都會針對個人權杖、bearer/basic 標頭、密碼、機密資訊、SNMP 社群字串、金鑰、`dbpass`、`dbsslkey` 與 URL 使用者資訊進行遮罩處理，使 `search` 無法作為探測機密資訊的預言機（oracle）。遮罩處理在失敗時採失效關閉策略並以 `[redacted]` 取代，而無法讀取的日誌會回傳 `FAILED_PRECONDITION`（`LOG_UNAVAILABLE`）。
 
 ## 安裝
 
@@ -314,7 +335,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | `reason` 值 |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`、`INVALID_FILTER`、`INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`、`INVALID_FILTER`、`INVALID_PAGE_TOKEN`、`LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN`（同時傳送 `WWW-Authenticate: Bearer`） |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`、`DEVICE_NOT_FOUND`、`UNKNOWN_PATH` |
@@ -413,14 +434,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## 開發與測試
 
-測試為純 PHP 指令碼，無須 Cacti 即可執行：
+測試套件包含 `tests/` 中的純 PHP 指令碼、`tests/Unit/` 中的 PHPUnit 單元測試以及 PHPStan 靜態分析（第 6 級），全部無須安裝 Cacti 即可執行：
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI 會在 PHP 8.2 至 8.5 上進行 PHP 語法檢查並執行 `tests/` 中的指令碼（各項皆列於 `.github/workflows/ci.yml`），隨後建置可安裝的 `mcp/` 封存檔及其總和檢查碼。涉及 Cacti 的測試會在 Cacti 輔助函式邊界使用測試夾具，並未針對完整的 Cacti 安裝環境進行測試。
+CI 會在 PHP 8.2 至 8.5 上執行：`test` 作業會檢查 PHP 語法（`php -l`）並執行列於 `.github/workflows/ci.yml` 的 13 個純 PHP 測試指令碼；`quality` 作業會執行 `composer phpstan` 與 `composer test`；`package` 作業會建置可安裝的 `mcp/` 封存檔（排除列於 `.gitattributes` 的開發與測試檔案）及其 `SHA256SUMS`。涉及 Cacti 的測試會在 Cacti 輔助函式邊界使用測試夾具，並未針對完整的 Cacti 安裝環境進行測試。
 
 ### 整合測試
 

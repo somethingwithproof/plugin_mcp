@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP は、AI クライアントが「アビリティ（ability）」と呼
 
 現在利用可能な機能:
 
-- システムバージョンおよびデバイスインベントリ用の読み取り専用組み込みアビリティ。
+- システムバージョン、デバイス、サイト、ポーラー、グラフツリー、グラフ、データソース、および上限付きで墨消し（リダクション）された Cacti ログ末尾を対象とする 9 つの読み取り専用組み込みアビリティ。
 - 唯一の認証情報としてのパーソナルアクセストークン（`cmcp_pat_...`）。
 - Management > MCP コンソール: アビリティの公開・非公開の切り替え、トークンの作成および失効、監査ログの閲覧。
 - Management > My MCP Tokens: ユーザー自身のトークン管理、アクティビティの確認、および自分のトークンで使用可能なツールの確認。
@@ -47,17 +47,38 @@ Cacti MCP は、AI クライアントが「アビリティ（ability）」と呼
 
 ## 組み込みアビリティ
 
-| ID | 引数 | 必要な Cacti レルム |
+| ID | カテゴリ | 引数 | 必要な Cacti レルム |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | なし | 15 |
+| `cacti-list-devices` | `inventory` | 任意: `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
+| `cacti-get-device` | `inventory` | 必須: `name`（例: `devices/12`） | 3 |
+| `cacti-list-sites` | `inventory` | 任意: `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
+| `cacti-list-pollers` | `system` | 任意: `pageSize`、`pageToken`、`filter`、`orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | 任意: `pageSize`、`pageToken`、`filter`、`orderBy` | 7 または 4 |
+| `cacti-list-graphs` | `inventory` | 任意: `pageSize`、`pageToken`、`filter`、`orderBy` | 7 または 5 |
+| `cacti-list-data-sources` | `inventory` | 任意: `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
+| `cacti-get-clog` | `system` | 任意: `lines`（1〜200、デフォルト 50）、`severity`、`search` | 19 または 18 |
+
+すべての呼び出しには、トークン所有者の **MCP and Abilities API** レルム、`abilities:read` スコープ（すべてのパーソナルトークンに付与されています）、および公開されたアビリティも必要です。コンソールの Abilities タブには、各組み込みアビリティが必要とする主要なレルムが表示されます。
+
+6 つの `cacti-list-*` アビリティはすべて、最大 100 件（デフォルト 50 件）の項目を含むページと `nextPageToken` を返します。ページトークンは、同じ `filter` および `orderBy` に対してのみ有効です。`filter` は `AND` で結合された比較式（`=`、`!=`、`<`、`<=`、`>`、`>=`）からなる AIP-160 式です（例: `state = "DOWN" AND disabled = false`）。`orderBy` にはソート可能なフィールドをカンマ区切りで指定でき、各フィールドの末尾に任意で `asc` または `desc` を付けられます。
+
+| アビリティ | フィルタフィールド | ソートフィールド |
 | --- | --- | --- |
-| `cacti-get-system-info` | なし | 15 |
-| `cacti-list-devices` | 任意: `pageSize`、`pageToken`、`filter`、`orderBy` | 3 |
-| `cacti-get-device` | 必須: `name`（例: `devices/12`） | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-すべての呼び出しには、トークン所有者の **MCP and Abilities API** レルム、`abilities:read` スコープ（すべてのパーソナルトークンに付与されています）、および公開されたアビリティも必要です。コンソールの Abilities タブには、各組み込みアビリティが必要とするレルムが表示されます。
+権限によるスコープ制限とシークレットの除外:
 
-- `cacti-list-devices` は最大 100 件（デフォルト 50 件）のデバイスを含むページと `nextPageToken` を返します。ページトークンは、同じ `filter` および `orderBy` に対してのみ有効です。`filter` は `AND` で結合された比較式の AIP-160 式です（例: `state = "DOWN" AND disabled = false`）。フィルタフィールドは `displayName`、`hostname`、`disabled`、`site`、`poller`、`deviceTemplate`、`externalId`、`state` です。`orderBy` には `displayName`、`hostname`、または `name` を指定でき、それぞれ末尾に任意で `desc` を付けられます。
-- デバイスのクエリは Cacti の `get_allowed_devices()` を経由するため、ユーザーには Cacti 上で表示を許可されているデバイスのみが表示されます。
-- デバイスフィールドには、SNMP コミュニティ文字列、パスフレーズ、その他の認証情報は含まれません。
+- `cacti-list-devices` および `cacti-get-device` は Cacti の `get_allowed_devices()` を経由してクエリを実行し、SNMP コミュニティ文字列、パスフレーズ、その他の認証情報を除外します。
+- `cacti-list-trees` は `get_allowed_trees()` を経由してクエリを実行します（利用可能な場合は `is_tree_allowed()` でフィルタリングします）。`cacti-list-graphs` は `get_allowed_graphs()` を経由してクエリを実行します（利用可能な場合は `is_graph_allowed()` でフィルタリングします）。
+- `cacti-list-data-sources` は `get_allowed_devices()`（および利用可能な場合は `is_device_allowed()`）から得られる呼び出し元の許可デバイスに行を限定し、`data_input_data` へのクエリやシークレット入力値の公開を行わずにメタデータのみを返します。
+- `cacti-list-pollers` はデータベース認証情報（`dbpass`、`dbuser`）および TLS キーと証明書の列（`dbsslkey`、`dbsslcert`、`dbsslca`）を除外します。
+- `cacti-get-clog` は設定された Cacti ログの末尾最大 1 MiB を読み込み（2048 バイトを超える個々の行は切り詰めます）、`severity`（`ALL`、`DEBUG`、`INFO`、`NOTICE`、`WARNING`、`ERROR`、`CRITICAL`、`ALERT`、`EMERGENCY`、`FATAL`、`STATS`、`POLLER`、`SYSTEM`、デフォルトは `ALL`）および大文字と小文字を区別しない `search`（最大 256 文字）でフィルタリングし、`lines`、`count`、`truncated` を返します。`search` がシークレット判別のオラクルとして悪用されるのを防ぐため、`severity` と `search` のフィルタを実行する前に、各行からパーソナルトークン、Bearer/Basic ヘッダー、パスワード、シークレット、SNMP コミュニティ、キー、`dbpass`、`dbsslkey`、および URL のユーザー情報が墨消しされます。墨消しは `[redacted]` でフェイルクローズドとなり、読み取れないログの場合は `FAILED_PRECONDITION`（`LOG_UNAVAILABLE`）を返します。
 
 ## インストール
 
@@ -272,7 +293,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | `reason` の値 |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN`（`WWW-Authenticate: Bearer` も送信されます） |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -381,16 +402,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## 開発とテスト
 
-テストは Cacti なしで実行できる通常の PHP スクリプトです:
+テストスイートには、`tests/` 内の通常の PHP スクリプトに加えて、`tests/Unit/` 内の PHPUnit ユニットテストおよび PHPStan 静的解析（レベル 6）が含まれており、いずれも Cacti をインストールせずに実行できます:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI では、PHP 8.2 から 8.5 上で PHP の構文チェック（lint）と `tests/` 内のスクリプト（それぞれ
-`.github/workflows/ci.yml` に記載）を実行し、その後インストール可能な `mcp/` アーカイブとそのチェックサムをビルドします。Cacti に関わるテストでは
-Cacti ヘルパー境界のフィクスチャを使用しており、完全な Cacti 環境でのテストは行いません。
+CI は PHP 8.2 から 8.5 上で実行されます。PHP 構文の lint（`php -l`）と `.github/workflows/ci.yml` に記載された 13 個の通常 PHP テストスクリプトを実行する `test` ジョブ、`composer phpstan` と `composer test` を実行する `quality` ジョブ、およびインストール可能な `mcp/` アーカイブ（`.gitattributes` に記載された開発用およびテスト用ファイルを除く）とその `SHA256SUMS` をビルドする `package` ジョブで構成されています。Cacti に関わるテストでは Cacti ヘルパー境界のフィクスチャを使用しており、完全な Cacti 環境でのテストは行いません。
 
 ### 統合テスト
 

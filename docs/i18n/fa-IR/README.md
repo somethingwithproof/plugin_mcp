@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP یک افزونه برای Cacti است که به کلاینت‌ها�
 
 امکانات موجود در حال حاضر:
 
-- قابلیت‌های توکار فقط‌خواندنی برای نسخه‌های سیستم و فهرست موجودی دستگاه‌ها.
+- نه قابلیت توکار فقط‌خواندنی برای نسخه‌های سیستم، دستگاه‌ها، سایت‌ها، پولرها، درخت‌های نمودار، نمودارها، منابع داده و بخش پایانی محدود و پالایش‌شده گزارش وقایع Cacti.
 - توکن‌های دسترسی شخصی (`cmcp_pat_...`) به‌عنوان تنها گواهی احراز هویت.
 - کنسول «مدیریت > MCP»: در دسترس قرار دادن یا پنهان‌کردن قابلیت‌ها، ایجاد و لغو توکن‌ها، و خواندن گزارش ممیزی.
 - «مدیریت > توکن‌های MCP من»: کاربران توکن‌های خودشان را مدیریت می‌کنند، فعالیت خود را می‌بینند و مشاهده می‌کنند که توکن‌هایشان از کدام ابزارها می‌توانند استفاده کنند.
@@ -47,17 +47,38 @@ Cacti MCP یک افزونه برای Cacti است که به کلاینت‌ها�
 
 ## قابلیت‌های توکار
 
-| شناسه | آرگومان‌ها | قلمرو Cacti موردنیاز |
+| شناسه | دسته‌بندی | آرگومان‌ها | قلمرو Cacti موردنیاز |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | ندارد | 15 |
+| `cacti-list-devices` | `inventory` | اختیاری: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | الزامی: `name`، مانند `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | اختیاری: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | اختیاری: `pageSize`، `pageToken`، `filter`، `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | اختیاری: `pageSize`، `pageToken`، `filter`، `orderBy` | 7 یا 4 |
+| `cacti-list-graphs` | `inventory` | اختیاری: `pageSize`، `pageToken`، `filter`، `orderBy` | 7 یا 5 |
+| `cacti-list-data-sources` | `inventory` | اختیاری: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-get-clog` | `system` | اختیاری: `lines` (۱ تا ۲۰۰، پیش‌فرض ۵۰)، `severity`، `search` | 19 یا 18 |
+
+هر فراخوانی همچنین به قلمرو **MCP and Abilities API** برای مالک توکن، دامنه `abilities:read` (که هر توکن شخصی آن را دارد) و در دسترس بودن قابلیت نیاز دارد. زبانه «قابلیت‌ها» در کنسول، قلمرو اصلی موردنیاز هر قابلیت توکار را نشان می‌دهد.
+
+هر شش قابلیت `cacti-list-*` صفحه‌هایی تا حداکثر ۱۰۰ مورد (به‌صورت پیش‌فرض ۵۰) و یک `nextPageToken` برمی‌گردانند. توکن صفحه فقط برای همان `filter` و `orderBy` معتبر است. `filter` یک عبارت AIP-160 از مقایسه‌هایی (`=`, `!=`, `<`, `<=`, `>`, `>=`) است که با `AND` به هم متصل شده‌اند، برای مثال `state = "DOWN" AND disabled = false`. پارامتر `orderBy` فهرستی جداشده با کاما از فیلدهای قابل مرتب‌سازی را می‌پذیرد که هر کدام می‌تواند به‌صورت اختیاری با `asc` یا `desc` همراه شود.
+
+| قابلیت | فیلدهای فیلتر | فیلدهای مرتب‌سازی |
 | --- | --- | --- |
-| `cacti-get-system-info` | ندارد | 15 |
-| `cacti-list-devices` | اختیاری: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
-| `cacti-get-device` | الزامی: `name`، مانند `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-هر فراخوانی همچنین به قلمرو **MCP and Abilities API** برای مالک توکن، دامنه `abilities:read` (که هر توکن شخصی آن را دارد) و در دسترس بودن قابلیت نیاز دارد. زبانه «قابلیت‌ها» در کنسول، قلمرو موردنیاز هر قابلیت توکار را نشان می‌دهد.
+محدودسازی دسترسی و حذف اطلاعات محرمانه:
 
-- قابلیت `cacti-list-devices` صفحه‌هایی تا حداکثر ۱۰۰ دستگاه (به‌صورت پیش‌فرض ۵۰) و یک `nextPageToken` برمی‌گرداند. توکن صفحه فقط برای همان `filter` و `orderBy` معتبر است. `filter` یک عبارت AIP-160 از مقایسه‌هایی است که با `AND` به هم متصل شده‌اند، برای مثال `state = "DOWN" AND disabled = false`. فیلدهای فیلتر عبارت‌اند از `displayName`، `hostname`، `disabled`، `site`، `poller`، `deviceTemplate`، `externalId` و `state`. پارامتر `orderBy` مقادیر `displayName`، `hostname` یا `name` را می‌پذیرد که هر کدام می‌تواند به‌صورت اختیاری با `desc` همراه شود.
-- پرس‌وجوهای دستگاه از طریق تابع `get_allowed_devices()` در Cacti انجام می‌شوند، بنابراین کاربر فقط دستگاه‌هایی را می‌بیند که Cacti به او نمایش می‌دهد.
-- فیلدهای دستگاه شامل رشته‌های community مربوط به SNMP، عبارت‌های عبور و سایر اطلاعات محرمانه نمی‌شوند.
+- قابلیت‌های `cacti-list-devices` و `cacti-get-device` پرس‌وجو را از طریق تابع `get_allowed_devices()` در Cacti انجام می‌دهند و رشته‌های community مربوط به SNMP، عبارت‌های عبور و سایر اطلاعات احراز هویت را حذف می‌کنند.
+- قابلیت `cacti-list-trees` از طریق `get_allowed_trees()` پرس‌وجو می‌کند (و در صورت موجود بودن با `is_tree_allowed()` فیلتر می‌کند)؛ قابلیت `cacti-list-graphs` از طریق `get_allowed_graphs()` پرس‌وجو می‌کند (و در صورت موجود بودن با `is_graph_allowed()` فیلتر می‌کند).
+- قابلیت `cacti-list-data-sources` ردیف‌ها را به دستگاه‌های مجاز فراخوانی‌کننده از `get_allowed_devices()` (و در صورت موجود بودن `is_device_allowed()`) محدود می‌کند و بدون پرس‌وجو از `data_input_data` یا افشای مقادیر ورودی محرمانه، فقط فراداده برمی‌گرداند.
+- قابلیت `cacti-list-pollers` اطلاعات احراز هویت پایگاه داده (`dbpass`، `dbuser`) و ستون‌های کلید و گواهی TLS (`dbsslkey`، `dbsslcert`، `dbsslca`) را حذف می‌کند.
+- قابلیت `cacti-get-clog` تا ۱ مگابایت پایانی گزارش وقایع پیکربندی‌شده Cacti را می‌خواند (خطوط تکی بیش از ۲۰۴۸ بایت را کوتاه می‌کند)، بر اساس `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`؛ پیش‌فرض `ALL`) و `search` غیرحساس به بزرگی و کوچکی حروف (تا ۲۵۶ کاراکتر) فیلتر می‌کند و `lines`، `count` و `truncated` را برمی‌گرداند. پیش از اجرای فیلترهای `severity` و `search`، هر خط برای پنهان‌سازی توکن‌های شخصی، سرآیندهای bearer/basic، گذرواژه‌ها، اسرار، رشته‌های community مربوط به SNMP، کلیدها، `dbpass`، `dbsslkey` و اطلاعات کاربر در URL پالایش می‌شود تا `search` نتواند به‌عنوان ابزار استخراج اسرار عمل کند. پالایش در صورت خطا به‌صورت بسته با `[redacted]` جایگزین می‌شود و گزارش غیرقابل خواندن `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`) برمی‌گرداند.
 
 ## نصب
 
@@ -272,7 +293,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | مقادیر `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (همچنین `WWW-Authenticate: Bearer` را ارسال می‌کند) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -346,14 +367,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## توسعه و آزمون‌ها
 
-آزمون‌ها اسکریپت‌های ساده PHP هستند که بدون Cacti اجرا می‌شوند:
+مجموعه آزمون شامل اسکریپت‌های ساده PHP در `tests/` به همراه آزمون‌های واحد PHPUnit در `tests/Unit/` و تحلیل ایستا با PHPStan (سطح ۶) است که همگی بدون نیاز به نصب Cacti اجرا می‌شوند:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-سیستم CI کدهای PHP را بررسی نحوی (lint) می‌کند و اسکریپت‌های موجود در `tests/` (که هر کدام در `.github/workflows/ci.yml` فهرست شده‌اند) را روی نسخه‌های PHP 8.2 تا 8.5 اجرا می‌کند، سپس بایگانی قابل نصب `mcp/` و چک‌سام (checksum) آن را می‌سازد. آزمون‌هایی که با Cacti سر و کار دارند از داده‌های آزمایشی (fixture) در مرز توابع کمکی Cacti استفاده می‌کنند و یک نصب کامل Cacti را شبیه‌سازی نمی‌کنند.
+سیستم CI روی نسخه‌های PHP 8.2 تا 8.5 اجرا می‌شود: یک کار `test` که نحو PHP را بررسی (`php -l`) و ۱۳ اسکریپت ساده آزمون PHP فهرست‌شده در `.github/workflows/ci.yml` را اجرا می‌کند، یک کار `quality` که `composer phpstan` و `composer test` را اجرا می‌کند، و یک کار `package` که بایگانی قابل نصب `mcp/` (به‌جز فایل‌های توسعه و آزمون فهرست‌شده در `.gitattributes`) و `SHA256SUMS` آن را می‌سازد. آزمون‌هایی که با Cacti سر و کار دارند از داده‌های آزمایشی (fixture) در مرز توابع کمکی Cacti استفاده می‌کنند و یک نصب کامل Cacti را شبیه‌سازی نمی‌کنند.
 
 ### آزمون‌های یکپارچه‌سازی
 

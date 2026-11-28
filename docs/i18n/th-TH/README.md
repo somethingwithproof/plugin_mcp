@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP เป็นปลั๊กอินของ Cacti ที่ช่ว
 
 สิ่งที่ใช้งานได้ในปัจจุบัน:
 
-- ความสามารถในตัวแบบอ่านอย่างเดียวสำหรับข้อมูลเวอร์ชันระบบและรายการอุปกรณ์
+- ความสามารถในตัวแบบอ่านอย่างเดียวเก้ารายการครอบคลุมเวอร์ชันระบบ อุปกรณ์ ไซต์ โพลเลอร์ แผนผังกราฟ กราฟ แหล่งข้อมูล และส่วนท้ายบันทึกของ Cacti ที่จำกัดขนาดและปกปิดข้อมูลลับแล้ว
 - โทเค็นการเข้าถึงส่วนบุคคล (`cmcp_pat_...`) เป็นข้อมูลรับรองเพียงรูปแบบเดียว
 - คอนโซล Management > MCP: เปิดเผยหรือซ่อนความสามารถ สร้างและเพิกถอนโทเค็น และอ่านบันทึกการตรวจสอบ (audit log)
 - Management > My MCP Tokens: ผู้ใช้สามารถจัดการโทเค็นของตนเอง ดูประวัติกิจกรรม และดูว่าโทเค็นของตนใช้งานเครื่องมือใดได้บ้าง
@@ -47,17 +47,38 @@ Cacti MCP เป็นปลั๊กอินของ Cacti ที่ช่ว
 
 ## ความสามารถในตัว
 
-| รหัส (ID) | อาร์กิวเมนต์ | Cacti realm ที่ต้องใช้ |
+| รหัส (ID) | หมวดหมู่ | อาร์กิวเมนต์ | Cacti realm ที่ต้องใช้ |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | ไม่มี | 15 |
+| `cacti-list-devices` | `inventory` | ทางเลือก: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | จำเป็น: `name` เช่น `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | ทางเลือก: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | ทางเลือก: `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | ทางเลือก: `pageSize`, `pageToken`, `filter`, `orderBy` | 7 หรือ 4 |
+| `cacti-list-graphs` | `inventory` | ทางเลือก: `pageSize`, `pageToken`, `filter`, `orderBy` | 7 หรือ 5 |
+| `cacti-list-data-sources` | `inventory` | ทางเลือก: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | ทางเลือก: `lines` (1 ถึง 200, ค่าเริ่มต้น 50), `severity`, `search` | 19 หรือ 18 |
+
+ทุกการเรียกใช้งานยังต้องอาศัย realm **MCP and Abilities API** สำหรับเจ้าของโทเค็น ขอบเขตสิทธิ์ `abilities:read` (โทเค็นส่วนบุคคลทุกอันมีสิทธิ์นี้) และความสามารถนั้นต้องถูกเปิดเผยไว้ด้วย แท็บ Abilities ในคอนโซลจะแสดง realm หลักที่ความสามารถในตัวแต่ละรายการต้องการ
+
+ความสามารถ `cacti-list-*` ทั้งหกรายการจะส่งคืนข้อมูลแบบแบ่งหน้าสูงสุดหน้าละ 100 รายการ (ค่าเริ่มต้น 50) พร้อมด้วย `nextPageToken` โทเค็นสำหรับแบ่งหน้าจะใช้ได้เฉพาะกับ `filter` และ `orderBy` เดียวกันเท่านั้น `filter` เป็นนิพจน์แบบ AIP-160 ของการเปรียบเทียบ (`=`, `!=`, `<`, `<=`, `>`, `>=`) ที่เชื่อมด้วย `AND` เช่น `state = "DOWN" AND disabled = false` ส่วน `orderBy` รับรายการฟิลด์ที่จัดเรียงได้คั่นด้วยเครื่องหมายจุลภาค โดยแต่ละค่าสามารถต่อท้ายด้วย `asc` หรือ `desc` ได้
+
+| ความสามารถ | ฟิลด์ตัวกรอง | ฟิลด์จัดเรียง |
 | --- | --- | --- |
-| `cacti-get-system-info` | ไม่มี | 15 |
-| `cacti-list-devices` | ทางเลือก: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | จำเป็น: `name` เช่น `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-ทุกการเรียกใช้งานยังต้องอาศัย realm **MCP and Abilities API** สำหรับเจ้าของโทเค็น ขอบเขตสิทธิ์ `abilities:read` (โทเค็นส่วนบุคคลทุกอันมีสิทธิ์นี้) และความสามารถนั้นต้องถูกเปิดเผยไว้ด้วย แท็บ Abilities ในคอนโซลจะแสดง realm ที่ความสามารถในตัวแต่ละรายการต้องการ
+การกำหนดขอบเขตสิทธิ์และการยกเว้นข้อมูลลับ:
 
-- `cacti-list-devices` จะส่งคืนข้อมูลแบบแบ่งหน้าสูงสุดหน้าละ 100 อุปกรณ์ (ค่าเริ่มต้น 50) พร้อมด้วย `nextPageToken` โทเค็นสำหรับแบ่งหน้าจะใช้ได้เฉพาะกับ `filter` และ `orderBy` เดียวกันเท่านั้น `filter` เป็นนิพจน์แบบ AIP-160 ของการเปรียบเทียบที่เชื่อมด้วย `AND` เช่น `state = "DOWN" AND disabled = false` ฟิลด์ที่รองรับการกรองได้แก่ `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId` และ `state` ส่วน `orderBy` รับค่า `displayName`, `hostname` หรือ `name` โดยแต่ละค่าสามารถต่อท้ายด้วย `desc` ได้
-- การคิวรีอุปกรณ์จะผ่านฟังก์ชัน `get_allowed_devices()` ของ Cacti ดังนั้นผู้ใช้จะเห็นเฉพาะอุปกรณ์ที่ Cacti อนุญาตให้แสดงต่อผู้ใช้นั้นเท่านั้น
-- ฟิลด์ข้อมูลอุปกรณ์จะไม่รวมสตริงชุมชน SNMP (community strings), รหัสผ่าน (passphrases) และข้อมูลรับรองอื่น ๆ
+- `cacti-list-devices` และ `cacti-get-device` จะคิวรีผ่าน `get_allowed_devices()` ของ Cacti และยกเว้นสตริงชุมชน SNMP รหัสผ่าน (passphrases) และข้อมูลรับรองอื่น ๆ
+- `cacti-list-trees` คิวรีผ่าน `get_allowed_trees()` (และกรองด้วย `is_tree_allowed()` เมื่อใช้งานได้); `cacti-list-graphs` คิวรีผ่าน `get_allowed_graphs()` (และกรองด้วย `is_graph_allowed()` เมื่อใช้งานได้)
+- `cacti-list-data-sources` จำกัดแถวให้อยู่ในอุปกรณ์ที่ผู้เรียกได้รับอนุญาตจาก `get_allowed_devices()` (และ `is_device_allowed()` เมื่อใช้งานได้) และส่งคืนเฉพาะเมตาดาตาโดยไม่คิวรี `data_input_data` หรือเปิดเผยค่าอินพุตที่เป็นความลับ
+- `cacti-list-pollers` ยกเว้นข้อมูลรับรองฐานข้อมูล (`dbpass`, `dbuser`) และคอลัมน์คีย์และใบรับรอง TLS (`dbsslkey`, `dbsslcert`, `dbsslca`)
+- `cacti-get-clog` อ่านข้อมูลสูงสุด 1 MiB สุดท้ายของบันทึก Cacti ที่กำหนดค่าไว้ (โดยตัดบรรทัดที่ยาวเกิน 2048 ไบต์) กรองตาม `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; ค่าเริ่มต้น `ALL`) และ `search` แบบไม่คำนึงถึงตัวพิมพ์ใหญ่เล็ก (สูงสุด 256 ตัวอักษร) แล้วส่งคืน `lines`, `count` และ `truncated` แต่ละบรรทัดจะถูกปกปิดข้อมูลสำหรับโทเค็นส่วนบุคคล ส่วนหัว bearer/basic รหัสผ่าน ข้อมูลลับ สตริงชุมชน SNMP คีย์ `dbpass`, `dbsslkey` และข้อมูลผู้ใช้ใน URL ก่อนที่ตัวกรอง `severity` และ `search` จะทำงาน เพื่อไม่ให้ `search` ถูกใช้เป็นช่องทางคาดเดาข้อมูลลับ การปกปิดข้อมูลจะทำงานแบบล้มเหลวอย่างปลอดภัยด้วย `[redacted]` และบันทึกที่ไม่สามารถอ่านได้จะส่งคืน `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`)
 
 ## การติดตั้ง
 
@@ -276,7 +297,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | ค่า `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (ส่ง `WWW-Authenticate: Bearer` มาด้วย) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -350,14 +371,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## การพัฒนาและการทดสอบ
 
-การทดสอบเป็นสคริปต์ PHP ธรรมดาที่ทำงานได้โดยไม่ต้องมี Cacti:
+ชุดทดสอบประกอบด้วยสคริปต์ PHP ธรรมดาใน `tests/` พร้อมกับการทดสอบยูนิต PHPUnit ใน `tests/Unit/` และการวิเคราะห์แบบสถิตด้วย PHPStan (ระดับ 6) ซึ่งทั้งหมดทำงานได้โดยไม่ต้องติดตั้ง Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI จะทำการตรวจวิเคราะห์ (lint) โค้ด PHP และรันสคริปต์ใน `tests/` (แต่ละสคริปต์ระบุไว้ใน `.github/workflows/ci.yml`) บน PHP 8.2 ถึง 8.5 จากนั้นจึงสร้างไฟล์เก็บถาวร `mcp/` ที่ติดตั้งได้พร้อมค่า checksum การทดสอบที่เกี่ยวข้องกับ Cacti จะใช้ข้อมูลจำลอง (fixtures) ที่ขอบเขตตัวช่วยของ Cacti โดยไม่ได้ทดสอบบนการติดตั้ง Cacti เต็มรูปแบบ
+CI ทำงานบน PHP 8.2 ถึง 8.5: งาน `test` ที่ตรวจวิเคราะห์ไวยากรณ์ PHP (`php -l`) และรันสคริปต์ทดสอบ PHP ธรรมดา 13 รายการที่ระบุไว้ใน `.github/workflows/ci.yml`, งาน `quality` ที่รัน `composer phpstan` และ `composer test` และงาน `package` ที่สร้างไฟล์เก็บถาวร `mcp/` ที่ติดตั้งได้ (โดยไม่รวมไฟล์สำหรับการพัฒนาและการทดสอบที่ระบุไว้ใน `.gitattributes`) พร้อมด้วย `SHA256SUMS` การทดสอบที่เกี่ยวข้องกับ Cacti จะใช้ข้อมูลจำลอง (fixtures) ที่ขอบเขตตัวช่วยของ Cacti โดยไม่ได้ทดสอบบนการติดตั้ง Cacti เต็มรูปแบบ
 
 ### การทดสอบแบบบูรณาการ
 

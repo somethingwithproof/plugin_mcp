@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP የ AI ደንበኞች ችሎታዎች (abilities) ተብለው በሚ
 
 ዛሬ የሚገኙት፦
 
-- ለስርዓት ስሪቶች እና ለመሣሪያዎች ዝርዝር የንባብ-ብቻ አብሮገነብ ችሎታዎች።
+- የስርዓት ስሪቶችን፣ መሣሪያዎችን፣ ሳይቶችን፣ ፖለሮችን፣ የግራፍ ዛፎችን፣ ግራፎችን፣ የውሂብ ምንጮችን እና የተገደበ፣ ሚስጥራዊ መረጃው የተሸፈነ የ Cacti ምዝግብ ማስታወሻ መጨረሻን የሚሸፍኑ ዘጠኝ የንባብ-ብቻ አብሮገነብ ችሎታዎች።
 - የግል መዳረሻ ቶከኖች (`cmcp_pat_...`) እንደ ብቸኛ ማረጋገጫ።
 - የ Management > MCP ኮንሶል፦ ችሎታዎችን ይፋ ማድረግ ወይም መደበቅ፣ ቶከኖችን መፍጠር እና መሰረዝ፣ የኦዲት መዝገቡን ማንበብ።
 - Management > My MCP Tokens፦ ተጠቃሚዎች የራሳቸውን ቶከኖች ያስተዳድራሉ፣ እንቅስቃሴያቸውን ያያሉ፣ እና ቶከኖቻቸው የትኞቹን መሣሪያዎች መጠቀም እንደሚችሉ ያያሉ።
@@ -47,17 +47,38 @@ Cacti MCP የ AI ደንበኞች ችሎታዎች (abilities) ተብለው በሚ
 
 ## አብሮገነብ ችሎታዎች
 
-| መለያ | ግቤቶች | የሚያስፈልገው የ Cacti ግዛት |
+| መለያ | ምድብ | ግቤቶች | የሚያስፈልገው የ Cacti ግዛት |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | የለም | 15 |
+| `cacti-list-devices` | `inventory` | አማራጭ `pageSize`፣ `pageToken`፣ `filter`፣ `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | አስገዳጅ `name`፣ ለምሳሌ `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | አማራጭ `pageSize`፣ `pageToken`፣ `filter`፣ `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | አማራጭ `pageSize`፣ `pageToken`፣ `filter`፣ `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | አማራጭ `pageSize`፣ `pageToken`፣ `filter`፣ `orderBy` | 7 ወይም 4 |
+| `cacti-list-graphs` | `inventory` | አማራጭ `pageSize`፣ `pageToken`፣ `filter`፣ `orderBy` | 7 ወይም 5 |
+| `cacti-list-data-sources` | `inventory` | አማራጭ `pageSize`፣ `pageToken`፣ `filter`፣ `orderBy` | 3 |
+| `cacti-get-clog` | `system` | አማራጭ `lines` (ከ1 እስከ 200፣ በነባሪ 50)፣ `severity`፣ `search` | 19 ወይም 18 |
+
+እያንዳንዱ ጥሪ ለቶከኑ ባለቤት የ **MCP and Abilities API** ግዛትን፣ የ `abilities:read` ወሰንን (እያንዳንዱ የግል ቶከን አለው)፣ እና ይፋ የተደረገ ችሎታንም ይፈልጋል። የኮንሶሉ Abilities ትር እያንዳንዱ አብሮገነብ የሚፈልገውን ዋና ግዛት ያሳያል።
+
+ስድስቱም `cacti-list-*` ችሎታዎች እስከ 100 ንጥሎች (በነባሪ 50) የያዙ ገጾችን እና `nextPageToken` ይመልሳሉ። የገጽ ቶከን የሚሠራው ለተመሳሳዩ `filter` እና `orderBy` ብቻ ነው። `filter` በ `AND` የተያያዙ የንጽጽር (`=`, `!=`, `<`, `<=`, `>`, `>=`) AIP-160 አገላለጽ ነው፣ ለምሳሌ `state = "DOWN" AND disabled = false`። `orderBy` በኮማ የተለዩ ሊደረደሩ የሚችሉ መስኮችን ዝርዝር ይቀበላል፣ እያንዳንዱም እንደ አማራጭ በ `asc` ወይም `desc` ሊከተል ይችላል።
+
+| ችሎታ | የማጣሪያ መስኮች | የመደርደሪያ መስኮች |
 | --- | --- | --- |
-| `cacti-get-system-info` | የለም | 15 |
-| `cacti-list-devices` | አማራጭ `pageSize`፣ `pageToken`፣ `filter`፣ `orderBy` | 3 |
-| `cacti-get-device` | አስገዳጅ `name`፣ ለምሳሌ `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-እያንዳንዱ ጥሪ ለቶከኑ ባለቤት የ **MCP and Abilities API** ግዛትን፣ የ `abilities:read` ወሰንን (እያንዳንዱ የግል ቶከን አለው)፣ እና ይፋ የተደረገ ችሎታንም ይፈልጋል። የኮንሶሉ Abilities ትር እያንዳንዱ አብሮገነብ የሚፈልገውን ግዛት ያሳያል።
+የፈቃድ ወሰን እና የምስጢር መረጃ ማግለል፦
 
-- `cacti-list-devices` እስከ 100 መሣሪያዎች (በነባሪ 50) የያዙ ገጾችን እና `nextPageToken` ይመልሳል። የገጽ ቶከን የሚሠራው ለተመሳሳዩ `filter` እና `orderBy` ብቻ ነው። `filter` በ `AND` የተያያዙ የንጽጽር AIP-160 አገላለጽ ነው፣ ለምሳሌ `state = "DOWN" AND disabled = false`። የማጣሪያ መስኮች `displayName`፣ `hostname`፣ `disabled`፣ `site`፣ `poller`፣ `deviceTemplate`፣ `externalId` እና `state` ናቸው። `orderBy` `displayName`፣ `hostname` ወይም `name` ይቀበላል፣ እያንዳንዱ እንደ አማራጭ በ `desc` ሊከተል ይችላል።
-- የመሣሪያ ጥያቄዎች በ Cacti `get_allowed_devices()` በኩል ያልፋሉ፣ ስለዚህ አንድ ተጠቃሚ የሚያየው Cacti የሚያሳየውን መሣሪያዎች ብቻ ነው።
-- የመሣሪያ መስኮች የ SNMP ማህበረሰብ ሕብረቁምፊዎችን፣ የይለፍ ሐረጎችን እና ሌሎች ማረጋገጫዎችን አያካትቱም።
+- `cacti-list-devices` እና `cacti-get-device` በ Cacti `get_allowed_devices()` በኩል ጥያቄዎችን ያቀርባሉ እንዲሁም የ SNMP ማህበረሰብ ሕብረቁምፊዎችን፣ የይለፍ ሐረጎችን እና ሌሎች ማረጋገጫዎችን አያካትቱም።
+- `cacti-list-trees` በ `get_allowed_trees()` በኩል ጥያቄዎችን ያቀርባል (እና ሲገኝ በ `is_tree_allowed()` ያጣራል)፤ `cacti-list-graphs` በ `get_allowed_graphs()` በኩል ጥያቄዎችን ያቀርባል (እና ሲገኝ በ `is_graph_allowed()` ያጣራል)።
+- `cacti-list-data-sources` ረድፎችን ከ `get_allowed_devices()` (እና ሲገኝ `is_device_allowed()`) በሚገኙ የጠሪው የተፈቀዱ መሣሪያዎች ላይ ይገድባል እንዲሁም `data_input_data`ን ሳይጠይቅ ወይም ሚስጥራዊ የግቤት እሴቶችን ሳያጋልጥ ሜታዳታ ብቻ ይመልሳል።
+- `cacti-list-pollers` የውሂብ ጎታ ማረጋገጫዎችን (`dbpass`፣ `dbuser`) እና የ TLS ቁልፍ እና የምስክር ወረቀት ዓምዶችን (`dbsslkey`፣ `dbsslcert`፣ `dbsslca`) አያካትትም።
+- `cacti-get-clog` የተዋቀረውን የ Cacti ምዝግብ ማስታወሻ የመጨረሻውን እስከ 1 MiB ያነባል (ከ 2048 ባይት በላይ የሆኑ ነጠላ መስመሮችን ይቆርጣል)፣ በ `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`፤ በነባሪ `ALL`) እና የፊደል መጠን የማይለይ `search` (እስከ 256 ቁምፊዎች) ያጣራል፣ እና `lines`፣ `count` እና `truncated` ይመልሳል። `search` እንደ ሚስጥር መፈለጊያ እንዳይሠራ የ `severity` እና `search` ማጣሪያዎች ከመሄዳቸው በፊት እያንዳንዱ መስመር ለግል ቶከኖች፣ bearer/basic ራስጌዎች፣ የይለፍ ቃሎች፣ ምስጢሮች፣ የ SNMP ማህበረሰቦች፣ ቁልፎች፣ `dbpass`፣ `dbsslkey` እና የ URL የተጠቃሚ መረጃ ይሸፈናል። መሸፈኑ ካልተሳካ በ `[redacted]` ይዘጋል፣ እና የማይነበብ ምዝግብ ማስታወሻ `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`) ይመልሳል።
 
 ## ጭነት
 
@@ -272,7 +293,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | የ`reason` ዋጋዎች |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (`WWW-Authenticate: Bearer`ንም ይልካል) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -346,14 +367,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## ልማት እና ሙከራዎች
 
-ሙከራዎች ያለ Cacti የሚሰሩ ቀላል የPHP ስክሪፕቶች ናቸው፦
+የሙከራ ስብስቡ በ`tests/` ውስጥ ያሉ ቀላል የPHP ስክሪፕቶችን፣ በ`tests/Unit/` ውስጥ ያሉ የPHPUnit ክፍል ሙከራዎችን እና የPHPStan የማይንቀሳቀስ ትንተና (ደረጃ 6) ያካትታል፤ ሁሉም ያለ Cacti ጭነት ይሰራሉ፦
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI የPHP ሊንት ያደርጋል እንዲሁም በ`tests/` ውስጥ ያሉትን ስክሪፕቶች (እያንዳንዱ በ`.github/workflows/ci.yml` ውስጥ ተዘርዝሯል) ከPHP 8.2 እስከ 8.5 ባሉት ላይ ያስኬዳል፤ ከዚያም የሚጫነውን የ`mcp/` ማህደር እና የቼክሰም ማረጋገጫውን ይገነባል። Cactiን የሚነኩ ሙከራዎች በCacti አጋዥ ወሰን ላይ ቋሚ መረጃዎችን ይጠቀማሉ፤ ሙሉ የCacti ጭነትን አይፈትሹም።
+CI በPHP 8.2 እስከ 8.5 ላይ ይሰራል፦ የPHP አገባብን (`php -l`) የሚፈትሽ እና በ`.github/workflows/ci.yml` ውስጥ የተዘረዘሩትን 13 ቀላል የPHP ሙከራ ስክሪፕቶች የሚያስኬድ የ`test` ስራ፣ `composer phpstan` እና `composer test` የሚያስኬድ የ`quality` ስራ፣ እና የሚጫነውን `mcp/` ማህደር (በ`.gitattributes` ውስጥ የተዘረዘሩትን የልማት እና የሙከራ ፋይሎች ሳያካትት) እና `SHA256SUMS` የሚገነባ የ`package` ስራ። Cactiን የሚነኩ ሙከራዎች በCacti አጋዥ ወሰን ላይ ቋሚ መረጃዎችን ይጠቀማሉ፤ ሙሉ የCacti ጭነትን አይፈትሹም።
 
 ### የውህደት ሙከራዎች
 

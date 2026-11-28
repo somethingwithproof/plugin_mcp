@@ -1,0 +1,431 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Latvian <https://translate.cacti.net/projects/cacti/core/lv/>\n"
+"Language: lv-LV\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n % 10 == 0 || n % 100 >= 11 && n % 100 <= 19) ? 0 : ((n % 10 == 1 && n % 100 != 11) ? 1 : 2);\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "%d marķieru tika atsaukts."
+msgstr[1] "%d marķieris tika atsaukts."
+msgstr[2] "%d marķieri tika atsaukti."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(dzēsts lietotājs)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "Spējas"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "Spēja"
+
+#: setup.php
+msgid "Actions"
+msgstr "Darbības"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "Aktīvs"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "Aktivitāte"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "Visi"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "Anotācijas"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "Jebkurš"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "Audits"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "Audita ieraksti"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "Pieejamie rīki"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "Atcelt"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "Kategorija"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "Izvēlieties marķieri, ko atsaukt."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "Izvēlieties lietotāju un derīguma termiņu no 1 līdz 365 dienām."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "Izvēlieties darbību."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "Izvēlieties derīguma termiņu no 1 līdz 365 dienām."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "Notīrīt"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "Noklikšķiniet uz „Turpināt”, lai atklātu šīs spējas AI klientiem. Lietotājiem joprojām ir nepieciešama katrai spējai prasītā piekļuves joma."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "Noklikšķiniet uz „Turpināt”, lai paslēptu šīs spējas no AI klientiem."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "Noklikšķiniet uz „Turpināt”, lai atsauktu šos marķierus. Atsauktos marķierus vairs nevar izmantot."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "Turpināt"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "Nokopējiet šo marķieri tagad. Tas vairs netiks parādīts."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "Izveidot"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "Izveidot marķieri"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "Izveidots"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "Izveidoja"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "Apraksts"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "Destruktīvs"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "Ieraksti"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "Beidzies derīguma termiņš"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "Derīgs līdz"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "Derīguma termiņš dienās"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "Atklāt"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "Atklāt spējas"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "Atklāts"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "Atklāšanas iestatījumus neizdevās nolasīt, tāpēc visas spējas ir paslēptas no AI klientiem."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "Pabeigts"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "Izpildīt"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "Paslēpt"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "Paslēpt spējas"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "Idempotents"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "Pēdējo reizi izmantots"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "MCP administrēšana"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "MCP administrēšana ir pieejama tikai galvenajā aptaujātājā (poller)."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP un spēju API"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "MCP instalācija nav pabeigta"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "MCP marķieri ir pieejami tikai galvenajā aptaujātājā (poller)."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "MCP marķieriem nepieciešams Cacti sistēmā pieteicies lietotājs."
+
+#: setup.php
+msgid "Management"
+msgstr "Pārvaldība"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "Mana aktivitāte"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "Mani MCP marķieri"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "Mani marķieri"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "Nosaukums"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "Jauns marķieris"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "Nē"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "Jums nav pieejamu spēju"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "Nav reģistrētu spēju"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "Aktivitāte nav atrasta"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "Audita ieraksti nav atrasti"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "Marķieri nav atrasti"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "Neviena no atlasītajām spējām nav reģistrēta."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "Neviens no atlasītajiem marķieriem nav aktīvs."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "Iznākums"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "Spraudnis"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "Publiskais Cacti URL"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "Tikai lasāms"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "Nepieciešamā piekļuves joma"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "Atsaukt"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "Atsaukt marķierus"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "Atsaukts"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "Atlasiet vismaz vienu vienumu."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "Iestatījis spraudnis"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "Pirms AI klientu pievienošanas iestatiet publisko Cacti URL sadaļā Iestatījumi > MCP."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "Sākts"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "Stāvoklis"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "Šis marķieris nav viens no jūsu aktīvajiem marķieriem."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "Adrese, ko MCP klienti izmanto piekļuvei šim Cacti serverim, piemēram, https://cacti.example.com/cacti. Nepieciešama, lai MCP galapunkts sāktu atbildēt."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "Audita žurnālu neizdevās nolasīt."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "Pieejamos rīkus neizdevās uzskaitīt."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "Atklāšanas izmaiņas neizdevās saglabāt. Nekas netika mainīts."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "Atklāšanas iestatījumi tika saglabāti."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "Atlase satur nederīgu spēju. Nekas netika mainīts."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "Marķieri neizdevās izveidot."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "Marķieri neizdevās atsaukt."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "Marķieru sarakstu neizdevās nolasīt."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "Marķieris tika atsaukts."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "Marķierus neizdevās atsaukt."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "Marķieri tika atsaukti, taču audita ierakstu neizdevās saglabāt."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "Šīs ir tikai lasāmās spējas, ko jūsu marķieris pašlaik var izmantot. Sarakstu nosaka jūsu Cacti atļaujas un administratora atklāšanas iestatījumi."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "Šī veidlapa jau ir iesniegta."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "Marķieris"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "Marķieri"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "Marķierus nevar izveidot viesa kontam vai atspējotiem lietotājiem."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "Lietotājs"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "Jā"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "Jums nav marķieru"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "Bez atļaujas „Lietotāji/Grupas” jūs varat izveidot marķierus tikai sev."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "Jūsu aktivitāti neizdevās nolasīt."

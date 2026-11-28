@@ -9,13 +9,19 @@
 
 require_once __DIR__ . '/registry.php';
 require_once __DIR__ . '/aip.php';
+require_once __DIR__ . '/capability_guard.php';
 
 const MCP_VERSION_MODERN = '2026-07-28';
 const MCP_VERSION_LEGACY = '2025-11-25';
 const MCP_VERSION_META   = 'io.modelcontextprotocol/protocolVersion';
 const MCP_SERVER_META    = 'io.modelcontextprotocol/serverInfo';
 
-/** Lowercase header names mapped from the HTTP_* entries of $_SERVER. @return array<string, string> */
+/**
+ * Lowercase header names mapped from the HTTP_* entries of $_SERVER.
+ *
+ * @param array<string, mixed> $server Server superglobal array.
+ * @return array<string, string> Lowercased HTTP request headers.
+ */
 function mcp_request_headers(array $server) : array {
 	$headers = [];
 
@@ -28,7 +34,16 @@ function mcp_request_headers(array $server) : array {
 	return $headers;
 }
 
-/** A JSON-RPC error response. $id is omitted when the request id is unknown. @return array{status: int, headers: array<string, string>, body: array} */
+/**
+ * A JSON-RPC error response. $id is omitted when the request id is unknown.
+ *
+ * @param int             $status  HTTP status code.
+ * @param int             $code    JSON-RPC error code.
+ * @param string          $message Human-readable error message.
+ * @param mixed           $data    Optional structured error data.
+ * @param string|int|null $id      Request identifier when known.
+ * @return array{status: int, headers: array<string, string>, body: array<string, mixed>}
+ */
 function mcp_rpc_error(int $status, int $code, string $message, mixed $data = null, string|int|null $id = null) : array {
 	$error = ['code' => $code, 'message' => $message];
 
@@ -44,7 +59,12 @@ function mcp_rpc_error(int $status, int $code, string $message, mixed $data = nu
 	return ['status' => $status, 'headers' => [], 'body' => $body + ['error' => $error]];
 }
 
-/** The MCP tool for a registry descriptor. */
+/**
+ * The MCP tool descriptor for a registry descriptor.
+ *
+ * @param array<string, mixed> $descriptor Registry ability descriptor.
+ * @return array<string, mixed> MCP tool definition.
+ */
 function mcp_rpc_tool(array $descriptor) : array {
 	return [
 		'name'         => $descriptor['id'],
@@ -56,7 +76,16 @@ function mcp_rpc_tool(array $descriptor) : array {
 	];
 }
 
-/** Run an ability. An AbilitiesError is a tool result with isError, never a protocol error. */
+/**
+ * Run an ability with capability-guard enforcement before and after execution.
+ * An AbilitiesError is a tool result with isError, never a protocol error.
+ *
+ * @param stdClass          $params    JSON-RPC tools/call params object.
+ * @param AbilitiesRegistry $registry  Ability registry instance.
+ * @param array             $principal Authenticated request principal.
+ * @param callable          $audit     Audit callback.
+ * @return array<string, mixed> MCP tool call result payload.
+ */
 function mcp_rpc_call(stdClass $params, AbilitiesRegistry $registry, array $principal, callable $audit) : array {
 	$arguments = $params->arguments ?? new stdClass();
 
@@ -68,12 +97,27 @@ function mcp_rpc_call(stdClass $params, AbilitiesRegistry $registry, array $prin
 	}
 
 	try {
+		$descriptor = $registry->get($principal, (string) $params->name);
+
+		if ($descriptor !== null) {
+			mcp_capability_guard_before_execute(
+				$principal,
+				(string) $params->name,
+				$descriptor['annotations'],
+				$arguments
+			);
+		}
+
 		$response   = $registry->execute($principal, $params->name, $arguments, $audit);
 		$structured = $response['result'] ?: new stdClass();
 
 		// structuredContent must be a JSON object; a non-empty list can only come from a misdeclared ability.
 		if (is_array($structured) && array_is_list($structured)) {
 			throw new AbilitiesError('INTERNAL', 'INVALID_RESULT');
+		}
+
+		if (is_array($structured)) {
+			$structured = mcp_capability_guard_after_execute((string) $params->name, $structured);
 		}
 
 		return ['content' => [['type' => 'text', 'text' => json_encode($structured, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)]],
@@ -91,7 +135,12 @@ function mcp_rpc_call(stdClass $params, AbilitiesRegistry $registry, array $prin
 	}
 }
 
-/** A tool result that reports an error to the model. */
+/**
+ * A tool result that reports an error to the model.
+ *
+ * @param AbilitiesError $error Domain error to format.
+ * @return array<string, mixed> MCP tool error envelope.
+ */
 function mcp_rpc_tool_error(AbilitiesError $error) : array {
 	$body = mcp_error_body($error);
 
@@ -99,7 +148,12 @@ function mcp_rpc_tool_error(AbilitiesError $error) : array {
 		'structuredContent' => $body];
 }
 
-/** Decode the mcp-name header, which carries non-ASCII or unsafe values as =?base64?...?=. */
+/**
+ * Decode the mcp-name header, which carries non-ASCII or unsafe values as =?base64?...?=.
+ *
+ * @param string $value Raw header value.
+ * @return ?string Decoded tool name, or null when base64 decoding fails.
+ */
 function mcp_rpc_header_name(string $value) : ?string {
 	if (preg_match('/^=\?base64\?([A-Za-z0-9+\/]*={0,2})\?=$/D', $value, $match)) {
 		$decoded = base64_decode($match[1], true);
@@ -113,8 +167,13 @@ function mcp_rpc_header_name(string $value) : ?string {
 /**
  * Handle one MCP HTTP request. Never throws.
  *
- * @param array<string, string> $headers    Request headers, lowercase names.
- * @param array{name: string, version: string} $serverInfo
+ * @param string                               $httpMethod HTTP request method.
+ * @param array<string, string>                $headers    Request headers, lowercase names.
+ * @param string                               $body       Raw JSON-RPC request body.
+ * @param AbilitiesRegistry                    $registry   Ability registry instance.
+ * @param array                                $principal  Authenticated request principal.
+ * @param callable                             $audit      Audit callback.
+ * @param array{name: string, version: string} $serverInfo Server identification metadata.
  * @return array{status: int, headers: array<string, string>, body: ?array}
  */
 function mcp_rpc_handle(string $httpMethod, array $headers, string $body, AbilitiesRegistry $registry,

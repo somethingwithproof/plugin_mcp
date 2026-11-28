@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Cacti MCP هي إضافة (plugin) لنظام Cacti تُمكّن عملاء ال
 
 المتوفر حالياً:
 
-- قدرات مدمجة للقراءة فقط الخاصة بمعلومات إصدار النظام وجرد الأجهزة.
+- تسع قدرات مدمجة للقراءة فقط تغطي إصدارات النظام والأجهزة والمواقع والمُجمّعات (pollers) وأشجار الرسوم البيانية والرسوم البيانية ومصادر البيانات ومقتطفاً محدوداً ومنقّحاً من نهاية سجل Cacti.
 - رموز الولوج الشخصية (`cmcp_pat_...`) باعتبارها وسيلة الاعتماد الوحيدة.
 - وحدة تحكم الإدارة > MCP (Management > MCP): كشف القدرات أو إخفاؤها، إنشاء الرموز وإلغاؤها، وقراءة سجل التدقيق (audit log).
 - الإدارة > رموز MCP الخاصة بي (Management > My MCP Tokens): يدير المستخدمون رموزهم الخاصة، ويطّلعون على نشاطهم، ويرون الأدوات التي يمكن لرموزهم استخدامها.
@@ -49,17 +49,38 @@ Cacti MCP هي إضافة (plugin) لنظام Cacti تُمكّن عملاء ال
 
 ## القدرات المدمجة
 
-| المعرّف | المعاملات | مجال Cacti المطلوب |
+| المعرّف | الفئة | المعاملات | مجال Cacti المطلوب |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | لا يوجد | 15 |
+| `cacti-list-devices` | `inventory` | اختيارية: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | إجباري: `name`، مثل `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | اختيارية: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | اختيارية: `pageSize`، `pageToken`، `filter`، `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | اختيارية: `pageSize`، `pageToken`، `filter`، `orderBy` | 7 أو 4 |
+| `cacti-list-graphs` | `inventory` | اختيارية: `pageSize`، `pageToken`، `filter`، `orderBy` | 7 أو 5 |
+| `cacti-list-data-sources` | `inventory` | اختيارية: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
+| `cacti-get-clog` | `system` | اختيارية: `lines` (من 1 إلى 200، الافتراضي 50)، `severity`، `search` | 19 أو 18 |
+
+يتطلب كل استدعاء أيضاً امتلاك مالك الرمز لمجال **MCP وواجهة برمجة التطبيقات Abilities (MCP and Abilities API)**، ونطاق الصلاحية `abilities:read` (يمتلكه كل رمز شخصي)، وأن تكون القدرة مكشوفة. يعرض تبويب القدرات (Abilities) في وحدة التحكم المجال الأساسي الذي تحتاجه كل قدرة مدمجة.
+
+تُرجع قدرات `cacti-list-*` الست جميعها صفحات تصل إلى 100 عنصر كحد أقصى (الافتراضي 50) مع رمز `nextPageToken`. يكون رمز الصفحة صالحاً فقط لنفس `filter` و`orderBy`. المعامل `filter` هو تعبير AIP-160 لمقارنات (`=`، `!=`، `<`، `<=`، `>`، `>=`) مربوطة بـ `AND`، مثلاً `state = "DOWN" AND disabled = false`. يقبل `orderBy` لائحة مفصولة بفواصل من الحقول القابلة للترتيب، متبوعة اختيارياً بـ `asc` أو `desc`.
+
+| القدرة | حقول التصفية | حقول الترتيب |
 | --- | --- | --- |
-| `cacti-get-system-info` | لا يوجد | 15 |
-| `cacti-list-devices` | اختيارية: `pageSize`، `pageToken`، `filter`، `orderBy` | 3 |
-| `cacti-get-device` | إجباري: `name`، مثل `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-يتطلب كل استدعاء أيضاً امتلاك مالك الرمز لمجال **MCP وواجهة برمجة التطبيقات Abilities (MCP and Abilities API)**، ونطاق الصلاحية `abilities:read` (يمتلكه كل رمز شخصي)، وأن تكون القدرة مكشوفة. يعرض تبويب القدرات (Abilities) في وحدة التحكم المجال الذي تحتاجه كل قدرة مدمجة.
+حصر الصلاحيات واستبعاد الأسرار:
 
-- تُرجع `cacti-list-devices` صفحات تصل إلى 100 جهاز كحد أقصى (الافتراضي 50) مع رمز الصفحة التالية `nextPageToken`. يكون رمز الصفحة صالحاً فقط لنفس `filter` و`orderBy`. المعامل `filter` هو تعبير AIP-160 لمقارنات مربوطة بـ `AND`، مثلاً `state = "DOWN" AND disabled = false`. حقول التصفية هي `displayName`، و`hostname`، و`disabled`، و`site`، و`poller`، و`deviceTemplate`، و`externalId`، و`state`. يقبل `orderBy` القيم `displayName` أو `hostname` أو `name`، متبوعة اختيارياً بـ `desc`.
-- تمر استعلامات الأجهزة عبر الدالة `get_allowed_devices()` في Cacti، بحيث لا يرى المستخدم سوى الأجهزة التي يسمح له Cacti برؤيتها.
-- تستبعد حقول الأجهزة سلاسل مجتمع SNMP وعبارات المرور وباقي بيانات الاعتماد.
+- تمر استعلامات `cacti-list-devices` و`cacti-get-device` عبر دالة `get_allowed_devices()` في Cacti وتستبعد سلاسل مجتمع SNMP وعبارات المرور وباقي بيانات الاعتماد.
+- تستعلم `cacti-list-trees` عبر `get_allowed_trees()` (وتُرشّح عبر `is_tree_allowed()` عند توفرها)؛ وتستعلم `cacti-list-graphs` عبر `get_allowed_graphs()` (وتُرشّح عبر `is_graph_allowed()` عند توفرها).
+- تحصر `cacti-list-data-sources` الصفوف في الأجهزة المسموح بها للمُستدعي انطلاقاً من `get_allowed_devices()` (و`is_device_allowed()` عند توفرها) وتُرجع البيانات الوصفية فقط دون الاستعلام من `data_input_data` أو كشف قيم الإدخال السرية.
+- تستبعد `cacti-list-pollers` بيانات اعتماد قاعدة البيانات (`dbpass`، `dbuser`) وأعمدة مفاتيح وشهادات TLS (`dbsslkey`، `dbsslcert`، `dbsslca`).
+- تقرأ `cacti-get-clog` حتى آخر 1 ميغابايت من سجل Cacti المُعدّ (مع بتر السطور الفردية التي تتجاوز 2048 بايت)، وتُرشّح حسب `severity` (`ALL`، `DEBUG`، `INFO`، `NOTICE`، `WARNING`، `ERROR`، `CRITICAL`، `ALERT`، `EMERGENCY`، `FATAL`، `STATS`، `POLLER`، `SYSTEM`؛ الافتراضي `ALL`) و`search` غير حساس لحالة الأحرف (حتى 256 حرفاً)، وتُرجع `lines` و`count` و`truncated`. يتم تنقيح كل سطر لإخفاء الرموز الشخصية وترويسات bearer/basic وكلمات المرور والأسرار ومجتمعات SNMP والمفاتيح و`dbpass` و`dbsslkey` ومعلومات مستخدم URL قبل تشغيل مرشحات `severity` و`search` حتى لا يعمل `search` ككاشف للأسرار. يفشل التنقيح بشكل آمن مع `[redacted]`، ويُرجع السجل غير القابل للقراءة `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## التثبيت
 
@@ -276,7 +297,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | قيم `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (يرسل أيضاً `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -350,14 +371,17 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## التطوير والاختبارات
 
-الاختبارات هي نصوص PHP برمجية بسيطة تعمل بدون Cacti:
+تضم مجموعة الاختبارات نصوص PHP برمجية بسيطة في `tests/` إلى جانب اختبارات الوحدة لـ PHPUnit في `tests/Unit/` والتحليل الساكن عبر PHPStan (المستوى 6)، وتعمل كلها من دون تثبيت Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-يقوم التكامل المستمر (CI) بفحص شيفرة PHP وتشغيل النصوص البرمجية في `tests/` (كل واحد منها مدرج في `.github/workflows/ci.yml`) على إصدارات PHP من 8.2 إلى 8.5، ثم يبني أرشيف `mcp/` القابل للتثبيت ومجموع التحقق (checksum) الخاص به. تستخدم الاختبارات التي تمس Cacti بيانات اختبارية (fixtures) عند حدود دوال Cacti المساعدة؛ وهي لا تختبر تثبيتاً كاملاً لـ Cacti.
+يشتغل التكامل المستمر (CI) على إصدارات PHP من 8.2 إلى 8.5: مهمة `test` تفحص صياغة PHP (`php -l`) وتشغّل نصوص الاختبار الـ 13 البسيطة بلغة PHP المدرجة في `.github/workflows/ci.yml`، ومهمة `quality` تشغّل `composer phpstan` و`composer test`، ومهمة `package` تبني أرشيف `mcp/` القابل للتثبيت (باستثناء ملفات التطوير والاختبار المدرجة في `.gitattributes`) وقيم `SHA256SUMS` الخاصة به. تستخدم الاختبارات التي تمس Cacti بيانات اختبارية (fixtures) عند حدود دوال Cacti المساعدة؛ وهي لا تختبر تثبيتاً كاملاً لـ Cacti.
 
 ### اختبارات التكامل
 

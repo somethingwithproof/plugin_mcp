@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2026 Thomas Vincent
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+parameters:
+	level: 6
+	paths:
+		- setup.php
+		- lib/admin.php
+		- lib/aip.php
+		- lib/api_http.php
+		- lib/bootstrap.php
+		- lib/capability_guard.php
+		- lib/integrations.php
+		- lib/mcp_server.php
+		- lib/origin.php
+		- lib/providers.php
+		- lib/registry.php
+		- lib/storage.php
+		- scripts/ss_mcp_stats.php
+	scanFiles:
+		- tests/phpstan-stubs.php
+	dynamicConstantNames:
+		- CACTI_PATH_PLUGINS
+		- CACTI_PATH_LOG
+	treatPhpDocTypesAsCertain: false
+	ignoreErrors:
+		-
+			identifier: includeOnce.fileNotFound
+			path: scripts/ss_mcp_stats.php
+		-
+			identifier: missingType.iterableValue
+			paths:
+				- lib/admin.php
+				- lib/api_http.php
+				- lib/mcp_server.php
+				- lib/registry.php
+				- lib/storage.php

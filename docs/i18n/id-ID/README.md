@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -41,7 +41,9 @@ klien MCP sebagai alat (*tools*) tanpa perlu menulis kode protokol.
 
 Tersedia saat ini:
 
-- Kemampuan bawaan baca-saja untuk versi sistem dan inventaris perangkat.
+- Sembilan kemampuan bawaan baca-saja yang mencakup versi sistem, perangkat,
+  situs, poller, pohon grafik (*graph trees*), grafik, sumber data (*data
+  sources*), serta bagian akhir log Cacti yang dibatasi dan disensor.
 - Token akses pribadi (`cmcp_pat_...`) sebagai satu-satunya kredensial.
 - Konsol Management > MCP: mengekspos atau menyembunyikan kemampuan, membuat dan
   mencabut token, serta membaca log audit.
@@ -66,29 +68,67 @@ dan urutan pembuatannya terdapat pada [docs/plan.md](../../plan.md).
 
 ## Kemampuan bawaan
 
-| ID | Argumen | Realm Cacti yang diperlukan |
-| --- | --- | --- |
-| `cacti-get-system-info` | tidak ada | 15 |
-| `cacti-list-devices` | opsional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | wajib `name`, seperti `devices/12` | 3 |
+| ID | Kategori | Argumen | Realm Cacti yang diperlukan |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | tidak ada | 15 |
+| `cacti-list-devices` | `inventory` | opsional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | wajib `name`, seperti `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | opsional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | opsional `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | opsional `pageSize`, `pageToken`, `filter`, `orderBy` | 7 atau 4 |
+| `cacti-list-graphs` | `inventory` | opsional `pageSize`, `pageToken`, `filter`, `orderBy` | 7 atau 5 |
+| `cacti-list-data-sources` | `inventory` | opsional `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | opsional `lines` (1 hingga 200, bawaan 50), `severity`, `search` | 19 atau 18 |
 
 Setiap panggilan juga memerlukan realm **MCP and Abilities API** untuk pemilik
 token, cakupan `abilities:read` (setiap token pribadi memilikinya), dan kemampuan
-yang diekspos. Tab Abilities pada konsol menampilkan realm yang diperlukan oleh
-masing-masing kemampuan bawaan.
+yang diekspos. Tab Abilities pada konsol menampilkan realm utama yang diperlukan
+oleh masing-masing kemampuan bawaan.
 
-- `cacti-list-devices` mengembalikan halaman hingga 100 perangkat (bawaan 50)
-  dan `nextPageToken`. Token halaman hanya berlaku untuk `filter` dan `orderBy`
-  yang sama. `filter` adalah ekspresi AIP-160 berisi perbandingan yang
-  digabungkan dengan `AND`, misalnya `state = "DOWN" AND disabled = false`.
-  Kolom filter meliputi `displayName`, `hostname`, `disabled`, `site`, `poller`,
-  `deviceTemplate`, `externalId`, dan `state`. `orderBy` menerima `displayName`,
-  `hostname`, atau `name`, yang masing-masing dapat diikuti secara opsional oleh
-  `desc`.
-- Kueri perangkat melalui fungsi `get_allowed_devices()` milik Cacti, sehingga
-  pengguna hanya melihat perangkat yang memang ditampilkan Cacti kepada mereka.
-- Kolom perangkat mengecualikan string komunitas SNMP, frasa sandi, dan
-  kredensial lainnya.
+Keenam kemampuan `cacti-list-*` mengembalikan halaman hingga 100 item (bawaan 50)
+dan `nextPageToken`. Token halaman hanya berlaku untuk `filter` dan `orderBy`
+yang sama. `filter` adalah ekspresi AIP-160 berisi perbandingan (`=`, `!=`, `<`,
+`<=`, `>`, `>=`) yang digabungkan dengan `AND`, misalnya
+`state = "DOWN" AND disabled = false`. `orderBy` menerima daftar kolom yang
+dapat diurutkan dan dipisahkan koma, yang masing-masing dapat diikuti secara
+opsional oleh `asc` atau `desc`.
+
+| Kemampuan | Kolom filter | Kolom pengurutan |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Pembatasan izin dan pengecualian rahasia:
+
+- `cacti-list-devices` dan `cacti-get-device` melakukan kueri melalui fungsi
+  `get_allowed_devices()` milik Cacti serta mengecualikan string komunitas SNMP,
+  frasa sandi, dan kredensial lainnya.
+- `cacti-list-trees` melakukan kueri melalui `get_allowed_trees()` (dan memfilter
+  dengan `is_tree_allowed()` apabila tersedia); `cacti-list-graphs` melakukan
+  kueri melalui `get_allowed_graphs()` (dan memfilter dengan `is_graph_allowed()`
+  apabila tersedia).
+- `cacti-list-data-sources` membatasi baris ke perangkat yang diizinkan bagi
+  pemanggil dari `get_allowed_devices()` (dan `is_device_allowed()` apabila
+  tersedia) serta hanya mengembalikan metadata tanpa melakukan kueri ke
+  `data_input_data` atau mengekspos nilai input rahasia.
+- `cacti-list-pollers` mengecualikan kredensial basis data (`dbpass`, `dbuser`)
+  serta kolom kunci dan sertifikat TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` membaca hingga 1 MiB terakhir dari log Cacti yang dikonfigurasi
+  (memotong baris individual yang lebih dari 2048 byte), memfilter berdasarkan
+  `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`,
+  `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; bawaan `ALL`) dan
+  `search` yang tidak peka huruf besar/kecil (hingga 256 karakter), lalu
+  mengembalikan `lines`, `count`, dan `truncated`. Setiap baris disensor untuk
+  token pribadi, header bearer/basic, kata sandi, rahasia, komunitas SNMP, kunci,
+  `dbpass`, `dbsslkey`, dan informasi pengguna URL sebelum filter `severity` dan
+  `search` dijalankan agar `search` tidak dapat bertindak sebagai peramal rahasia
+  (*secret oracle*). Penyensoran gagal secara tertutup (*fail-closed*) dengan
+  `[redacted]`, dan log yang tidak dapat dibaca mengembalikan
+  `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Pemasangan
 
@@ -454,7 +494,7 @@ atau server bukan poller utama.
 
 | HTTP | Nilai `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (juga mengirimkan `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -597,16 +637,26 @@ di luar plugin.
 
 ## Pengembangan dan pengujian
 
-Pengujian berupa skrip PHP biasa yang berjalan tanpa Cacti:
+Rangkaian pengujian mencakup skrip PHP biasa di `tests/` ditambah pengujian unit
+PHPUnit di `tests/Unit/` dan analisis statis PHPStan (level 6), semuanya berjalan
+tanpa instalasi Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI melakukan linting PHP dan menjalankan skrip di `tests/` (masing-masing tercantum di
-`.github/workflows/ci.yml`) pada PHP 8.2 hingga 8.5, kemudian membangun arsip `mcp/` yang dapat dipasang dan checksum-nya. Pengujian yang menyentuh Cacti menggunakan
-fikstur pada batas helper Cacti; pengujian ini tidak menjalankan instalasi Cacti secara penuh.
+CI berjalan pada PHP 8.2 hingga 8.5: pekerjaan `test` yang melakukan linting sintaks
+PHP (`php -l`) dan menjalankan 13 skrip pengujian PHP biasa yang tercantum di
+`.github/workflows/ci.yml`, pekerjaan `quality` yang menjalankan `composer phpstan`
+dan `composer test`, serta pekerjaan `package` yang membangun arsip `mcp/` yang
+dapat dipasang (tidak termasuk berkas pengembangan dan pengujian yang tercantum
+di `.gitattributes`) beserta `SHA256SUMS`-nya. Pengujian yang menyentuh Cacti
+menggunakan fikstur pada batas helper Cacti; pengujian ini tidak menjalankan
+instalasi Cacti secara penuh.
 
 ### Pengujian integrasi
 

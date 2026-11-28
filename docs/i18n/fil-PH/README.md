@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -41,7 +41,9 @@ MCP client bilang mga tool nang walang kinakailangang protocol code.
 
 Magagamit na ngayon:
 
-- Mga built-in na read-only na ability para sa mga bersyon ng sistema at imbentaryo ng mga device.
+- Siyam na built-in na read-only na ability na sumasaklaw sa mga bersyon ng sistema,
+  mga device, mga site, mga poller, mga graph tree, mga graph, mga data source,
+  at isang limitado at na-redact na dulo ng log ng Cacti.
 - Mga personal access token (`cmcp_pat_...`) bilang tanging kredensyal.
 - Ang console na Management > MCP: ilantad o itago ang mga ability, gumawa at
   mag-revoke ng mga token, at basahin ang audit log.
@@ -64,28 +66,67 @@ at ang pagkakasunod-sunod ng pagbuo ay nasa [docs/plan.md](../../plan.md).
 
 ## Mga built-in na ability
 
-| ID | Mga Argumento | Kinakailangang Cacti realm |
-| --- | --- | --- |
-| `cacti-get-system-info` | wala | 15 |
-| `cacti-list-devices` | opsyonal na `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | kinakailangang `name`, tulad ng `devices/12` | 3 |
+| ID | Kategorya | Mga Argumento | Kinakailangang Cacti realm |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | wala | 15 |
+| `cacti-list-devices` | `inventory` | opsyonal na `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | kinakailangang `name`, tulad ng `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | opsyonal na `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | opsyonal na `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | opsyonal na `pageSize`, `pageToken`, `filter`, `orderBy` | 7 o 4 |
+| `cacti-list-graphs` | `inventory` | opsyonal na `pageSize`, `pageToken`, `filter`, `orderBy` | 7 o 5 |
+| `cacti-list-data-sources` | `inventory` | opsyonal na `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | opsyonal na `lines` (1 hanggang 200, default 50), `severity`, `search` | 19 o 18 |
 
 Ang bawat tawag ay nangangailangan din ng realm na **MCP and Abilities API** para sa
 may-ari ng token, ng saklaw na `abilities:read` (taglay ito ng bawat personal token),
-at ng isang nakalantad na ability. Ipinapakita ng tab na Abilities sa console ang realm
-na kailangan ng bawat built-in na ability.
+at ng isang nakalantad na ability. Ipinapakita ng tab na Abilities sa console ang
+pangunahing realm na kailangan ng bawat built-in na ability.
 
-- Nagbabalik ang `cacti-list-devices` ng mga pahina na may hanggang 100 device (default ay 50)
-  at isang `nextPageToken`. Ang isang page token ay balido lamang para sa parehong `filter`
-  at `orderBy`. Ang `filter` ay isang ekspresyong AIP-160 ng mga paghahambing na pinagdugtong
-  ng `AND`, halimbawa `state = "DOWN" AND disabled = false`. Ang mga field ng filter ay
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId`, at `state`. Tumatanggap ang `orderBy` ng `displayName`, `hostname`, o `name`,
-  na bawat isa ay maaaring sundan ng `desc`.
-- Dumadaan ang mga query sa device sa `get_allowed_devices()` ng Cacti, kaya nakikita
-  lamang ng user ang mga device na ipapakita sa kanya ng Cacti.
-- Hindi isinasama sa mga field ng device ang mga SNMP community string, passphrase, at
-  iba pang kredensyal.
+Nagbabalik ang lahat ng anim na `cacti-list-*` na ability ng mga pahina na may
+hanggang 100 item (default ay 50) at isang `nextPageToken`. Ang isang page token
+ay balido lamang para sa parehong `filter` at `orderBy`. Ang `filter` ay isang
+ekspresyong AIP-160 ng mga paghahambing (`=`, `!=`, `<`, `<=`, `>`, `>=`) na
+pinagdugtong ng `AND`, halimbawa `state = "DOWN" AND disabled = false`.
+Tumatanggap ang `orderBy` ng listahan ng mga field na maaaring i-order na
+pinaghihiwalay ng kuwit, na bawat isa ay maaaring sundan ng `asc` o `desc`.
+
+| Ability | Mga field ng filter | Mga field ng order |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Pagtatakda ng saklaw ng pahintulot at pagbubukod ng mga lihim:
+
+- Ang `cacti-list-devices` at `cacti-get-device` ay nag-query sa pamamagitan ng
+  `get_allowed_devices()` ng Cacti at hindi isinasama ang mga SNMP community string,
+  passphrase, at iba pang kredensyal.
+- Ang `cacti-list-trees` ay nag-query sa pamamagitan ng `get_allowed_trees()` (at
+  nagsasala gamit ang `is_tree_allowed()` kapag available); ang `cacti-list-graphs`
+  ay nag-query sa pamamagitan ng `get_allowed_graphs()` (at nagsasala gamit ang
+  `is_graph_allowed()` kapag available).
+- Nililimitahan ng `cacti-list-data-sources` ang mga row sa mga pinapayagang device
+  ng tumatawag mula sa `get_allowed_devices()` (at `is_device_allowed()` kapag
+  available) at nagbabalik lamang ng metadata nang hindi nag-query ng
+  `data_input_data` o naglalantad ng mga lihim na halaga ng input.
+- Hindi isinasama ng `cacti-list-pollers` ang mga kredensyal sa database (`dbpass`,
+  `dbuser`) at mga column ng TLS key at certificate (`dbsslkey`, `dbsslcert`,
+  `dbsslca`).
+- Binabasa ng `cacti-get-clog` ang hanggang sa huling 1 MiB ng naka-configure na
+  Cacti log (pinuputol ang mga indibidwal na linyang lampas sa 2048 byte), nagsasala
+  ayon sa `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`,
+  `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; default
+  `ALL`) at `search` na hindi sensitibo sa laki ng titik (hanggang 256 karakter), at
+  nagbabalik ng `lines`, `count`, at `truncated`. Ang bawat linya ay nire-redact
+  para sa mga personal token, mga bearer/basic header, mga password, mga lihim, mga
+  SNMP community, mga key, `dbpass`, `dbsslkey`, at URL userinfo bago tumakbo ang
+  mga filter na `severity` at `search` upang hindi magsilbing secret oracle ang
+  `search`. Nabibigo nang sarado ang pag-redact gamit ang `[redacted]`, at ang
+  hindi mabasang log ay nagbabalik ng `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Pag-install
 
@@ -440,7 +481,7 @@ o ang server ay hindi ang pangunahing poller.
 
 | HTTP | Mga halaga ng `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (nagpapadala rin ng `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -546,14 +587,26 @@ Hinaharangan ng pag-disable ng plugin ang parehong endpoint. Binabawi ng pag-uni
 
 ## Pag-develop at mga pagsusuri
 
-Ang mga pagsusuri ay mga simpleng PHP script na tumatakbo nang walang Cacti:
+Kasama sa test suite ang mga simpleng PHP script sa `tests/` pati na rin ang mga
+unit test ng PHPUnit sa `tests/Unit/` at static analysis ng PHPStan (antas 6), na
+lahat ay tumatakbo nang walang pag-install ng Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-Sinusuri ng CI ang lint ng PHP at pinapatakbo ang mga script sa `tests/` (bawat isa ay nakalista sa `.github/workflows/ci.yml`) sa PHP 8.2 hanggang 8.5, pagkatapos ay binubuo ang mai-install na `mcp/` archive at ang checksum nito. Ang mga pagsusuring gumagamit ng Cacti ay gumagamit ng mga fixture sa hangganan ng Cacti helper; hindi nito sinusuri ang isang kumpletong pag-install ng Cacti.
+Tumatakbo ang CI sa PHP 8.2 hanggang 8.5: isang `test` job na nagsusuri ng syntax ng
+PHP (`php -l`) at nagpapatakbo ng 13 simpleng PHP test script na nakalista sa
+`.github/workflows/ci.yml`, isang `quality` job na nagpapatakbo ng `composer phpstan`
+at `composer test`, at isang `package` job na bumubuo ng mai-install na `mcp/` archive
+(hindi kasama ang mga development at test file na nakalista sa `.gitattributes`) at
+ang `SHA256SUMS` nito. Ang mga pagsusuring gumagamit ng Cacti ay gumagamit ng mga
+fixture sa hangganan ng Cacti helper; hindi nito sinusuri ang isang kumpletong
+pag-install ng Cacti.
 
 ### Mga pagsusuri sa integrasyon
 

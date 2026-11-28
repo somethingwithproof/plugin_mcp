@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -39,7 +39,9 @@ koodu usoro nkwukọrịta ọ bụla.
 
 Dị taa:
 
-- Ikike ọgụgụ naanị ndị dịbu n'ime ya maka ụdị sistemụ na ndepụta ngwa.
+- Ikike ọgụgụ naanị itoolu ndị dịbu n'ime ya nke na-ekpuchi ụdị sistemụ, ngwa,
+  saịtị, ndị poller, osisi eserese (graph trees), eserese (graphs), isi mmalite
+  data, na njedebe ndekọ Cacti nke nwere oke ma zoo ihe nzuzo.
 - Token nnweta nke onwe (`cmcp_pat_...`) dị ka naanị nzere njirimara.
 - Njikwa Management > MCP: kpughee ma ọ bụ zoo ikike, mepụta ma kagbuo
   token, gụọ ndekọ nyocha.
@@ -61,27 +63,61 @@ usoro nrụnye ya dịkwa na [docs/plan.md](../../plan.md).
 
 ## Ikike ndị dịbu n'ime ya
 
-| ID | Arụmụka | Mpaghara ikike Cacti dị mkpa |
-| --- | --- | --- |
-| `cacti-get-system-info` | enweghị | 15 |
-| `cacti-list-devices` | nke nhọrọ `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | nke dị mkpa `name`, dị ka `devices/12` | 3 |
+| ID | Ngalaba | Arụmụka | Mpaghara ikike Cacti dị mkpa |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | enweghị | 15 |
+| `cacti-list-devices` | `inventory` | nke nhọrọ `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | nke dị mkpa `name`, dị ka `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | nke nhọrọ `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | nke nhọrọ `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | nke nhọrọ `pageSize`, `pageToken`, `filter`, `orderBy` | 7 ma ọ bụ 4 |
+| `cacti-list-graphs` | `inventory` | nke nhọrọ `pageSize`, `pageToken`, `filter`, `orderBy` | 7 ma ọ bụ 5 |
+| `cacti-list-data-sources` | `inventory` | nke nhọrọ `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | nke nhọrọ `lines` (1 ruo 200, ndabere 50), `severity`, `search` | 19 ma ọ bụ 18 |
 
 Ọkpụkpọ ọ bụla chọkwara mpaghara ikike **MCP and Abilities API** maka onye nwe token,
 oke ikike `abilities:read` (token nke onwe ọ bụla nwere ya), na ikike e kpugheere.
-Taabụ Abilities nke njikwa ahụ na-egosi mpaghara ikike nke ọ bụla dịbu n'ime ya chọrọ.
+Taabụ Abilities nke njikwa ahụ na-egosi mpaghara ikike bụ isi nke ọ bụla dịbu n'ime ya chọrọ.
 
-- `cacti-list-devices` na-eweghachi peeji ndị nwere ruo ngwa 100 (ndabere 50) na
-  `nextPageToken`. Token peeji dị irè naanị maka otu `filter` na
-  `orderBy` ahụ. `filter` bụ okwu AIP-160 nke ntụnyere ndị `AND` jikọtara,
-  dị ka ọmụmaatụ `state = "DOWN" AND disabled = false`. Mpaghara nzacha bụ
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId`, na `state`. `orderBy` na-anara `displayName`, `hostname`, ma ọ bụ `name`,
-  nke ọ bụla nwere ike inwe `desc` na-eso ya.
-- Ajụjụ ngwa na-agafe na `get_allowed_devices()` nke Cacti, ya mere onye ọrụ na-ahụ naanị
-  ngwa ndị Cacti ga-egosi ha.
-- Mpaghara ngwa anaghị agụnye eriri obodo SNMP, okwuntụghe, na nzere
-  ndị ọzọ.
+Ikike `cacti-list-*` isii niile na-eweghachi peeji ndị nwere ruo ihe 100 (ndabere 50)
+na `nextPageToken`. Token peeji dị irè naanị maka otu `filter` na `orderBy` ahụ.
+`filter` bụ okwu AIP-160 nke ntụnyere (`=`, `!=`, `<`, `<=`, `>`, `>=`) ndị `AND`
+jikọtara, dị ka ọmụmaatụ `state = "DOWN" AND disabled = false`. `orderBy` na-anara
+ndepụta mpaghara a pụrụ ịhazi nke rịkọm kewara, nke ọ bụla nwere ike inwe `asc`
+ma ọ bụ `desc` na-eso ya.
+
+| Ikike | Mpaghara nzacha | Mpaghara nhazi |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Oke ikike na mwepu ihe nzuzo:
+
+- `cacti-list-devices` na `cacti-get-device` na-ajụ ajụjụ site na `get_allowed_devices()`
+  nke Cacti ma na-ewepụ eriri obodo SNMP, okwuntụghe, na nzere ndị ọzọ.
+- `cacti-list-trees` na-ajụ ajụjụ site na `get_allowed_trees()` (ma na-enyocha na
+  `is_tree_allowed()` mgbe ọ dị); `cacti-list-graphs` na-ajụ ajụjụ site na
+  `get_allowed_graphs()` (ma na-enyocha na `is_graph_allowed()` mgbe ọ dị).
+- `cacti-list-data-sources` na-egbochi ahịrị na ngwa e nyere onye na-akpọ oku ikike
+  site na `get_allowed_devices()` (na `is_device_allowed()` mgbe ọ dị) ma na-eweghachi
+  naanị metadata n'ajụghị `data_input_data` ma ọ bụ ikpughe uru ntinye nzuzo.
+- `cacti-list-pollers` na-ewepụ nzere ebe nchekwa data (`dbpass`, `dbuser`) na
+  kọlụm igodo na asambodo TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` na-agụ ruo 1 MiB ikpeazụ nke ndekọ Cacti a haziri (na-ebipụ ahịrị
+  nke ọ bụla karịrị byte 2048), na-enyocha site na `severity` (`ALL`, `DEBUG`, `INFO`,
+  `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`,
+  `POLLER`, `SYSTEM`; ndabere `ALL`) na `search` nke na-adịghị eleba anya na mkpụrụ
+  edemede ukwu ma ọ bụ obere (ruo mkpụrụedemede 256), ma na-eweghachi `lines`,
+  `count`, na `truncated`. A na-ezochi ihe nzuzo n'ahịrị ọ bụla maka token nke onwe,
+  isiokwu bearer/basic, okwuntụghe, ihe nzuzo, obodo SNMP, igodo, `dbpass`,
+  `dbsslkey`, na ozi onye ọrụ URL tupu nzacha `severity` na `search` agbaa ka
+  `search` ghara ịrụ ọrụ dị ka ihe nchọpụta nzuzo. Nzochi ihe nzuzo na-ada n'ụzọ
+  mechiri emechi na `[redacted]`, ndekọ a na-apụghị ịgụ na-eweghachikwa
+  `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Wụnye
 
@@ -427,7 +463,7 @@ agbanyụrụ ngwa mgbakwunye ahụ ma ọ bụ mgbe sava ahụ abụghị isi p
 
 | HTTP | Uru `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (na-ezipụkwa `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -537,14 +573,24 @@ na-ekpughe ha na taabụ Ikike nke njikwa, ma kọlụm Mpaghara Achọrọ na-a
 
 ## Mmepe na ule
 
-Ule ndị ahụ bụ edemede PHP dị mfe nke na-agba ọsọ na-enweghị Cacti:
+Usoro ule ahụ gụnyere edemede PHP dị mfe n'ime `tests/` tinyere ule nkeji PHPUnit
+n'ime `tests/Unit/` na nyocha kwụsiri ike nke PHPStan (ọkwa 6), ha niile na-agba ọsọ
+n'enweghị nwụnye Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI na-enyocha PHP ma na-agba edemede ndị dị na `tests/` (edepụtara nke ọ bụla na `.github/workflows/ci.yml`) na PHP 8.2 ruo 8.5, wee wuo ebe nchekwa `mcp/` enwere ike ịwụnye na checksum ya. Ule ndị na-emetụ Cacti na-eji ngwa nkwado (fixtures) n'ókè nke onye inyeaka Cacti; ha anaghị anwale nwụnye Cacti zuru ezu.
+CI na-agba na PHP 8.2 ruo 8.5: ọrụ `test` nke na-enyocha usoro okwu PHP (`php -l`)
+ma na-agba edemede ule PHP 13 dị mfe edepụtara na `.github/workflows/ci.yml`, ọrụ
+`quality` nke na-agba `composer phpstan` na `composer test`, na ọrụ `package` nke
+na-ewu ebe nchekwa `mcp/` enwere ike ịwụnye (ma e wezụga faịlụ mmepe na ule
+edepụtara na `.gitattributes`) na `SHA256SUMS` ya. Ule ndị na-emetụ Cacti na-eji ngwa
+nkwado (fixtures) n'ókè nke onye inyeaka Cacti; ha anaghị anwale nwụnye Cacti zuru ezu.
 
 ### Ule njikọta
 

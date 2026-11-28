@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -38,7 +38,8 @@ Cacti MCP הוא תוסף ל-Cacti המאפשר ללקוחות AI לקרוא א�
 
 זמין כיום:
 
-- יכולות מובנות לקריאה בלבד עבור גרסאות מערכת ומלאי התקנים.
+- תשע יכולות מובנות לקריאה בלבד המכסות גרסאות מערכת, התקנים, אתרים,
+  pollers, עצי גרפים, גרפים, מקורות נתונים וזנב תחום ומושחר של יומן Cacti.
 - טוקנים לגישה אישית (`cmcp_pat_...`) כאמצעי האימות היחיד.
 - מסוף Management > MCP: חשיפה או הסתרה של יכולות, יצירה וביטול של טוקנים,
   וקריאת יומן הביקורת.
@@ -59,26 +60,59 @@ Cacti MCP הוא תוסף ל-Cacti המאפשר ללקוחות AI לקרוא א�
 
 ## יכולות מובנות
 
-| מזהה | ארגומנטים | תחום Cacti נדרש |
-| --- | --- | --- |
-| `cacti-get-system-info` | ללא | 15 |
-| `cacti-list-devices` | אופציונליים: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | נדרש: `name`, כגון `devices/12` | 3 |
+| מזהה | קטגוריה | ארגומנטים | תחום Cacti נדרש |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | ללא | 15 |
+| `cacti-list-devices` | `inventory` | אופציונליים: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | נדרש: `name`, כגון `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | אופציונליים: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | אופציונליים: `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | אופציונליים: `pageSize`, `pageToken`, `filter`, `orderBy` | 7 או 4 |
+| `cacti-list-graphs` | `inventory` | אופציונליים: `pageSize`, `pageToken`, `filter`, `orderBy` | 7 או 5 |
+| `cacti-list-data-sources` | `inventory` | אופציונליים: `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | אופציונליים: `lines` (1 עד 200, ברירת מחדל 50), `severity`, `search` | 19 או 18 |
 
 כל קריאה דורשת גם את תחום ההרשאה **MCP and Abilities API** עבור בעל הטוקן,
 את ההיקף (scope) `abilities:read` (הקיים בכל טוקן אישי), ויכולת חשופה.
-הלשונית Abilities במסוף מציגה את תחום ההרשאה שכל יכולת מובנית דורשת.
+הלשונית Abilities במסוף מציגה את תחום ההרשאה הראשי שכל יכולת מובנית דורשת.
 
-- `cacti-list-devices` מחזירה דפים של עד 100 התקנים (ברירת מחדל 50) וכן
-  `nextPageToken`. טוקן דף תקף רק עבור אותם `filter` ו-`orderBy`.
-  `filter` הוא ביטוי AIP-160 של השוואות המחוברות ב-`AND`,
-  לדוגמה `state = "DOWN" AND disabled = false`. שדות הסינון הם
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId` ו-`state`. `orderBy` מקבל `displayName`, `hostname` או `name`,
-  וניתן להוסיף אחרי כל אחד מהם `desc`.
-- שאילתות התקנים עוברות דרך `get_allowed_devices()` של Cacti, כך שמשתמש רואה רק
-  את ההתקנים ש-Cacti הייתה מציגה לו.
-- שדות ההתקנים אינם כוללים מחרוזות קהילה של SNMP, סיסמאות ופרטי אימות אחרים.
+כל שש יכולות `cacti-list-*` מחזירות דפים של עד 100 פריטים (ברירת מחדל 50)
+וכן `nextPageToken`. טוקן דף תקף רק עבור אותם `filter` ו-`orderBy`.
+`filter` הוא ביטוי AIP-160 של השוואות (`=`, `!=`, `<`, `<=`, `>`, `>=`) המחוברות
+ב-`AND`, לדוגמה `state = "DOWN" AND disabled = false`. `orderBy` מקבל רשימה
+מופרדת בפסיקים של שדות הניתנים למיון, כשלאחר כל אחד מהם ניתן לציין אופציונלית
+`asc` או `desc`.
+
+| יכולת | שדות סינון | שדות מיון |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+תיחום הרשאות והחרגת סודות:
+
+- `cacti-list-devices` ו-`cacti-get-device` מבצעות שאילתות דרך `get_allowed_devices()`
+  של Cacti ומחריגות מחרוזות קהילה של SNMP, סיסמאות ופרטי אימות אחרים.
+- `cacti-list-trees` מבצעת שאילתה דרך `get_allowed_trees()` (ומסננת באמצעות
+  `is_tree_allowed()` כאשר זמינה); `cacti-list-graphs` מבצעת שאילתה דרך
+  `get_allowed_graphs()` (ומסננת באמצעות `is_graph_allowed()` כאשר זמינה).
+- `cacti-list-data-sources` תוחמת שורות להתקנים המותרים של הפונה מתוך
+  `get_allowed_devices()` (ו-`is_device_allowed()` כאשר זמינה) ומחזירה מטא-נתונים
+  בלבד ללא שליחת שאילתה ל-`data_input_data` וללא חשיפת ערכי קלט סודיים.
+- `cacti-list-pollers` מחריגה פרטי גישה למסד נתונים (`dbpass`, `dbuser`) ועמודות
+  של מפתחות ותעודות TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` קוראת עד 1 MiB האחרונים של יומן Cacti המוגדר (תוך קטימת שורות
+  בודדות מעל 2048 בתים), מסננת לפי `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`,
+  `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`,
+  `SYSTEM`; ברירת מחדל `ALL`) ולפי `search` שאינו תלוי רישיות (עד 256 תווים),
+  ומחזירה `lines`, `count` ו-`truncated`. כל שורה מושחרת להסתרת טוקנים אישיים,
+  כותרות bearer/basic, סיסמאות, סודות, קהילות SNMP, מפתחות, `dbpass`, `dbsslkey`
+  ופרטי משתמש ב-URL לפני הרצת מסנני `severity` ו-`search`, כך ש-`search` לא יוכל
+  לשמש אורקל לחשיפת סודות. ההשחרה נכשלת באופן סגור (fail-closed) עם `[redacted]`,
+  ויומן שאינו ניתן לקריאה מחזיר `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## התקנה
 
@@ -364,7 +398,7 @@ curl -sS -H "Authorization: Bearer $CACTI_MCP_TOKEN" -H 'Content-Type: applicati
 
 | HTTP | ערכי `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (שולח גם `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -438,14 +472,23 @@ function acme_abilities_register(AbilitiesRegistrar $registrar) : void {
 
 ## פיתוח ובדיקות
 
-הבדיקות הן סקריפטים פשוטים של PHP שרצים ללא Cacti:
+חבילת הבדיקות כוללת סקריפטים פשוטים של PHP ב-`tests/`, בדיקות יחידה של PHPUnit
+ב-`tests/Unit/` וניתוח סטטי עם PHPStan (רמה 6), וכולם רצים ללא התקנת Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-מערכת ה-CI מבצעת בדיקת תחביר ל-PHP ומריצה את הסקריפטים ב-`tests/` (כל אחד מהם מופיע ב-`.github/workflows/ci.yml`) על גרסאות PHP 8.2 עד 8.5, ולאחר מכן בונה את ארכיון ההתקנה `mcp/` ואת סכום הביקורת שלו. בדיקות שנוגעות ב-Cacti משתמשות ב-fixtures בגבול הפונקציות המסייעות של Cacti; הן אינן בודקות התקנת Cacti מלאה.
+מערכת ה-CI רצה על גרסאות PHP 8.2 עד 8.5: משימת `test` המבצעת בדיקת תחביר ל-PHP (`php -l`)
+ומריצה את 13 סקריפטי הבדיקה הפשוטים של PHP המפורטים ב-`.github/workflows/ci.yml`,
+משימת `quality` המריצה את `composer phpstan` ואת `composer test`, ומשימת `package`
+הבונה את ארכיון ההתקנה `mcp/` (למעט קובצי פיתוח ובדיקה המפורטים ב-`.gitattributes`)
+ואת קובץ `SHA256SUMS` שלו. בדיקות שנוגעות ב-Cacti משתמשות ב-fixtures בגבול
+הפונקציות המסייעות של Cacti; הן אינן בודקות התקנת Cacti מלאה.
 
 ### בדיקות אינטגרציה
 

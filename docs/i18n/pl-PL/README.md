@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](../sw-KE/README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -32,7 +32,7 @@ Autorzy wtyczek mogą rejestrować własne zdolności tylko do odczytu za pomoc�
 
 Obecnie dostępne funkcje:
 
-- Wbudowane zdolności tylko do odczytu do pobierania wersji systemu oraz spisu urządzeń.
+- Dziewięć wbudowanych zdolności tylko do odczytu obejmujących wersje systemu, urządzenia, lokalizacje (sites), pollery, drzewa wykresów, wykresy, źródła danych oraz ograniczony, zredagowany końcowy fragment dziennika Cacti.
 - Osobiste tokeny dostępu (`cmcp_pat_...`) jako jedyny mechanizm uwierzytelniania.
 - Konsola Management > MCP: udostępnianie i ukrywanie zdolności, tworzenie oraz unieważnianie tokenów, przeglądanie dziennika audytu.
 - Management > My MCP Tokens: zarządzanie własnymi tokenami przez użytkowników, podgląd aktywności oraz lista narzędzi dostępnych dla ich tokenów.
@@ -47,17 +47,38 @@ Projekt architektury znajduje się w [specyfikacji punktu końcowego](../../supe
 
 ## Wbudowane zdolności
 
-| ID | Argumenty | Wymagane uprawnienie Cacti (realm) |
+| ID | Kategoria | Argumenty | Wymagane uprawnienie Cacti (realm) |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | brak | 15 |
+| `cacti-list-devices` | `inventory` | opcjonalnie `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | wymagany `name`, np. `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | opcjonalnie `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | opcjonalnie `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | opcjonalnie `pageSize`, `pageToken`, `filter`, `orderBy` | 7 lub 4 |
+| `cacti-list-graphs` | `inventory` | opcjonalnie `pageSize`, `pageToken`, `filter`, `orderBy` | 7 lub 5 |
+| `cacti-list-data-sources` | `inventory` | opcjonalnie `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | opcjonalnie `lines` (od 1 do 200, domyślnie 50), `severity`, `search` | 19 lub 18 |
+
+Każde wywołanie wymaga również posiadania przez właściciela tokenu uprawnienia **MCP and Abilities API**, zakresu `abilities:read` (każdy token osobisty go zawiera) oraz udostępnienia danej zdolności. Karta Abilities w konsoli pokazuje główne uprawnienie (realm) wymagane przez każdą wbudowaną zdolność.
+
+Wszystkie sześć zdolności `cacti-list-*` zwraca strony zawierające maksymalnie 100 elementów (domyślnie 50) oraz `nextPageToken`. Token strony zachowuje ważność wyłącznie dla tych samych wartości `filter` i `orderBy`. Parametr `filter` to wyrażenie AIP-160 złożone z porównań (`=`, `!=`, `<`, `<=`, `>`, `>=`) połączonych operatorem `AND`, na przykład `state = "DOWN" AND disabled = false`. Parametr `orderBy` przyjmuje rozdzieloną przecinkami listę pól sortowania, z opcjonalnym sufiksem `asc` lub `desc` po każdym z nich.
+
+| Zdolność | Pola filtrowania | Pola sortowania |
 | --- | --- | --- |
-| `cacti-get-system-info` | brak | 15 |
-| `cacti-list-devices` | opcjonalnie `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | wymagany `name`, np. `devices/12` | 3 |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
 
-Każde wywołanie wymaga również posiadania przez właściciela tokenu uprawnienia **MCP and Abilities API**, zakresu `abilities:read` (każdy token osobisty go zawiera) oraz udostępnienia danej zdolności. Karta Abilities w konsoli pokazuje uprawnienie (realm) wymagane przez każdą wbudowaną zdolność.
+Zakres uprawnień i wykluczanie danych poufnych:
 
-- `cacti-list-devices` zwraca strony zawierające maksymalnie 100 urządzeń (domyślnie 50) oraz `nextPageToken`. Token strony zachowuje ważność wyłącznie dla tych samych wartości `filter` i `orderBy`. Parametr `filter` to wyrażenie AIP-160 złożone z porównań połączonych operatorem `AND`, na przykład `state = "DOWN" AND disabled = false`. Dostępne pola filtrowania to `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId` oraz `state`. Parametr `orderBy` przyjmuje wartości `displayName`, `hostname` lub `name`, z opcjonalnym sufiksem `desc`.
-- Zapytania o urządzenia przechodzą przez funkcję `get_allowed_devices()` w Cacti, dzięki czemu użytkownik widzi wyłącznie te urządzenia, które Cacti normalnie by mu wyświetliło.
-- Pola urządzeń nie zawierają ciągów społeczności SNMP (community strings), haseł ani innych danych uwierzytelniających.
+- `cacti-list-devices` oraz `cacti-get-device` wykonują zapytania przez funkcję Cacti `get_allowed_devices()` i wykluczają ciągi społeczności SNMP (community strings), hasła oraz inne dane uwierzytelniające.
+- `cacti-list-trees` wykonuje zapytania przez `get_allowed_trees()` (i filtruje funkcją `is_tree_allowed()`, gdy jest dostępna); `cacti-list-graphs` wykonuje zapytania przez `get_allowed_graphs()` (i filtruje funkcją `is_graph_allowed()`, gdy jest dostępna).
+- `cacti-list-data-sources` ogranicza wiersze do urządzeń dozwolonych dla wywołującego z funkcji `get_allowed_devices()` (oraz `is_device_allowed()`, gdy jest dostępna) i zwraca wyłącznie metadane bez odpytywania tabeli `data_input_data` ani ujawniania poufnych wartości wejściowych.
+- `cacti-list-pollers` wyklucza dane uwierzytelniające bazy danych (`dbpass`, `dbuser`) oraz kolumny kluczy i certyfikatów TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` odczytuje maksymalnie ostatni 1 MiB skonfigurowanego dziennika Cacti (przycinając pojedyncze linie powyżej 2048 bajtów), filtruje według `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; domyślnie `ALL`) oraz niewrażliwego na wielkość liter parametru `search` (do 256 znaków), zwracając `lines`, `count` oraz `truncated`. Każda linia przed uruchomieniem filtrów `severity` i `search` jest redagowana w celu usunięcia tokenów osobistych, nagłówków bearer/basic, haseł, sekretów, ciągów społeczności SNMP, kluczy, `dbpass`, `dbsslkey` oraz danych użytkownika z adresów URL, aby `search` nie mogło służyć jako wyrocznia sekretów. Redakcja działa w trybie bezpiecznym (fail-closed) z użyciem `[redacted]`, a nieczytelny dziennik zwraca `FAILED_PRECONDITION` (`LOG_UNAVAILABLE`).
 
 ## Instalacja
 
@@ -272,7 +293,7 @@ Błędy są zgodne ze standardem AIP-193: obiekt `error` z polami `code`, `messa
 
 | HTTP | Wartości `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (wysyła również `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -393,18 +414,17 @@ stosuj politykę retencji audytu poza samą wtyczką.
 
 ## Rozwój i testy
 
-Testy to zwykłe skrypty PHP działające bez Cacti:
+Zestaw testów obejmuje zwykłe skrypty PHP w `tests/`, testy jednostkowe PHPUnit w `tests/Unit/` oraz statyczną analizę PHPStan (poziom 6), a wszystko działa bez instalacji Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI przeprowadza lintowanie kodu PHP i uruchamia skrypty w katalogu `tests/` (każdy
-jest wymieniony w `.github/workflows/ci.yml`) w wersjach PHP od 8.2 do 8.5, a
-następnie buduje instalowalne archiwum `mcp/` oraz jego sumę kontrolną. Testy
-dotykające Cacti wykorzystują fikstury na granicy funkcji pomocniczych Cacti; nie
-testują pełnej instalacji Cacti.
+CI działa na wersjach PHP od 8.2 do 8.5: zadanie `test` sprawdza składnię PHP (`php -l`) i uruchamia 13 zwykłych skryptów testowych PHP wymienionych w `.github/workflows/ci.yml`, zadanie `quality` uruchamia `composer phpstan` oraz `composer test`, a zadanie `package` buduje instalowalne archiwum `mcp/` (z pominięciem plików deweloperskich i testowych wymienionych w `.gitattributes`) oraz jego plik `SHA256SUMS`. Testy dotykające Cacti wykorzystują fikstury na granicy funkcji pomocniczych Cacti; nie testują pełnej instalacji Cacti.
 
 ### Testy integracyjne
 

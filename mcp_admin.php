@@ -12,21 +12,44 @@ require_once __DIR__ . '/lib/providers.php';
 require_once __DIR__ . '/lib/admin.php';
 require_once __DIR__ . '/lib/origin.php';
 
-/** Cacti-relative URL of this page, for forms, links, and redirects. */
+/**
+ * Cacti-relative URL of this page, for forms, links, and redirects.
+ *
+ * @param string $query Optional query string suffix starting with '?'.
+ * @return string Relative console URL.
+ */
 function mcp_admin_url(string $query = '') : string {
 	global $config;
 
 	return $config['url_path'] . 'plugins/mcp/mcp_admin.php' . $query;
 }
 
+/**
+ * Queue a Cacti error banner message for the MCP console.
+ *
+ * @param string $text Localized error text.
+ * @return void
+ */
 function mcp_admin_error(string $text) : void {
 	raise_message('mcp_error', $text, MESSAGE_LEVEL_ERROR);
 }
 
+/**
+ * Queue a Cacti info banner message for the MCP console.
+ *
+ * @param string $text Localized informational text.
+ * @return void
+ */
 function mcp_admin_info(string $text) : void {
 	raise_message('mcp_info', $text, MESSAGE_LEVEL_INFO);
 }
 
+/**
+ * Render the administration tab bar for Abilities, Tokens, and Audit.
+ *
+ * @param string $current Active tab slug.
+ * @return void
+ */
 function mcp_admin_tabs(string $current) : void {
 	$labels = ['abilities' => __('Abilities', 'mcp'), 'tokens' => __('Tokens', 'mcp'), 'audit' => __('Audit', 'mcp')];
 
@@ -38,30 +61,56 @@ function mcp_admin_tabs(string $current) : void {
 	print '</ul></nav></div>';
 }
 
+/**
+ * Render an inline warning notice box on the administration page.
+ *
+ * @param string $text Localized notice text.
+ * @return void
+ */
 function mcp_admin_notice(string $text) : void {
 	html_start_box('', '100%', '', '3', 'center', '');
 	print "<tr class='odd'><td><span class='deviceDown'>" . html_escape($text) . '</span></td></tr>';
 	html_end_box();
 }
 
+/**
+ * Format a Unix timestamp for display in admin tables.
+ *
+ * @param mixed $value Unix timestamp or empty/zero value.
+ * @return string Formatted date string or '-'.
+ */
 function mcp_admin_time(mixed $value) : string {
 	return (int) $value > 0 ? date('Y-m-d H:i:s', (int) $value) : '-';
 }
 
-/** Rows per page from Cacti's setting or the filter, kept within what the storage helpers accept. */
+/**
+ * Rows per page from Cacti's setting or the filter, kept within what the storage helpers accept.
+ *
+ * @return int Bounded row count per page.
+ */
 function mcp_admin_rows() : int {
 	$rows = get_request_var('rows') == '-1' ? (int) read_config_option('num_rows_table') : (int) get_request_var('rows');
 
 	return $rows >= 1 && $rows <= 500 ? $rows : 30;
 }
 
+/**
+ * Return Cacti's realm ID to display-name map.
+ *
+ * @return array<int, string>
+ */
 function mcp_admin_realm_names() : array {
 	global $user_auth_realms;
 
 	return is_array($user_auth_realms) ? $user_auth_realms : [];
 }
 
-/** Resolve the abilities and apply a bulk expose or hide. Returns whether anything was saved. */
+/**
+ * Resolve the abilities and apply a bulk expose or hide. Returns whether anything was saved.
+ *
+ * @param array{action: string, ids: list<string>|list<int>} $parsed Parsed bulk action payload.
+ * @return bool True when exposure settings were saved.
+ */
 function mcp_admin_apply_exposure(array $parsed) : bool {
 	$registered = array_column(mcp_registry()->all(), 'id');
 	$ids        = array_values(array_intersect($parsed['ids'], $registered));
@@ -87,7 +136,13 @@ function mcp_admin_apply_exposure(array $parsed) : bool {
 	return true;
 }
 
-/** Confirmation step for a bulk action, in Cacti's form_actions layout. */
+/**
+ * Confirmation step for a bulk action, in Cacti's form_actions layout.
+ *
+ * @param array{action: string, ids: list<string>|list<int>} $parsed Parsed bulk action payload.
+ * @param string                                             $tab    Active console tab slug.
+ * @return void
+ */
 function mcp_admin_confirm(array $parsed, string $tab) : void {
 	top_header();
 
@@ -122,16 +177,29 @@ function mcp_admin_confirm(array $parsed, string $tab) : void {
 	bottom_footer();
 }
 
+/**
+ * Return the signed-in admin user ID from the active Cacti session.
+ *
+ * @return int User ID or 0 when unauthenticated.
+ */
 function mcp_admin_actor() : int {
 	return (int) ($_SESSION['sess_user_id'] ?? 0);
 }
 
-/** Cacti's Users/Groups realm (user_admin.php, realm 1 on 1.2.31). */
+/**
+ * Cacti's Users/Groups realm (user_admin.php, realm 1 on 1.2.31).
+ *
+ * @return bool True when the signed-in admin holds realm 1.
+ */
 function mcp_admin_has_user_admin() : bool {
 	return is_realm_allowed(1);
 }
 
-/** Create a token from the posted form. Returns the token once, or null with a message raised. */
+/**
+ * Create a token from the posted form. Returns the token once, or null with a message raised.
+ *
+ * @return ?string Newly created token string or null on validation/storage error.
+ */
 function mcp_admin_create_token() : ?string {
 	$userId = get_filter_request_var('user_id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 	$days   = get_filter_request_var('days', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 365]]);
@@ -181,6 +249,11 @@ function mcp_admin_create_token() : ?string {
 	}
 }
 
+/**
+ * Render the Abilities administration tab.
+ *
+ * @return void
+ */
 function mcp_admin_abilities_tab() : void {
 	$rows  = mcp_admin_ability_rows(mcp_registry()->all(), mcp_exposure_map(true),
 		fn (array $ability) => mcp_admin_realm_name($ability, mcp_admin_realm_names()));
@@ -226,6 +299,12 @@ function mcp_admin_abilities_tab() : void {
 	print '</form>';
 }
 
+/**
+ * Build Cacti request-filter definitions for pagination plus extra filters.
+ *
+ * @param array<string, mixed> $extra Additional filter specifications.
+ * @return array<string, mixed> Combined filter definitions.
+ */
 function mcp_admin_paging_filters(array $extra = []) : array {
 	return [
 		'rows' => ['filter' => FILTER_VALIDATE_INT, 'pageset' => true, 'default' => '-1'],
@@ -233,6 +312,12 @@ function mcp_admin_paging_filters(array $extra = []) : array {
 	] + $extra;
 }
 
+/**
+ * Render the Tokens administration tab and token creation form.
+ *
+ * @param ?string $newToken Newly created token to display once, or null.
+ * @return void
+ */
 function mcp_admin_tokens_tab(?string $newToken) : void {
 	validate_store_request_vars(mcp_admin_paging_filters(), 'sess_mcp_tokens');
 	$rows = mcp_admin_rows();
@@ -326,6 +411,11 @@ function mcp_admin_tokens_tab(?string $newToken) : void {
 	html_end_box();
 }
 
+/**
+ * Render the Audit administration tab with filter controls and log table.
+ *
+ * @return void
+ */
 function mcp_admin_audit_tab() : void {
 	$filters = mcp_admin_paging_filters([
 		'user_id' => ['filter' => FILTER_VALIDATE_INT, 'options' => ['options' => ['min_range' => -1]], 'pageset' => true, 'default' => '-1'],

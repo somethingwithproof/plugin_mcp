@@ -11,3 +11,9 @@ build/
 # Integration test checkouts and run output
 tests/integration/out/
 tests/integration/src/
+
+# Composer and PHPUnit artifacts
+/vendor/
+/coverage/
+/.phpunit.cache/
+/.phpunit.result.cache

@@ -1,4 +1,4 @@
-<!-- Source: README.md; SHA256: c12fa4c7d7a3caad21297cb19693610b9639b219c8cac8ef7c53f8a62f5f5a7c -->
+<!-- Source: README.md; SHA256: a0711b045d0578dd0c89eaf784f90b80493821faa5ae168442580bacbce74154 -->
 
 <!-- translations:start -->
 [English](../../../README.md) | [Afrikaans](../af-ZA/README.md) | [አማርኛ](../am-ET/README.md) | [العربية (مصر)](../ar-EG/README.md) | [العربية (المغرب)](../ar-MA/README.md) | [العربية (السعودية)](../ar-SA/README.md) | [বাংলা](../bn-BD/README.md) | [Bosanski](../bs-BA/README.md) | [Deutsch](../de-DE/README.md) | [Español (España)](../es-ES/README.md) | [فارسی](../fa-IR/README.md) | [Filipino](../fil-PH/README.md) | [Français](../fr-FR/README.md) | [Français (Maroc)](../fr-MA/README.md) | [Français (Sénégal)](../fr-SN/README.md) | [Hausa](../ha-NG/README.md) | [עברית](../he-IL/README.md) | [हिन्दी](../hi-IN/README.md) | [Hrvatski](../hr-HR/README.md) | [Bahasa Indonesia](../id-ID/README.md) | [Igbo](../ig-NG/README.md) | [Italiano](../it-IT/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Malagasy](../mg-MG/README.md) | [मराठी](../mr-IN/README.md) | [Bahasa Melayu](../ms-MY/README.md) | [Nederlands](../nl-NL/README.md) | [Polski](../pl-PL/README.md) | [Português (Brasil)](../pt-BR/README.md) | [Русский](../ru-RU/README.md) | [Kinyarwanda](../rw-RW/README.md) | [Soomaali](../so-SO/README.md) | [Српски](../sr-RS/README.md) | [Svenska](../sv-SE/README.md) | [Kiswahili](README.md) | [தமிழ்](../ta-IN/README.md) | [తెలుగు](../te-IN/README.md) | [ไทย](../th-TH/README.md) | [Türkçe](../tr-TR/README.md) | [Українська](../uk-UA/README.md) | [اردو](../ur-PK/README.md) | [Tiếng Việt](../vi-VN/README.md) | [isiXhosa](../xh-ZA/README.md) | [Yorùbá](../yo-NG/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-TW/README.md) | [isiZulu](../zu-ZA/README.md)
@@ -39,7 +39,9 @@ msimbo wowote wa itifaki.
 
 Yanayopatikana leo:
 
-- Uwezo uliojengewa ndani wa kusoma tu kwa matoleo ya mfumo na orodha ya vifaa.
+- Uwezo tisa uliojengewa ndani wa kusoma tu unaofunika matoleo ya mfumo, vifaa,
+  maeneo (sites), pollers, miti ya grafu, grafu, vyanzo vya data, na sehemu ya
+  mwisho yenye mipaka na iliyoondolewa siri ya kumbukumbu ya Cacti.
 - Tokeni za ufikiaji za kibinafsi (`cmcp_pat_...`) kama kitambulisho pekee.
 - Konsoli ya Management > MCP: fichua au ficha uwezo, unda na ubatilishe
   tokeni, soma kumbukumbu ya ukaguzi.
@@ -61,27 +63,65 @@ na mfuatano wa ujenzi umo katika [docs/plan.md](../../plan.md).
 
 ## Uwezo uliojengewa ndani
 
-| Kitambulisho (ID) | Hoja (Arguments) | Eneo la Cacti linalohitajika |
-| --- | --- | --- |
-| `cacti-get-system-info` | hakuna | 15 |
-| `cacti-list-devices` | za hiari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
-| `cacti-get-device` | ya lazima `name`, kama vile `devices/12` | 3 |
+| Kitambulisho (ID) | Kategoria | Hoja (Arguments) | Eneo la Cacti linalohitajika |
+| --- | --- | --- | --- |
+| `cacti-get-system-info` | `system` | hakuna | 15 |
+| `cacti-list-devices` | `inventory` | za hiari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-device` | `inventory` | ya lazima `name`, kama vile `devices/12` | 3 |
+| `cacti-list-sites` | `inventory` | za hiari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-list-pollers` | `system` | za hiari `pageSize`, `pageToken`, `filter`, `orderBy` | 15 |
+| `cacti-list-trees` | `inventory` | za hiari `pageSize`, `pageToken`, `filter`, `orderBy` | 7 au 4 |
+| `cacti-list-graphs` | `inventory` | za hiari `pageSize`, `pageToken`, `filter`, `orderBy` | 7 au 5 |
+| `cacti-list-data-sources` | `inventory` | za hiari `pageSize`, `pageToken`, `filter`, `orderBy` | 3 |
+| `cacti-get-clog` | `system` | za hiari `lines` (1 hadi 200, chaguo-msingi 50), `severity`, `search` | 19 au 18 |
 
 Kila mwito pia unahitaji eneo la **MCP and Abilities API** kwa mmiliki wa tokeni,
 wigo wa `abilities:read` (kila tokeni ya kibinafsi inao), na uwezo
-uliofichuliwa. Kichupo cha Abilities cha konsoli kinaonyesha eneo ambalo kila uwezo uliojengewa ndani linahitaji.
+uliofichuliwa. Kichupo cha Abilities cha konsoli kinaonyesha eneo kuu ambalo kila uwezo uliojengewa ndani linahitaji.
 
-- `cacti-list-devices` hurejesha kurasa za hadi vifaa 100 (chaguo-msingi 50) na
-  `nextPageToken`. Tokeni ya ukurasa ni halali tu kwa `filter` na
-  `orderBy` zilezile. `filter` ni usemi wa AIP-160 wa ulinganisho uliounganishwa na `AND`,
-  kwa mfano `state = "DOWN" AND disabled = false`. Sehemu za kichujio ni
-  `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`,
-  `externalId`, na `state`. `orderBy` huchukua `displayName`, `hostname`, au `name`,
-  kila moja ikifuatiwa kwa hiari na `desc`.
-- Maswali ya vifaa hupitia `get_allowed_devices()` ya Cacti, hivyo mtumiaji huona tu
-  vifaa ambavyo Cacti ingemwonyesha.
-- Sehemu za kifaa hazijumuishi misururu ya jamii ya SNMP, kaulisiri, na vitambulisho
-  vingine.
+Uwezo wote sita wa `cacti-list-*` hurejesha kurasa za hadi vipengee 100
+(chaguo-msingi 50) na `nextPageToken`. Tokeni ya ukurasa ni halali tu kwa
+`filter` na `orderBy` zilezile. `filter` ni usemi wa AIP-160 wa ulinganisho (`=`,
+`!=`, `<`, `<=`, `>`, `>=`) uliounganishwa na `AND`, kwa mfano
+`state = "DOWN" AND disabled = false`. `orderBy` hukubali orodha iliyotenganishwa
+kwa koma ya sehemu zinazoweza kupangwa, kila moja ikifuatiwa kwa hiari na `asc`
+au `desc`.
+
+| Uwezo | Sehemu za kichujio | Sehemu za mpangilio |
+| --- | --- | --- |
+| `cacti-list-devices` | `displayName`, `hostname`, `disabled`, `site`, `poller`, `deviceTemplate`, `externalId`, `state` (`UNKNOWN`, `DOWN`, `RECOVERING`, `UP`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-sites` | `displayName`, `city`, `state`, `country`, `timezone`, `alternateId` | `displayName`, `city`, `state`, `country`, `name` |
+| `cacti-list-pollers` | `displayName`, `hostname`, `disabled`, `state` (`NEW`, `RUNNING`, `IDLE`, `UNKNOWN`, `DISABLED`, `RECOVERING`, `ERROR`) | `displayName`, `hostname`, `name` |
+| `cacti-list-trees` | `displayName`, `enabled` | `displayName`, `name` |
+| `cacti-list-graphs` | `title`, `device`, `graphTemplate`, `templateName` | `title`, `templateName`, `name` |
+| `cacti-list-data-sources` | `displayName`, `device`, `dataTemplate`, `active` | `displayName`, `name` |
+
+Mipaka ya ruhusa na uondoaji wa siri:
+
+- `cacti-list-devices` na `cacti-get-device` huuliza kupitia
+  `get_allowed_devices()` ya Cacti na hazijumuishi misururu ya jamii ya SNMP,
+  kaulisiri, na vitambulisho vingine.
+- `cacti-list-trees` huuliza kupitia `get_allowed_trees()` (na huchuja kwa
+  `is_tree_allowed()` inapopatikana); `cacti-list-graphs` huuliza kupitia
+  `get_allowed_graphs()` (na huchuja kwa `is_graph_allowed()` inapopatikana).
+- `cacti-list-data-sources` huweka mipaka ya safu mlalo kwa vifaa vinavyoruhusiwa
+  vya mpigaji kutoka `get_allowed_devices()` (na `is_device_allowed()`
+  inapopatikana) na hurejesha metadata pekee bila kuuliza `data_input_data` au
+  kufichua thamani za siri za kuingiza.
+- `cacti-list-pollers` huondoa vitambulisho vya hifadhidata (`dbpass`, `dbuser`)
+  na safu wima za funguo na vyeti vya TLS (`dbsslkey`, `dbsslcert`, `dbsslca`).
+- `cacti-get-clog` husoma hadi MiB 1 ya mwisho ya kumbukumbu ya Cacti
+  iliyosanidiwa (ikikata mistari binafsi inayozidi baiti 2048), huchuja kwa
+  `severity` (`ALL`, `DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`,
+  `ALERT`, `EMERGENCY`, `FATAL`, `STATS`, `POLLER`, `SYSTEM`; chaguo-msingi
+  `ALL`) na `search` isiyojali herufi kubwa au ndogo (hadi vibambo 256), na
+  hurejesha `lines`, `count`, na `truncated`. Kila mstari huondolewa tokeni za
+  kibinafsi, vichwa vya bearer/basic, nywila, siri, jamii za SNMP, funguo,
+  `dbpass`, `dbsslkey`, na taarifa za mtumiaji za URL kabla ya vichujio vya
+  `severity` na `search` kuendeshwa ili `search` isiweze kufanya kazi kama njia
+  ya kugundua siri. Uondoaji wa siri ukishindwa hufunga kwa usalama kwa
+  `[redacted]`, na kumbukumbu isiyosomeka hurejesha `FAILED_PRECONDITION`
+  (`LOG_UNAVAILABLE`).
 
 ## Sakinisha
 
@@ -373,7 +413,7 @@ Makosa hufuata AIP-193: kipengee cha `error` chenye `code`, `message`, `status`,
 
 | HTTP | Thamani za `reason` |
 | --- | --- |
-| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN` |
+| 400 | `INVALID_ARGUMENTS`, `INVALID_FILTER`, `INVALID_PAGE_TOKEN`, `LOG_UNAVAILABLE` |
 | 401 | `INVALID_TOKEN` (also sends `WWW-Authenticate: Bearer`) |
 | 403 | `REALM_REQUIRED` |
 | 404 | `ABILITY_NOT_FOUND`, `DEVICE_NOT_FOUND`, `UNKNOWN_PATH` |
@@ -493,18 +533,26 @@ Cacti na utumie sera ya uhifadhi wa ukaguzi nje ya programu-jalizi.
 
 ## Uundaji na majaribio
 
-Majaribio ni hati za kawaida za PHP zinazoendeshwa bila Cacti:
+Kundi la majaribio linajumuisha hati za kawaida za PHP katika `tests/` pamoja na
+majaribio ya kitengo ya PHPUnit katika `tests/Unit/` na uchambuzi tuli wa PHPStan
+(kiwango cha 6), vyote vikiendeshwa bila usakinishaji wa Cacti:
 
 ```console
 for t in tests/*.php; do php "$t" || break; done
+composer install
+composer phpstan
+composer test
 git archive --format=tar.gz --prefix=mcp/ HEAD > mcp.tar.gz
 ```
 
-CI hukagua sintaksia ya PHP na huendesha hati katika `tests/` (kila moja
-imeorodheshwa katika `.github/workflows/ci.yml`) kwenye PHP 8.2 hadi 8.5, kisha
-hujenga kumbukumbu ya `mcp/` inayoweza kusakinishwa na hundi yake ya ukaguzi
-(checksum). Majaribio yanayogusa Cacti hutumia vifaa vya majaribio (fixtures)
-kwenye mpaka wa visaidizi vya Cacti; hayajaribu usakinishaji kamili wa Cacti.
+CI inaendeshwa kwenye PHP 8.2 hadi 8.5: kazi ya `test` inayokagua sintaksia ya
+PHP (`php -l`) na kuendesha hati 13 za kawaida za majaribio za PHP
+zilizoorodheshwa katika `.github/workflows/ci.yml`, kazi ya `quality`
+inayoendesha `composer phpstan` na `composer test`, na kazi ya `package`
+inayounda kumbukumbu ya `mcp/` inayoweza kusakinishwa (ikiondoa faili za uundaji
+na majaribio zilizoorodheshwa katika `.gitattributes`) na `SHA256SUMS` yake.
+Majaribio yanayogusa Cacti hutumia vifaa vya majaribio (fixtures) kwenye mpaka wa
+visaidizi vya Cacti; hayajaribu usakinishaji kamili wa Cacti.
 
 ### Majaribio ya ujumuishaji
 
