@@ -1,0 +1,430 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Portuguese (Portugal) <https://translate.cacti.net/projects/cacti/core/pt_PT/>\n"
+"Language: pt-PT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "%d token foi revogado."
+msgstr[1] "%d tokens foram revogados."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(utilizador eliminado)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "Capacidades"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "Capacidade"
+
+#: setup.php
+msgid "Actions"
+msgstr "Ações"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "Ativo"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "Atividade"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "Todos"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "Anotações"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "Qualquer"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "Auditoria"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "Registos de auditoria"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "Ferramentas disponíveis"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "Categoria"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "Escolha um token para revogar."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "Escolha um utilizador e um prazo de validade de 1 a 365 dias."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "Escolha uma ação."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "Escolha um prazo de validade de 1 a 365 dias."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "Limpar"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "Clique em Continuar para expor estas capacidades a clientes de AI. Os utilizadores continuam a precisar do domínio de permissões que cada capacidade requer."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "Clique em Continuar para ocultar estas capacidades dos clientes de AI."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "Clique em Continuar para revogar estes tokens. Os tokens revogados não podem voltar a ser utilizados."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "Continuar"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "Copie este token agora. Não voltará a ser apresentado."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "Criar"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "Criar token"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "Criado"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "Criado por"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "Descrição"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "Destrutiva"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "Registos"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "Expirado"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "Expira"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "Expira em dias"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "Expor"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "Expor capacidades"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "Exposta"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "Não foi possível ler as definições de exposição, pelo que todas as capacidades estão ocultas dos clientes de AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "Concluído"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "Ir"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "Ocultar"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "Ocultar capacidades"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "Idempotente"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "Última utilização"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "Administração MCP"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "A administração MCP só está disponível no poller principal."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP e API de capacidades"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "A instalação do MCP está incompleta"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "Os tokens MCP só estão disponíveis no poller principal."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "Os tokens MCP requerem um utilizador do Cacti com sessão iniciada."
+
+#: setup.php
+msgid "Management"
+msgstr "Gestão"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "A minha atividade"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "Os meus tokens MCP"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "Os meus tokens"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "Nome"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "Novo token"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "Não"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "Não existem capacidades disponíveis para si"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "Não existem capacidades registadas"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "Nenhuma atividade encontrada"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "Nenhum registo de auditoria encontrado"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "Nenhum token encontrado"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "Nenhuma das capacidades selecionadas está registada."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "Nenhum dos tokens selecionados está ativo."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "Resultado"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "Plugin"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "URL público do Cacti"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "Só de leitura"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "Domínio necessário"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "Revogar"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "Revogar tokens"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "Revogado"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "Selecione pelo menos um item."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "Definido pelo plugin"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "Defina o URL público do Cacti em Definições > MCP antes de ligar clientes de AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "Iniciado"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "Estado"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "Esse token não é um dos seus tokens ativos."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "O endereço que os clientes MCP utilizam para aceder a este servidor Cacti, por exemplo https://cacti.example.com/cacti. Obrigatório antes de o endpoint MCP responder."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "Não foi possível ler o registo de auditoria."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "Não foi possível listar as ferramentas disponíveis."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "Não foi possível guardar a alteração de exposição. Nada foi alterado."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "As definições de exposição foram guardadas."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "A seleção contém uma capacidade inválida. Nada foi alterado."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "Não foi possível criar o token."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "Não foi possível revogar o token."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "Não foi possível ler a lista de tokens."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "O token foi revogado."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "Não foi possível revogar os tokens."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "Os tokens foram revogados, mas não foi possível gravar o registo de auditoria."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "Estas são as capacidades só de leitura que um token seu pode utilizar atualmente. As suas permissões do Cacti e as definições de exposição do administrador determinam a lista."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "Este formulário já foi submetido."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "Token"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "Tokens"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "Não é possível criar tokens para a conta de convidado nem para utilizadores desativados."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "Utilizador"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "Sim"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "Não tem tokens"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "Sem a permissão Utilizadores/Grupos, só pode criar tokens para si próprio."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "Não foi possível ler a sua atividade."

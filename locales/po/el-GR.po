@@ -1,0 +1,430 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mcp 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/somethingwithproof/plugin_mcp/issues\n"
+"PO-Revision-Date: 2026-11-28 00:00+0000\n"
+"Last-Translator: Thomas Vincent <thomasvincent@gmail.com>\n"
+"Language-Team: Greek <https://translate.cacti.net/projects/cacti/core/el/>\n"
+"Language: el-GR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: mcp_admin.php
+#, php-format
+msgid "%d token was revoked."
+msgid_plural "%d tokens were revoked."
+msgstr[0] "Ανακλήθηκε %d διακριτικό."
+msgstr[1] "Ανακλήθηκαν %d διακριτικά."
+
+#: mcp_admin.php
+msgid "(deleted user)"
+msgstr "(διαγραμμένος χρήστης)"
+
+#: mcp_admin.php
+msgid "Abilities"
+msgstr "Δυνατότητες"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Ability"
+msgstr "Δυνατότητα"
+
+#: setup.php
+msgid "Actions"
+msgstr "Ενέργειες"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Active"
+msgstr "Ενεργό"
+
+#: mcp_tokens.php
+msgid "Activity"
+msgstr "Δραστηριότητα"
+
+#: mcp_admin.php
+msgid "All"
+msgstr "Όλα"
+
+#: mcp_admin.php
+msgid "Annotations"
+msgstr "Σημειώσεις"
+
+#: mcp_admin.php
+msgid "Any"
+msgstr "Οποιοδήποτε"
+
+#: mcp_admin.php
+msgid "Audit"
+msgstr "Έλεγχος"
+
+#: mcp_admin.php
+msgid "Audit Entries"
+msgstr "Καταχωρίσεις ελέγχου"
+
+#: mcp_tokens.php
+msgid "Available Tools"
+msgstr "Διαθέσιμα εργαλεία"
+
+#: mcp_admin.php
+msgid "Cancel"
+msgstr "Ακύρωση"
+
+#: mcp_admin.php
+msgid "Category"
+msgstr "Κατηγορία"
+
+#: mcp_tokens.php
+msgid "Choose a token to revoke."
+msgstr "Επιλέξτε ένα διακριτικό για ανάκληση."
+
+#: mcp_admin.php
+msgid "Choose a user and an expiry of 1 to 365 days."
+msgstr "Επιλέξτε έναν χρήστη και διάρκεια λήξης από 1 έως 365 ημέρες."
+
+#: mcp_admin.php
+msgid "Choose an action."
+msgstr "Επιλέξτε μια ενέργεια."
+
+#: mcp_tokens.php
+msgid "Choose an expiry of 1 to 365 days."
+msgstr "Επιλέξτε διάρκεια λήξης από 1 έως 365 ημέρες."
+
+#: mcp_admin.php
+msgid "Clear"
+msgstr "Εκκαθάριση"
+
+#: mcp_admin.php
+msgid "Click Continue to expose these abilities to AI clients. Users still need the realm each ability requires."
+msgstr "Κάντε κλικ στο «Συνέχεια» για να εκθέσετε αυτές τις δυνατότητες σε πελάτες AI. Οι χρήστες εξακολουθούν να χρειάζονται τον τομέα δικαιωμάτων που απαιτεί κάθε δυνατότητα."
+
+#: mcp_admin.php
+msgid "Click Continue to hide these abilities from AI clients."
+msgstr "Κάντε κλικ στο «Συνέχεια» για να αποκρύψετε αυτές τις δυνατότητες από τους πελάτες AI."
+
+#: mcp_admin.php
+msgid "Click Continue to revoke these tokens. Revoked tokens cannot be used again."
+msgstr "Κάντε κλικ στο «Συνέχεια» για να ανακαλέσετε αυτά τα διακριτικά. Τα ανακλημένα διακριτικά δεν μπορούν να χρησιμοποιηθούν ξανά."
+
+#: mcp_admin.php
+msgid "Continue"
+msgstr "Συνέχεια"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Copy this token now. It is not shown again."
+msgstr "Αντιγράψτε αυτό το διακριτικό τώρα. Δεν θα εμφανιστεί ξανά."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create"
+msgstr "Δημιουργία"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Create Token"
+msgstr "Δημιουργία διακριτικού"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Created"
+msgstr "Δημιουργήθηκε"
+
+#: mcp_admin.php
+msgid "Created By"
+msgstr "Δημιουργήθηκε από"
+
+#: mcp_tokens.php
+msgid "Description"
+msgstr "Περιγραφή"
+
+#: mcp_admin.php
+msgid "Destructive"
+msgstr "Καταστροφικό"
+
+#: mcp_tokens.php
+msgid "Entries"
+msgstr "Καταχωρίσεις"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expired"
+msgstr "Ληγμένο"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires"
+msgstr "Λήγει"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Expires in days"
+msgstr "Λήγει σε ημέρες"
+
+#: mcp_admin.php
+msgid "Expose"
+msgstr "Έκθεση"
+
+#: mcp_admin.php
+msgid "Expose Abilities"
+msgstr "Έκθεση δυνατοτήτων"
+
+#: mcp_admin.php
+msgid "Exposed"
+msgstr "Εκτεθειμένο"
+
+#: mcp_admin.php
+msgid "Exposure settings could not be read, so every ability is hidden from AI clients."
+msgstr "Δεν ήταν δυνατή η ανάγνωση των ρυθμίσεων έκθεσης, επομένως κάθε δυνατότητα παραμένει κρυφή από τους πελάτες AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Finished"
+msgstr "Ολοκληρώθηκε"
+
+#: mcp_admin.php
+msgid "Go"
+msgstr "Μετάβαση"
+
+#: mcp_admin.php
+msgid "Hide"
+msgstr "Απόκρυψη"
+
+#: mcp_admin.php
+msgid "Hide Abilities"
+msgstr "Απόκρυψη δυνατοτήτων"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "ID"
+msgstr "ID"
+
+#: mcp_admin.php
+msgid "Idempotent"
+msgstr "Ταυτοδύναμο"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Last Used"
+msgstr "Τελευταία χρήση"
+
+#: setup.php
+msgid "MCP"
+msgstr "MCP"
+
+#: setup.php
+msgid "MCP Administration"
+msgstr "Διαχείριση MCP"
+
+#: mcp_admin.php
+msgid "MCP administration is available on the main poller only."
+msgstr "Η διαχείριση MCP είναι διαθέσιμη μόνο στον κύριο poller."
+
+#: setup.php
+msgid "MCP and Abilities API"
+msgstr "MCP και API δυνατοτήτων"
+
+#: setup.php
+msgid "MCP installation is incomplete"
+msgstr "Η εγκατάσταση του MCP δεν έχει ολοκληρωθεί"
+
+#: mcp_tokens.php
+msgid "MCP tokens are available on the main poller only."
+msgstr "Τα διακριτικά MCP είναι διαθέσιμα μόνο στον κύριο poller."
+
+#: mcp_tokens.php
+msgid "MCP tokens need a signed-in Cacti user."
+msgstr "Τα διακριτικά MCP απαιτούν συνδεδεμένο χρήστη του Cacti."
+
+#: setup.php
+msgid "Management"
+msgstr "Διαχείριση"
+
+#: mcp_tokens.php
+msgid "My Activity"
+msgstr "Η δραστηριότητά μου"
+
+#: setup.php
+msgid "My MCP Tokens"
+msgstr "Τα δικά μου διακριτικά MCP"
+
+#: mcp_tokens.php
+msgid "My Tokens"
+msgstr "Τα διακριτικά μου"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Name"
+msgstr "Όνομα"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "New Token"
+msgstr "Νέο διακριτικό"
+
+#: mcp_admin.php
+msgid "No"
+msgstr "Όχι"
+
+#: mcp_tokens.php
+msgid "No abilities are available to you"
+msgstr "Δεν υπάρχουν διαθέσιμες δυνατότητες για εσάς"
+
+#: mcp_admin.php
+msgid "No abilities are registered"
+msgstr "Δεν έχουν καταχωριστεί δυνατότητες"
+
+#: mcp_tokens.php
+msgid "No activity found"
+msgstr "Δεν βρέθηκε δραστηριότητα"
+
+#: mcp_admin.php
+msgid "No audit entries found"
+msgstr "Δεν βρέθηκαν καταχωρίσεις ελέγχου"
+
+#: mcp_admin.php
+msgid "No tokens found"
+msgstr "Δεν βρέθηκαν διακριτικά"
+
+#: mcp_admin.php
+msgid "None of the selected abilities is registered."
+msgstr "Καμία από τις επιλεγμένες δυνατότητες δεν είναι καταχωρισμένη."
+
+#: mcp_admin.php
+msgid "None of the selected tokens are active."
+msgstr "Κανένα από τα επιλεγμένα διακριτικά δεν είναι ενεργό."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Outcome"
+msgstr "Αποτέλεσμα"
+
+#: mcp_admin.php
+msgid "Plugin"
+msgstr "Πρόσθετο"
+
+#: setup.php
+msgid "Public Cacti URL"
+msgstr "Δημόσιο URL του Cacti"
+
+#: mcp_admin.php
+msgid "Read-only"
+msgstr "Μόνο για ανάγνωση"
+
+#: mcp_admin.php
+msgid "Required Realm"
+msgstr "Απαιτούμενος τομέας"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoke"
+msgstr "Ανάκληση"
+
+#: mcp_admin.php
+msgid "Revoke Tokens"
+msgstr "Ανάκληση διακριτικών"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Revoked"
+msgstr "Ανακλημένο"
+
+#: mcp_admin.php
+msgid "Select at least one item."
+msgstr "Επιλέξτε τουλάχιστον ένα στοιχείο."
+
+#: mcp_admin.php
+msgid "Set by the plugin"
+msgstr "Ορίζεται από το πρόσθετο"
+
+#: mcp_admin.php
+msgid "Set the Public Cacti URL in Settings > MCP before connecting AI clients."
+msgstr "Ορίστε το Δημόσιο URL του Cacti στις Ρυθμίσεις > MCP πριν συνδέσετε πελάτες AI."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Started"
+msgstr "Έναρξη"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "State"
+msgstr "Κατάσταση"
+
+#: mcp_tokens.php
+msgid "That token is not one of your active tokens."
+msgstr "Αυτό το διακριτικό δεν ανήκει στα ενεργά σας διακριτικά."
+
+#: setup.php
+msgid "The address MCP clients use to reach this Cacti server, for example https://cacti.example.com/cacti. Required before the MCP endpoint answers."
+msgstr "Η διεύθυνση που χρησιμοποιούν οι πελάτες MCP για πρόσβαση σε αυτόν τον διακομιστή Cacti, για παράδειγμα https://cacti.example.com/cacti. Απαιτείται προτού απαντήσει το τελικό σημείο MCP."
+
+#: mcp_admin.php
+msgid "The audit log could not be read."
+msgstr "Δεν ήταν δυνατή η ανάγνωση του αρχείου καταγραφής ελέγχου."
+
+#: mcp_tokens.php
+msgid "The available tools could not be listed."
+msgstr "Δεν ήταν δυνατή η εμφάνιση της λίστας διαθέσιμων εργαλείων."
+
+#: mcp_admin.php
+msgid "The exposure change could not be saved. Nothing was changed."
+msgstr "Δεν ήταν δυνατή η αποθήκευση της αλλαγής έκθεσης. Δεν πραγματοποιήθηκε καμία αλλαγή."
+
+#: mcp_admin.php
+msgid "The exposure settings were saved."
+msgstr "Οι ρυθμίσεις έκθεσης αποθηκεύτηκαν."
+
+#: mcp_admin.php
+msgid "The selection contains an invalid ability. Nothing was changed."
+msgstr "Η επιλογή περιέχει μη έγκυρη δυνατότητα. Δεν πραγματοποιήθηκε καμία αλλαγή."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token could not be created."
+msgstr "Δεν ήταν δυνατή η δημιουργία του διακριτικού."
+
+#: mcp_tokens.php
+msgid "The token could not be revoked."
+msgstr "Δεν ήταν δυνατή η ανάκληση του διακριτικού."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The token list could not be read."
+msgstr "Δεν ήταν δυνατή η ανάγνωση της λίστας διακριτικών."
+
+#: mcp_tokens.php
+msgid "The token was revoked."
+msgstr "Το διακριτικό ανακλήθηκε."
+
+#: mcp_admin.php
+msgid "The tokens could not be revoked."
+msgstr "Δεν ήταν δυνατή η ανάκληση των διακριτικών."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "The tokens were revoked, but the audit entry could not be written."
+msgstr "Τα διακριτικά ανακλήθηκαν, αλλά δεν ήταν δυνατή η εγγραφή της καταχώρισης ελέγχου."
+
+#: mcp_tokens.php
+msgid "These are the read-only abilities a token of yours can use today. Your Cacti permissions and the administrator's exposure settings decide the list."
+msgstr "Αυτές είναι οι δυνατότητες μόνο για ανάγνωση που μπορεί να χρησιμοποιήσει ένα δικό σας διακριτικό αυτή τη στιγμή. Τα δικαιώματά σας στο Cacti και οι ρυθμίσεις έκθεσης του διαχειριστή καθορίζουν τη λίστα."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "This form was already submitted."
+msgstr "Αυτή η φόρμα έχει ήδη υποβληθεί."
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Token"
+msgstr "Διακριτικό"
+
+#: mcp_admin.php mcp_tokens.php
+msgid "Tokens"
+msgstr "Διακριτικά"
+
+#: lib/admin.php
+msgid "Tokens cannot be created for the guest account or disabled users."
+msgstr "Δεν είναι δυνατή η δημιουργία διακριτικών για τον λογαριασμό επισκέπτη ή για απενεργοποιημένους χρήστες."
+
+#: mcp_admin.php
+msgid "User"
+msgstr "Χρήστης"
+
+#: mcp_admin.php
+msgid "Yes"
+msgstr "Ναι"
+
+#: mcp_tokens.php
+msgid "You have no tokens"
+msgstr "Δεν έχετε διακριτικά"
+
+#: mcp_admin.php
+msgid "You may only create tokens for yourself without the Users/Groups permission."
+msgstr "Χωρίς το δικαίωμα «Χρήστες/Ομάδες» μπορείτε να δημιουργείτε διακριτικά μόνο για τον εαυτό σας."
+
+#: mcp_tokens.php
+msgid "Your activity could not be read."
+msgstr "Δεν ήταν δυνατή η ανάγνωση της δραστηριότητάς σας."
